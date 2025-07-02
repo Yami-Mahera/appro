@@ -225,18 +225,18 @@ class Commande(BaseModel):
     nom_fournisseur: str
     
     # Dates
-    date_commande: date
-    date_livraison_prevue: Optional[date] = None
-    date_livraison_reelle: Optional[date] = None
+    date_commande: str
+    date_livraison_prevue: Optional[str] = None
+    date_livraison_reelle: Optional[str] = None
     
     # État et suivi
-    etat: EtatCommande = EtatCommande.BROUILLON
+    etat: str = "brouillon"
     priorite: str = "normale"  # haute, normale, basse
     
     # Conditions commerciales
-    devise: Devise = Devise.EUR
+    devise: str = "EUR"
     incoterm: Optional[str] = None
-    mode_transport: Optional[ModeTransport] = None
+    mode_transport: Optional[str] = None
     
     # Montants
     montant_ht: float = 0.0
