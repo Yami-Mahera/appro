@@ -527,14 +527,14 @@ async def get_dashboard():
     })
     
     # Commandes en retard
-    today = date.today()
+    today_str = datetime.utcnow().strftime("%Y-%m-%d")
     nb_commandes_retard = await db.commandes.count_documents({
-        "date_livraison_prevue": {"$lt": today},
+        "date_livraison_prevue": {"$lt": today_str},
         "etat": {"$nin": ["livree", "facturee", "annulee"]}
     })
     
     # Montant des commandes du mois
-    debut_mois = date.today().replace(day=1)
+    debut_mois = datetime.utcnow().replace(day=1).strftime("%Y-%m-%d")
     pipeline_montant = [
         {"$match": {"date_commande": {"$gte": debut_mois}}},
         {"$group": {"_id": None, "total": {"$sum": "$montant_ttc"}}}
