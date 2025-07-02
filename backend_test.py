@@ -303,8 +303,8 @@ def test_commandes_api():
     
     # Test GET /commandes with filters
     response = make_request("get", "/commandes", params={"fournisseur_id": created_resources["fournisseur_id"]})
-    success = "error" not in response
-    log_test("commandes", "GET /commandes with filters", success, response.get("error"))
+    success = isinstance(response, list) or ("error" not in response)
+    log_test("commandes", "GET /commandes with filters", success, None if isinstance(response, list) else response.get("error"))
 
 def test_stocks_api():
     """Test the stocks API endpoints"""
