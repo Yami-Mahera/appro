@@ -343,13 +343,7 @@ test_plan:
     - "Système d'authentification JWT"
     - "APIs CRUD Fournisseurs"
     - "Dashboard avec graphiques"
-  stuck_tasks:
-    - "Architecture TypeScript modulaire"
-    - "Système d'authentification frontend"
-    - "Composants Layout et Navigation"
-    - "Page de connexion"
-    - "Dashboard avec graphiques"
-    - "Routes protégées"
+  stuck_tasks: []
   test_all: false
   test_priority: "stuck_first"
 
