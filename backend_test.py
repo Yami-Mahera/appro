@@ -317,8 +317,8 @@ def test_stocks_api():
     
     # Test GET /stocks (list)
     response = make_request("get", "/stocks")
-    success = "error" not in response
-    log_test("stocks", "GET /stocks", success, response.get("error"))
+    success = isinstance(response, list) or ("error" not in response)
+    log_test("stocks", "GET /stocks", success, None if isinstance(response, list) else response.get("error"))
     
     # Test GET /stocks/{article_id}
     response = make_request("get", f"/stocks/{created_resources['article_id']}")
