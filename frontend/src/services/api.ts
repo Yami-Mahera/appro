@@ -96,12 +96,30 @@ class ApiService {
   }
 
   // Articles methods
-  async getArticles(filters?: { famille?: string; fournisseur_id?: string }) {
-    const params = new URLSearchParams();
-    if (filters?.famille) params.append('famille', filters.famille);
-    if (filters?.fournisseur_id) params.append('fournisseur_id', filters.fournisseur_id);
+  async getArticles(params?: {
+    search?: string;
+    sort_by?: string;
+    sort_order?: string;
+    famille?: string;
+    fournisseur_id?: string;
+    stock_bas?: boolean;
+    active?: boolean;
+    limit?: number;
+    skip?: number;
+  }) {
+    const queryParams = new URLSearchParams();
+    if (params?.search) queryParams.append('search', params.search);
+    if (params?.sort_by) queryParams.append('sort_by', params.sort_by);
+    if (params?.sort_order) queryParams.append('sort_order', params.sort_order);
+    if (params?.famille) queryParams.append('famille', params.famille);
+    if (params?.fournisseur_id) queryParams.append('fournisseur_id', params.fournisseur_id);
+    if (params?.stock_bas !== undefined) queryParams.append('stock_bas', params.stock_bas.toString());
+    if (params?.active !== undefined) queryParams.append('active', params.active.toString());
+    if (params?.limit) queryParams.append('limit', params.limit.toString());
+    if (params?.skip) queryParams.append('skip', params.skip.toString());
     
-    const response = await this.api.get(`/articles?${params.toString()}`);
+    const url = queryParams.toString() ? `/articles?${queryParams.toString()}` : '/articles';
+    const response = await this.api.get(url);
     return response.data;
   }
 
