@@ -6,6 +6,7 @@ import {
   CubeIcon,
   DocumentTextIcon,
   ExclamationTriangleIcon,
+  ChartBarIcon,
   Bars3Icon,
   XMarkIcon,
   UserIcon,
@@ -18,6 +19,7 @@ const navigation = [
   { name: 'Fournisseurs', href: '/fournisseurs', icon: BuildingOfficeIcon },
   { name: 'Articles', href: '/articles', icon: CubeIcon },
   { name: 'Commandes', href: '/commandes', icon: DocumentTextIcon },
+  { name: 'Reporting', href: '/reporting', icon: ChartBarIcon },
   { name: 'Alertes', href: '/alertes', icon: ExclamationTriangleIcon },
 ];
 
