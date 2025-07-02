@@ -374,8 +374,8 @@ def test_alertes_api():
     
     # Test GET /alertes with filters
     response = make_request("get", "/alertes", params={"type": "critique"})
-    success = "error" not in response
-    log_test("alertes", "GET /alertes with filters", success, response.get("error"))
+    success = isinstance(response, list) or ("error" not in response)
+    log_test("alertes", "GET /alertes with filters", success, None if isinstance(response, list) else response.get("error"))
 
 def test_dashboard_api():
     """Test the dashboard API endpoint"""
