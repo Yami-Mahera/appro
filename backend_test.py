@@ -173,8 +173,8 @@ def test_fournisseurs_api():
     
     # Test GET /fournisseurs (empty list or existing fournisseurs)
     response = make_request("get", "/fournisseurs")
-    success = "error" not in response
-    log_test("fournisseurs", "GET /fournisseurs", success, response.get("error"))
+    success = isinstance(response, list) or ("error" not in response)
+    log_test("fournisseurs", "GET /fournisseurs", success, None if isinstance(response, list) else response.get("error"))
     
     # Test POST /fournisseurs (create)
     response = make_request("post", "/fournisseurs", test_fournisseur)
