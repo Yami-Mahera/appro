@@ -107,87 +107,108 @@ user_problem_statement: "Créer un outil de gestion des approvisionnements et de
 backend:
   - task: "Modèles de données MongoDB"
     implemented: true
-    working: "NA"
+    working: true
     file: "/app/backend/server.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
         comment: "Créé tous les modèles de données : User, Fournisseur, Article, Commande, Alerte avec leurs schémas Pydantic"
+      - working: true
+        agent: "testing"
+        comment: "Les modèles de données sont correctement implémentés et fonctionnent avec MongoDB. Tous les champs nécessaires sont présents et les relations entre les modèles sont correctes."
 
   - task: "Système d'authentification JWT"
     implemented: true
-    working: "NA"
+    working: true
     file: "/app/backend/server.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
         comment: "Implémenté l'authentification JWT avec 3 rôles (admin, manager, utilisateur), login, register et middleware de sécurité"
+      - working: true
+        agent: "testing"
+        comment: "Le système d'authentification JWT fonctionne correctement. Correction d'un bug dans la fonction register où le hashed_password n'était pas correctement sauvegardé dans MongoDB. Les endpoints /auth/register, /auth/login et /auth/me fonctionnent parfaitement."
 
   - task: "APIs CRUD Fournisseurs"
     implemented: true
-    working: "NA"
+    working: true
     file: "/app/backend/server.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
         comment: "Créé les endpoints CRUD pour les fournisseurs avec contrôle d'accès par rôle"
+      - working: true
+        agent: "testing"
+        comment: "Les APIs CRUD pour les fournisseurs fonctionnent correctement. La création, la lecture, la mise à jour et la récupération des fournisseurs fonctionnent comme prévu. Le contrôle d'accès par rôle est également bien implémenté."
 
   - task: "APIs CRUD Articles"
     implemented: true
-    working: "NA"
+    working: true
     file: "/app/backend/server.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
         comment: "Créé les endpoints CRUD pour les articles avec filtres et détection de stock bas"
+      - working: true
+        agent: "testing"
+        comment: "Les APIs CRUD pour les articles fonctionnent correctement. La création et la lecture des articles fonctionnent comme prévu. L'endpoint pour récupérer les articles avec un stock bas fonctionne également correctement."
 
   - task: "APIs Commandes"
     implemented: true
-    working: "NA"
+    working: true
     file: "/app/backend/server.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
         comment: "Créé les endpoints pour créer et gérer les commandes avec calcul automatique des totaux"
+      - working: true
+        agent: "testing"
+        comment: "Les APIs pour les commandes fonctionnent correctement. La création et la récupération des commandes fonctionnent comme prévu. Le calcul automatique des totaux est également bien implémenté."
 
   - task: "APIs Alertes"
     implemented: true
-    working: "NA"
+    working: true
     file: "/app/backend/server.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
         comment: "Créé les endpoints pour gérer les alertes et les marquer comme lues"
+      - working: true
+        agent: "testing"
+        comment: "Les APIs pour les alertes fonctionnent correctement. La récupération des alertes et le marquage des alertes comme lues fonctionnent comme prévu. Ajout d'un endpoint de test pour créer des alertes."
 
   - task: "API Dashboard Stats"
     implemented: true
-    working: "NA"
+    working: true
     file: "/app/backend/server.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
         comment: "Créé l'endpoint pour récupérer les statistiques du dashboard"
+      - working: true
+        agent: "testing"
+        comment: "L'API pour récupérer les statistiques du dashboard fonctionne correctement. Toutes les statistiques (fournisseurs, articles, commandes, alertes, articles en stock bas, commandes en cours) sont correctement calculées et renvoyées."
 
 frontend:
   - task: "Architecture TypeScript modulaire"
@@ -289,7 +310,7 @@ frontend:
 metadata:
   created_by: "main_agent"
   version: "1.0"
-  test_sequence: 0
+  test_sequence: 1
   run_ui: false
 
 test_plan:
@@ -311,3 +332,5 @@ test_plan:
 agent_communication:
   - agent: "main"
     message: "Implémenté l'architecture complète backend et frontend basée sur le repository GitHub. Backend avec FastAPI, MongoDB, JWT auth, et tous les modèles de données. Frontend avec React TypeScript, architecture modulaire, mais problème de compilation ESLint en cours de résolution. Prêt pour les tests backend une fois les problèmes frontend résolus."
+  - agent: "testing"
+    message: "Tests backend complets effectués. Correction d'un bug dans l'authentification où le hashed_password n'était pas correctement sauvegardé dans MongoDB. Ajout d'un endpoint de test pour créer des alertes. Tous les tests backend passent maintenant avec succès. Le backend est entièrement fonctionnel avec toutes les APIs requises."
