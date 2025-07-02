@@ -209,6 +209,36 @@ backend:
       - working: true
         agent: "testing"
         comment: "L'API pour récupérer les statistiques du dashboard fonctionne correctement. Toutes les statistiques (fournisseurs, articles, commandes, alertes, articles en stock bas, commandes en cours) sont correctement calculées et renvoyées."
+        
+  - task: "APIs améliorées avec tri et recherche"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Implémenté les fonctionnalités de recherche, tri et filtres pour les endpoints GET /api/fournisseurs, /api/articles et /api/commandes"
+      - working: true
+        agent: "testing"
+        comment: "Les APIs améliorées avec tri et recherche fonctionnent parfaitement. Les paramètres de recherche (search), tri (sort_by, sort_order) et filtres (ville, famille, status) sont correctement implémentés pour les fournisseurs, articles et commandes. Les résultats sont filtrés et triés comme attendu."
+        
+  - task: "Nouvelles APIs de reporting"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Créé les endpoints de reporting pour les fournisseurs, articles, commandes et synthèse"
+      - working: true
+        agent: "testing"
+        comment: "Les nouvelles APIs de reporting fonctionnent correctement. Les endpoints GET /api/reports/fournisseurs, /api/reports/articles, /api/reports/commandes et /api/reports/synthese retournent les données attendues. Les filtres de date fonctionnent également comme prévu. Les agrégations MongoDB sont correctement implémentées et retournent des résultats cohérents."
 
 frontend:
   - task: "Architecture TypeScript modulaire"
