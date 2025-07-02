@@ -466,14 +466,47 @@ async def create_commande(
 
 @api_router.get("/commandes", response_model=List[Commande])
 async def get_commandes(
+    search: Optional[str] = None,
+    sort_by: Optional[str] = "created_at",
+    sort_order: Optional[str] = "desc",
     status: Optional[CommandeStatus] = None,
+    fournisseur_id: Optional[str] = None,
+    date_from: Optional[str] = None,
+    date_to: Optional[str] = None,
+    limit: Optional[int] = 1000,
+    skip: Optional[int] = 0,
     current_user: User = Depends(get_current_user)
 ):
+    # Build query
     query = {}
+    
+    # Add search functionality
+    if search:
+        query["$or"] = [
+            {"numero_commande": {"$regex": search, "$options": "i"}},
+            {"notes": {"$regex": search, "$options": "i"}}
+        ]
+    
+    # Add filters
     if status:
         query["status"] = status
+    if fournisseur_id:
+        query["fournisseur_id"] = fournisseur_id
     
-    commandes = await db.commandes.find(query).to_list(1000)
+    # Date range filter
+    if date_from or date_to:
+        date_query = {}
+        if date_from:
+            date_query["$gte"] = datetime.fromisoformat(date_from.replace('Z', '+00:00'))
+        if date_to:
+            date_query["$lte"] = datetime.fromisoformat(date_to.replace('Z', '+00:00'))
+        query["created_at"] = date_query
+    
+    # Build sort criteria
+    sort_direction = 1 if sort_order == "asc" else -1
+    sort_criteria = [(sort_by, sort_direction)]
+    
+    commandes = await db.commandes.find(query).sort(sort_criteria).skip(skip).limit(limit).to_list(limit)
     return [Commande(**c) for c in commandes]
 
 # Alertes Routes
