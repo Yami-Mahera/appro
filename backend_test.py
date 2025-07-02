@@ -145,7 +145,10 @@ def make_request(method: str, endpoint: str, data: Dict = None, params: Dict = N
         elif method.lower() == "post":
             response = requests.post(url, json=data, headers=headers)
         elif method.lower() == "put":
-            response = requests.put(url, json=data, headers=headers)
+            if params:
+                response = requests.put(url, params=params, headers=headers)
+            else:
+                response = requests.put(url, json=data, headers=headers)
         elif method.lower() == "delete":
             response = requests.delete(url, headers=headers)
         else:
