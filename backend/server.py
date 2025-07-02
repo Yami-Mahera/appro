@@ -551,6 +551,305 @@ async def marquer_alerte_lue(
     )
     return {"message": "Alerte marquée comme lue"}
 
+# Reporting Routes
+@api_router.get("/reports/fournisseurs")
+async def get_fournisseurs_report(
+    date_from: Optional[str] = None,
+    date_to: Optional[str] = None,
+    current_user: User = Depends(get_current_user)
+):
+    pipeline = [
+        {"$match": {"active": True}},
+        {
+            "$lookup": {
+                "from": "articles",
+                "localField": "id",
+                "foreignField": "fournisseur_id",
+                "as": "articles"
+            }
+        },
+        {
+            "$lookup": {
+                "from": "commandes",
+                "localField": "id",
+                "foreignField": "fournisseur_id",
+                "as": "commandes"
+            }
+        },
+        {
+            "$addFields": {
+                "total_articles": {"$size": "$articles"},
+                "total_commandes": {"$size": "$commandes"},
+                "valeur_stock": {
+                    "$sum": {
+                        "$map": {
+                            "input": "$articles",
+                            "as": "article",
+                            "in": {"$multiply": ["$$article.stock_actuel", "$$article.prix_unitaire"]}
+                        }
+                    }
+                }
+            }
+        },
+        {
+            "$project": {
+                "nom": 1,
+                "code_fournisseur": 1,
+                "ville": 1,
+                "pays": 1,
+                "email": 1,
+                "telephone": 1,
+                "total_articles": 1,
+                "total_commandes": 1,
+                "valeur_stock": 1,
+                "created_at": 1
+            }
+        }
+    ]
+    
+    # Add date filter if provided
+    if date_from or date_to:
+        match_stage = pipeline[0]["$match"]
+        date_query = {}
+        if date_from:
+            date_query["$gte"] = datetime.fromisoformat(date_from.replace('Z', '+00:00'))
+        if date_to:
+            date_query["$lte"] = datetime.fromisoformat(date_to.replace('Z', '+00:00'))
+        match_stage["created_at"] = date_query
+    
+    results = await db.fournisseurs.aggregate(pipeline).to_list(1000)
+    return results
+
+@api_router.get("/reports/articles")
+async def get_articles_report(
+    date_from: Optional[str] = None,
+    date_to: Optional[str] = None,
+    current_user: User = Depends(get_current_user)
+):
+    pipeline = [
+        {"$match": {"active": True}},
+        {
+            "$lookup": {
+                "from": "fournisseurs",
+                "localField": "fournisseur_id",
+                "foreignField": "id",
+                "as": "fournisseur"
+            }
+        },
+        {
+            "$unwind": {
+                "path": "$fournisseur",
+                "preserveNullAndEmptyArrays": True
+            }
+        },
+        {
+            "$addFields": {
+                "fournisseur_nom": "$fournisseur.nom",
+                "valeur_stock": {"$multiply": ["$stock_actuel", "$prix_unitaire"]},
+                "stock_status": {
+                    "$cond": {
+                        "if": {"$lte": ["$stock_actuel", "$seuil_min"]},
+                        "then": "Critique",
+                        "else": {
+                            "$cond": {
+                                "if": {"$lte": ["$stock_actuel", {"$multiply": ["$seuil_min", 1.5]}]},
+                                "then": "Bas",
+                                "else": "Normal"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        {
+            "$project": {
+                "reference": 1,
+                "nom": 1,
+                "famille": 1,
+                "fournisseur_nom": 1,
+                "prix_unitaire": 1,
+                "unite": 1,
+                "seuil_min": 1,
+                "seuil_max": 1,
+                "stock_actuel": 1,
+                "valeur_stock": 1,
+                "stock_status": 1,
+                "created_at": 1
+            }
+        }
+    ]
+    
+    # Add date filter if provided
+    if date_from or date_to:
+        match_stage = pipeline[0]["$match"]
+        date_query = {}
+        if date_from:
+            date_query["$gte"] = datetime.fromisoformat(date_from.replace('Z', '+00:00'))
+        if date_to:
+            date_query["$lte"] = datetime.fromisoformat(date_to.replace('Z', '+00:00'))
+        match_stage["created_at"] = date_query
+    
+    results = await db.articles.aggregate(pipeline).to_list(1000)
+    return results
+
+@api_router.get("/reports/commandes")
+async def get_commandes_report(
+    date_from: Optional[str] = None,
+    date_to: Optional[str] = None,
+    current_user: User = Depends(get_current_user)
+):
+    pipeline = [
+        {
+            "$lookup": {
+                "from": "fournisseurs",
+                "localField": "fournisseur_id",
+                "foreignField": "id",
+                "as": "fournisseur"
+            }
+        },
+        {
+            "$unwind": {
+                "path": "$fournisseur",
+                "preserveNullAndEmptyArrays": True
+            }
+        },
+        {
+            "$lookup": {
+                "from": "users",
+                "localField": "created_by",
+                "foreignField": "id",
+                "as": "user"
+            }
+        },
+        {
+            "$unwind": {
+                "path": "$user",
+                "preserveNullAndEmptyArrays": True
+            }
+        },
+        {
+            "$addFields": {
+                "fournisseur_nom": "$fournisseur.nom",
+                "created_by_name": {"$concat": ["$user.prenom", " ", "$user.nom"]},
+                "delai_livraison": {
+                    "$cond": {
+                        "if": {"$and": ["$date_commande", "$date_livraison_reelle"]},
+                        "then": {
+                            "$divide": [
+                                {"$subtract": ["$date_livraison_reelle", "$date_commande"]},
+                                86400000
+                            ]
+                        },
+                        "else": None
+                    }
+                }
+            }
+        },
+        {
+            "$project": {
+                "numero_commande": 1,
+                "fournisseur_nom": 1,
+                "status": 1,
+                "total_ht": 1,
+                "total_ttc": 1,
+                "date_commande": 1,
+                "date_livraison_prevue": 1,
+                "date_livraison_reelle": 1,
+                "delai_livraison": 1,
+                "created_by_name": 1,
+                "created_at": 1,
+                "notes": 1
+            }
+        }
+    ]
+    
+    # Add date filter if provided
+    if date_from or date_to:
+        date_query = {}
+        if date_from:
+            date_query["$gte"] = datetime.fromisoformat(date_from.replace('Z', '+00:00'))
+        if date_to:
+            date_query["$lte"] = datetime.fromisoformat(date_to.replace('Z', '+00:00'))
+        pipeline.insert(0, {"$match": {"created_at": date_query}})
+    
+    results = await db.commandes.aggregate(pipeline).to_list(1000)
+    return results
+
+@api_router.get("/reports/synthese")
+async def get_synthese_report(
+    date_from: Optional[str] = None,
+    date_to: Optional[str] = None,
+    current_user: User = Depends(get_current_user)
+):
+    date_filter = {}
+    if date_from or date_to:
+        if date_from:
+            date_filter["$gte"] = datetime.fromisoformat(date_from.replace('Z', '+00:00'))
+        if date_to:
+            date_filter["$lte"] = datetime.fromisoformat(date_to.replace('Z', '+00:00'))
+    
+    # Get basic stats
+    stats = {}
+    
+    # Fournisseurs stats
+    fournisseurs_query = {"active": True}
+    if date_filter:
+        fournisseurs_query["created_at"] = date_filter
+    stats["total_fournisseurs"] = await db.fournisseurs.count_documents(fournisseurs_query)
+    
+    # Articles stats
+    articles_query = {"active": True}
+    if date_filter:
+        articles_query["created_at"] = date_filter
+    stats["total_articles"] = await db.articles.count_documents(articles_query)
+    
+    # Stock bas
+    stats["articles_stock_bas"] = await db.articles.count_documents({
+        "active": True,
+        "$expr": {"$lte": ["$stock_actuel", "$seuil_min"]}
+    })
+    
+    # Commandes stats
+    commandes_query = {}
+    if date_filter:
+        commandes_query["created_at"] = date_filter
+    stats["total_commandes"] = await db.commandes.count_documents(commandes_query)
+    
+    # Valeur totale des commandes
+    commandes_pipeline = [
+        {"$match": commandes_query},
+        {"$group": {"_id": None, "valeur_totale": {"$sum": "$total_ttc"}}}
+    ]
+    valeur_result = await db.commandes.aggregate(commandes_pipeline).to_list(1)
+    stats["valeur_totale_commandes"] = valeur_result[0]["valeur_totale"] if valeur_result else 0
+    
+    # Commandes par statut
+    statut_pipeline = [
+        {"$match": commandes_query},
+        {"$group": {"_id": "$status", "count": {"$sum": 1}}}
+    ]
+    stats["commandes_par_statut"] = await db.commandes.aggregate(statut_pipeline).to_list(10)
+    
+    # Valeur totale du stock
+    stock_pipeline = [
+        {"$match": {"active": True}},
+        {
+            "$group": {
+                "_id": None,
+                "valeur_totale_stock": {
+                    "$sum": {"$multiply": ["$stock_actuel", "$prix_unitaire"]}
+                }
+            }
+        }
+    ]
+    stock_result = await db.articles.aggregate(stock_pipeline).to_list(1)
+    stats["valeur_totale_stock"] = stock_result[0]["valeur_totale_stock"] if stock_result else 0
+    
+    # Alertes non lues
+    stats["alertes_non_lues"] = await db.alertes.count_documents({"lue": False})
+    
+    return stats
+
 # Dashboard Routes
 @api_router.get("/dashboard/stats")
 async def get_dashboard_stats(
