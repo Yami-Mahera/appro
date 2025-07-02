@@ -260,10 +260,10 @@ async def update_article(article_id: str, article_data: ArticleCreate):
 
 @api_router.get("/commandes", response_model=List[Commande])
 async def get_commandes(
-    etat: Optional[EtatCommande] = None,
+    etat: Optional[str] = None,
     fournisseur_id: Optional[str] = None,
-    date_debut: Optional[date] = None,
-    date_fin: Optional[date] = None,
+    date_debut: Optional[str] = None,
+    date_fin: Optional[str] = None,
     limit: int = Query(100, ge=1, le=1000)
 ):
     """Récupérer la liste des commandes avec filtres"""
