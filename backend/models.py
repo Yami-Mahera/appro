@@ -204,7 +204,7 @@ class LigneCommande(BaseModel):
     prix_unitaire: float
     remise: float = 0.0
     total_ligne: float = 0.0
-    date_livraison_souhaitee: Optional[date] = None
+    date_livraison_souhaitee: Optional[str] = None
     notes: Optional[str] = None
 
 class LigneCommandeCreate(BaseModel):
