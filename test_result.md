@@ -334,3 +334,5 @@ agent_communication:
     message: "Implémenté l'architecture complète backend et frontend basée sur le repository GitHub. Backend avec FastAPI, MongoDB, JWT auth, et tous les modèles de données. Frontend avec React TypeScript, architecture modulaire, mais problème de compilation ESLint en cours de résolution. Prêt pour les tests backend une fois les problèmes frontend résolus."
   - agent: "testing"
     message: "Tests backend complets effectués. Correction d'un bug dans l'authentification où le hashed_password n'était pas correctement sauvegardé dans MongoDB. Ajout d'un endpoint de test pour créer des alertes. Tous les tests backend passent maintenant avec succès. Le backend est entièrement fonctionnel avec toutes les APIs requises."
+  - agent: "main"
+    message: "RÉSOLU: Erreur WebSocket 'ws://localhost:NaN/ws' - Problème dans /app/frontend/.env où WDS_SOCKET_PORT et DISABLE_ESLINT_PLUGIN étaient mal formatés sur la même ligne. Corrigé la configuration et redémarré les services. Application maintenant compilée avec succès. Corrigé aussi un warning TypeScript dans Dashboard.tsx avec 'percent' possiblement undefined."
