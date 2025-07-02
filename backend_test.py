@@ -8,22 +8,22 @@ from typing import Dict, List, Optional, Any
 # Configuration
 BASE_URL = "https://3fc8b13e-1e2f-4d6c-b557-68c0aa1d3221.preview.emergentagent.com/api"
 ADMIN_USER = {
-    "email": f"admin_{uuid.uuid4()}@test.com",
-    "password": "Admin@123456",
+    "email": "admin@test.com",
+    "password": "admin123",
     "nom": "Admin",
     "prenom": "Test",
     "role": "administrateur"
 }
 MANAGER_USER = {
-    "email": f"manager_{uuid.uuid4()}@test.com",
-    "password": "Manager@123456",
+    "email": "manager@test.com",
+    "password": "manager123",
     "nom": "Manager",
     "prenom": "Test",
     "role": "manager"
 }
 NORMAL_USER = {
-    "email": f"user_{uuid.uuid4()}@test.com",
-    "password": "User@123456",
+    "email": "user@test.com",
+    "password": "user123",
     "nom": "User",
     "prenom": "Test",
     "role": "utilisateur"
