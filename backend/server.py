@@ -392,17 +392,44 @@ async def create_article(
 
 @api_router.get("/articles", response_model=List[Article])
 async def get_articles(
+    search: Optional[str] = None,
+    sort_by: Optional[str] = "nom",
+    sort_order: Optional[str] = "asc",
     famille: Optional[str] = None,
     fournisseur_id: Optional[str] = None,
+    stock_bas: Optional[bool] = None,
+    active: Optional[bool] = True,
+    limit: Optional[int] = 1000,
+    skip: Optional[int] = 0,
     current_user: User = Depends(get_current_user)
 ):
-    query = {"active": True}
+    # Build query
+    query = {}
+    if active is not None:
+        query["active"] = active
+    
+    # Add search functionality
+    if search:
+        query["$or"] = [
+            {"nom": {"$regex": search, "$options": "i"}},
+            {"reference": {"$regex": search, "$options": "i"}},
+            {"description": {"$regex": search, "$options": "i"}},
+            {"famille": {"$regex": search, "$options": "i"}}
+        ]
+    
+    # Add filters
     if famille:
-        query["famille"] = famille
+        query["famille"] = {"$regex": famille, "$options": "i"}
     if fournisseur_id:
         query["fournisseur_id"] = fournisseur_id
+    if stock_bas:
+        query["$expr"] = {"$lte": ["$stock_actuel", "$seuil_min"]}
     
-    articles = await db.articles.find(query).to_list(1000)
+    # Build sort criteria
+    sort_direction = 1 if sort_order == "asc" else -1
+    sort_criteria = [(sort_by, sort_direction)]
+    
+    articles = await db.articles.find(query).sort(sort_criteria).skip(skip).limit(limit).to_list(limit)
     return [Article(**a) for a in articles]
 
 @api_router.get("/articles/stock-bas")
