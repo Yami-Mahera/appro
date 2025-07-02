@@ -369,13 +369,11 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Résoudre problèmes compilation TypeScript"
-    - "Système d'authentification JWT"
-    - "APIs CRUD Fournisseurs"
-    - "Dashboard avec graphiques"
+    - "APIs améliorées avec tri et recherche"
+    - "Nouvelles APIs de reporting"
   stuck_tasks: []
   test_all: false
-  test_priority: "stuck_first"
+  test_priority: "high_first"
 
 agent_communication:
   - agent: "main"
