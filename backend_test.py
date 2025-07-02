@@ -277,8 +277,8 @@ def test_commandes_api():
     
     # Test GET /commandes (empty list or existing commandes)
     response = make_request("get", "/commandes")
-    success = "error" not in response
-    log_test("commandes", "GET /commandes", success, response.get("error"))
+    success = isinstance(response, list) or ("error" not in response)
+    log_test("commandes", "GET /commandes", success, None if isinstance(response, list) else response.get("error"))
     
     # Test POST /commandes (create)
     response = make_request("post", "/commandes", test_commande)
