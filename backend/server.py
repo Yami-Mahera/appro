@@ -316,6 +316,14 @@ async def create_commande(commande_data: CommandeCreate):
         remise_montant = sous_total * (ligne_data.remise / 100)
         total_ligne = sous_total - remise_montant
         
+        # Convertir la date en string si elle existe
+        date_livraison_str = None
+        if ligne_data.date_livraison_souhaitee:
+            if isinstance(ligne_data.date_livraison_souhaitee, str):
+                date_livraison_str = ligne_data.date_livraison_souhaitee
+            else:
+                date_livraison_str = ligne_data.date_livraison_souhaitee.isoformat()
+        
         ligne = LigneCommande(
             article_id=ligne_data.article_id,
             reference_article=article["reference"],
@@ -324,7 +332,7 @@ async def create_commande(commande_data: CommandeCreate):
             prix_unitaire=prix_unitaire,
             remise=ligne_data.remise,
             total_ligne=total_ligne,
-            date_livraison_souhaitee=ligne_data.date_livraison_souhaitee,
+            date_livraison_souhaitee=date_livraison_str,
             notes=ligne_data.notes
         )
         
@@ -337,12 +345,24 @@ async def create_commande(commande_data: CommandeCreate):
     montant_tva = montant_ht_final * (commande_data.taux_tva / 100)
     montant_ttc = montant_ht_final + montant_tva
     
+    # Convertir les dates en string
+    date_commande_str = commande_data.date_commande
+    if not isinstance(date_commande_str, str):
+        date_commande_str = commande_data.date_commande.isoformat()
+        
+    date_livraison_prevue_str = None
+    if commande_data.date_livraison_prevue:
+        if isinstance(commande_data.date_livraison_prevue, str):
+            date_livraison_prevue_str = commande_data.date_livraison_prevue
+        else:
+            date_livraison_prevue_str = commande_data.date_livraison_prevue.isoformat()
+    
     commande = Commande(
         numero=numero,
         fournisseur_id=commande_data.fournisseur_id,
         nom_fournisseur=fournisseur["nom"],
-        date_commande=commande_data.date_commande,
-        date_livraison_prevue=commande_data.date_livraison_prevue,
+        date_commande=date_commande_str,
+        date_livraison_prevue=date_livraison_prevue_str,
         priorite=commande_data.priorite,
         devise=commande_data.devise,
         incoterm=commande_data.incoterm,
