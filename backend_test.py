@@ -224,8 +224,8 @@ def test_articles_api():
     
     # Test GET /articles (empty list or existing articles)
     response = make_request("get", "/articles")
-    success = "error" not in response
-    log_test("articles", "GET /articles", success, response.get("error"))
+    success = isinstance(response, list) or ("error" not in response)
+    log_test("articles", "GET /articles", success, None if isinstance(response, list) else response.get("error"))
     
     # Test POST /articles (create)
     response = make_request("post", "/articles", test_article)
