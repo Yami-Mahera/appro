@@ -1059,29 +1059,41 @@ def run_all_tests():
     # Test unauthorized access first
     test_unauthorized_access()
     
-    # Test authentication
-    admin_registered = test_auth_register(ADMIN_USER)
-    if admin_registered:
-        admin_token = test_auth_login(ADMIN_USER)
-        if admin_token:
-            test_auth_me(admin_token, ADMIN_USER["email"])
+    # Test authentication - skip registration if users already exist
+    admin_token = test_auth_login(ADMIN_USER)
+    if not admin_token:
+        # Try to register if login fails
+        admin_registered = test_auth_register(ADMIN_USER)
+        if admin_registered:
+            admin_token = test_auth_login(ADMIN_USER)
     
-    # Register manager user
-    manager_registered = test_auth_register(MANAGER_USER)
-    if manager_registered:
-        manager_token = test_auth_login(MANAGER_USER)
-        if manager_token:
-            test_auth_me(manager_token, MANAGER_USER["email"])
+    if admin_token:
+        test_auth_me(admin_token, ADMIN_USER["email"])
+        
+    # Manager user
+    manager_token = test_auth_login(MANAGER_USER)
+    if not manager_token:
+        # Try to register if login fails
+        manager_registered = test_auth_register(MANAGER_USER)
+        if manager_registered:
+            manager_token = test_auth_login(MANAGER_USER)
     
-    # Register a normal user
-    user_registered = test_auth_register(NORMAL_USER)
-    if user_registered:
-        user_token = test_auth_login(NORMAL_USER)
-        if user_token:
-            test_auth_me(user_token, NORMAL_USER["email"])
+    if manager_token:
+        test_auth_me(manager_token, MANAGER_USER["email"])
+    
+    # Normal user
+    user_token = test_auth_login(NORMAL_USER)
+    if not user_token:
+        # Try to register if login fails
+        user_registered = test_auth_register(NORMAL_USER)
+        if user_registered:
+            user_token = test_auth_login(NORMAL_USER)
+    
+    if user_token:
+        test_auth_me(user_token, NORMAL_USER["email"])
     
     # Test role-based access control
-    if tokens["user"]:
+    if tokens["user"] and tokens["admin"]:
         test_role_based_access()
     
     # If admin authentication failed, we can't test the rest
