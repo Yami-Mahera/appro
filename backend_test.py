@@ -362,6 +362,24 @@ def test_list_commandes(token):
 
 def test_list_alertes(token):
     print_header("Testing List Alertes")
+    
+    # First, create an alert for testing
+    if created_ids["article"]:
+        alerte_data = {
+            "type": "stock_bas",
+            "priorite": "high",
+            "titre": "Stock bas pour article test",
+            "message": "Le stock de l'article test est en dessous du seuil minimum",
+            "article_id": created_ids["article"],
+            "lue": False
+        }
+        
+        # Insert alert directly into the database using a custom endpoint
+        success, message, data = make_request("post", "/alertes/test-create", alerte_data, token=token, expected_status=200)
+        if success and data and "id" in data:
+            created_ids["alerte"] = data["id"]
+    
+    # Now get the list of alerts
     success, message, data = make_request("get", "/alertes", token=token, expected_status=200)
     
     if success and isinstance(data, list):
@@ -373,6 +391,31 @@ def test_list_alertes(token):
         if data and len(data) > 0:
             created_ids["alerte"] = data[0]["id"]
             return True
+        
+        # If no alerts were found but we have an article, create a test alert manually
+        if not created_ids["alerte"] and created_ids["article"]:
+            # Create a test alert directly in MongoDB
+            print("Creating a test alert manually...")
+            success, message, _ = make_request(
+                "post", 
+                "/alertes/test-create", 
+                {
+                    "type": "stock_bas",
+                    "priorite": "high",
+                    "titre": "Test Alert",
+                    "message": "This is a test alert",
+                    "article_id": created_ids["article"]
+                },
+                token=token
+            )
+            
+            # Try to get alerts again
+            success, message, data = make_request("get", "/alertes", token=token, expected_status=200)
+            if success and isinstance(data, list) and len(data) > 0:
+                created_ids["alerte"] = data[0]["id"]
+                print_test_result("Create test alert", True, f"Created test alert with ID: {created_ids['alerte']}")
+                return True
+        
         return True
     else:
         print_test_result("List alertes", False, message)
