@@ -337,8 +337,8 @@ def test_stocks_api():
     
     # Test GET /stocks with filters
     response = make_request("get", "/stocks", params={"alerte": True})
-    success = "error" not in response
-    log_test("stocks", "GET /stocks with filters", success, response.get("error"))
+    success = isinstance(response, list) or ("error" not in response)
+    log_test("stocks", "GET /stocks with filters", success, None if isinstance(response, list) else response.get("error"))
 
 def test_alertes_api():
     """Test the alertes API endpoints"""
