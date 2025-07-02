@@ -467,7 +467,11 @@ async def create_alerte(alerte_data: AlerteCreate):
     return alerte
 
 @api_router.put("/alertes/{alerte_id}/traiter")
-async def traiter_alerte(alerte_id: str, actions_prises: str, traitee_par: str):
+async def traiter_alerte(
+    alerte_id: str, 
+    actions_prises: str = Query(..., description="Actions prises pour traiter l'alerte"),
+    traitee_par: str = Query(..., description="Personne ayant traité l'alerte")
+):
     """Marquer une alerte comme traitée"""
     result = await db.alertes.update_one(
         {"id": alerte_id},
