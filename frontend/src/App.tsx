@@ -41,7 +41,7 @@ function App() {
               element={
                 <ProtectedRoute>
                   <Layout currentPath="/fournisseurs">
-                    <Fournisseurs />
+                    <FournisseursAdvanced />
                   </Layout>
                 </ProtectedRoute>
               }
@@ -51,7 +51,7 @@ function App() {
               element={
                 <ProtectedRoute>
                   <Layout currentPath="/articles">
-                    <Articles />
+                    <ArticlesAdvanced />
                   </Layout>
                 </ProtectedRoute>
               }
@@ -61,7 +61,17 @@ function App() {
               element={
                 <ProtectedRoute>
                   <Layout currentPath="/commandes">
-                    <Commandes />
+                    <CommandesAdvanced />
+                  </Layout>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/reporting"
+              element={
+                <ProtectedRoute>
+                  <Layout currentPath="/reporting">
+                    <Reporting />
                   </Layout>
                 </ProtectedRoute>
               }
