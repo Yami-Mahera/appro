@@ -251,6 +251,227 @@ def require_roles(roles: List[UserRole]):
         return current_user
     return role_checker
 
+# Authentication Routes
+@api_router.post("/auth/register", response_model=User)
+async def register(user_data: UserCreate):
+    # Check if user exists
+    existing_user = await db.users.find_one({"email": user_data.email})
+    if existing_user:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Email already registered"
+        )
+    
+    # Hash password and create user
+    hashed_password = get_password_hash(user_data.password)
+    user_dict = user_data.dict()
+    user_dict.pop("password")
+    user_dict["hashed_password"] = hashed_password
+    
+    user = User(**user_dict)
+    await db.users.insert_one(user.dict())
+    return user
+
+@api_router.post("/auth/login", response_model=Token)
+async def login(user_credentials: UserLogin):
+    user = await db.users.find_one({"email": user_credentials.email})
+    if not user or not verify_password(user_credentials.password, user["hashed_password"]):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Incorrect email or password",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    
+    access_token_expires = timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
+    access_token = create_access_token(
+        data={"sub": user["email"]}, expires_delta=access_token_expires
+    )
+    
+    # Update last login
+    await db.users.update_one(
+        {"email": user["email"]}, 
+        {"$set": {"last_login": datetime.utcnow()}}
+    )
+    
+    user_obj = User(**user)
+    return {"access_token": access_token, "token_type": "bearer", "user": user_obj}
+
+@api_router.get("/auth/me", response_model=User)
+async def get_current_user_info(current_user: User = Depends(get_current_user)):
+    return current_user
+
+# Fournisseur Routes
+@api_router.post("/fournisseurs", response_model=Fournisseur)
+async def create_fournisseur(
+    fournisseur_data: FournisseurCreate,
+    current_user: User = Depends(require_roles([UserRole.ADMIN, UserRole.MANAGER]))
+):
+    fournisseur = Fournisseur(**fournisseur_data.dict())
+    await db.fournisseurs.insert_one(fournisseur.dict())
+    return fournisseur
+
+@api_router.get("/fournisseurs", response_model=List[Fournisseur])
+async def get_fournisseurs(
+    current_user: User = Depends(get_current_user)
+):
+    fournisseurs = await db.fournisseurs.find({"active": True}).to_list(1000)
+    return [Fournisseur(**f) for f in fournisseurs]
+
+@api_router.get("/fournisseurs/{fournisseur_id}", response_model=Fournisseur)
+async def get_fournisseur(
+    fournisseur_id: str,
+    current_user: User = Depends(get_current_user)
+):
+    fournisseur = await db.fournisseurs.find_one({"id": fournisseur_id})
+    if not fournisseur:
+        raise HTTPException(status_code=404, detail="Fournisseur not found")
+    return Fournisseur(**fournisseur)
+
+@api_router.put("/fournisseurs/{fournisseur_id}", response_model=Fournisseur)
+async def update_fournisseur(
+    fournisseur_id: str,
+    fournisseur_data: FournisseurCreate,
+    current_user: User = Depends(require_roles([UserRole.ADMIN, UserRole.MANAGER]))
+):
+    updated_data = fournisseur_data.dict()
+    updated_data["updated_at"] = datetime.utcnow()
+    
+    await db.fournisseurs.update_one(
+        {"id": fournisseur_id},
+        {"$set": updated_data}
+    )
+    
+    fournisseur = await db.fournisseurs.find_one({"id": fournisseur_id})
+    if not fournisseur:
+        raise HTTPException(status_code=404, detail="Fournisseur not found")
+    return Fournisseur(**fournisseur)
+
+# Articles Routes
+@api_router.post("/articles", response_model=Article)
+async def create_article(
+    article_data: ArticleCreate,
+    current_user: User = Depends(require_roles([UserRole.ADMIN, UserRole.MANAGER]))
+):
+    article = Article(**article_data.dict())
+    await db.articles.insert_one(article.dict())
+    return article
+
+@api_router.get("/articles", response_model=List[Article])
+async def get_articles(
+    famille: Optional[str] = None,
+    fournisseur_id: Optional[str] = None,
+    current_user: User = Depends(get_current_user)
+):
+    query = {"active": True}
+    if famille:
+        query["famille"] = famille
+    if fournisseur_id:
+        query["fournisseur_id"] = fournisseur_id
+    
+    articles = await db.articles.find(query).to_list(1000)
+    return [Article(**a) for a in articles]
+
+@api_router.get("/articles/stock-bas")
+async def get_articles_stock_bas(
+    current_user: User = Depends(get_current_user)
+):
+    articles = await db.articles.find({
+        "active": True,
+        "$expr": {"$lte": ["$stock_actuel", "$seuil_min"]}
+    }).to_list(1000)
+    return [Article(**a) for a in articles]
+
+# Commandes Routes
+@api_router.post("/commandes", response_model=Commande)
+async def create_commande(
+    commande_data: CommandeCreate,
+    current_user: User = Depends(require_roles([UserRole.ADMIN, UserRole.MANAGER]))
+):
+    # Calculate totals
+    total_ht = sum(ligne.total for ligne in commande_data.lignes)
+    total_ttc = total_ht * 1.2  # 20% TVA
+    
+    commande_dict = commande_data.dict()
+    commande_dict.update({
+        "numero_commande": f"CMD-{datetime.now().strftime('%Y%m%d')}-{str(uuid.uuid4())[:8]}",
+        "total_ht": total_ht,
+        "total_ttc": total_ttc,
+        "created_by": current_user.id
+    })
+    
+    commande = Commande(**commande_dict)
+    await db.commandes.insert_one(commande.dict())
+    return commande
+
+@api_router.get("/commandes", response_model=List[Commande])
+async def get_commandes(
+    status: Optional[CommandeStatus] = None,
+    current_user: User = Depends(get_current_user)
+):
+    query = {}
+    if status:
+        query["status"] = status
+    
+    commandes = await db.commandes.find(query).to_list(1000)
+    return [Commande(**c) for c in commandes]
+
+# Alertes Routes
+@api_router.get("/alertes", response_model=List[Alerte])
+async def get_alertes(
+    lue: Optional[bool] = None,
+    current_user: User = Depends(get_current_user)
+):
+    query = {}
+    if lue is not None:
+        query["lue"] = lue
+    
+    alertes = await db.alertes.find(query).sort("created_at", -1).to_list(100)
+    return [Alerte(**a) for a in alertes]
+
+@api_router.put("/alertes/{alerte_id}/marquer-lue")
+async def marquer_alerte_lue(
+    alerte_id: str,
+    current_user: User = Depends(get_current_user)
+):
+    await db.alertes.update_one(
+        {"id": alerte_id},
+        {"$set": {"lue": True}}
+    )
+    return {"message": "Alerte marquée comme lue"}
+
+# Dashboard Routes
+@api_router.get("/dashboard/stats")
+async def get_dashboard_stats(
+    current_user: User = Depends(get_current_user)
+):
+    total_fournisseurs = await db.fournisseurs.count_documents({"active": True})
+    total_articles = await db.articles.count_documents({"active": True})
+    total_commandes = await db.commandes.count_documents({})
+    alertes_non_lues = await db.alertes.count_documents({"lue": False})
+    
+    articles_stock_bas = await db.articles.count_documents({
+        "active": True,
+        "$expr": {"$lte": ["$stock_actuel", "$seuil_min"]}
+    })
+    
+    commandes_en_cours = await db.commandes.count_documents({
+        "status": {"$in": [CommandeStatus.PENDING, CommandeStatus.APPROVED, CommandeStatus.ORDERED]}
+    })
+    
+    return {
+        "total_fournisseurs": total_fournisseurs,
+        "total_articles": total_articles,
+        "total_commandes": total_commandes,
+        "alertes_non_lues": alertes_non_lues,
+        "articles_stock_bas": articles_stock_bas,
+        "commandes_en_cours": commandes_en_cours
+    }
+
+# Basic routes for backward compatibility
+@api_router.get("/")
+async def root():
+    return {"message": "API Gestion des Approvisionnements"}
+
 # Include the router in the main app
 app.include_router(api_router)
 
