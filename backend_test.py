@@ -525,10 +525,19 @@ def run_all_tests():
         if admin_token:
             test_auth_me(admin_token, ADMIN_USER["email"])
     
-    # Register a normal user for role-based access testing
+    # Register manager user
+    manager_registered = test_auth_register(MANAGER_USER)
+    if manager_registered:
+        manager_token = test_auth_login(MANAGER_USER)
+        if manager_token:
+            test_auth_me(manager_token, MANAGER_USER["email"])
+    
+    # Register a normal user
     user_registered = test_auth_register(NORMAL_USER)
     if user_registered:
         user_token = test_auth_login(NORMAL_USER)
+        if user_token:
+            test_auth_me(user_token, NORMAL_USER["email"])
     
     # Test role-based access control
     if tokens["user"]:
@@ -567,8 +576,170 @@ def run_all_tests():
     # Test dashboard
     test_dashboard_stats(tokens["admin"])
     
+    # Create additional test data
+    create_test_data(tokens["admin"])
+    
     # Print summary
     print_summary()
+
+def create_test_data(admin_token):
+    print_header("Creating Additional Test Data")
+    
+    # Create additional suppliers
+    suppliers = [
+        {
+            "nom": "Fournitures Bureau Express",
+            "code_fournisseur": f"FBE-{uuid.uuid4().hex[:6]}",
+            "adresse": "45 Rue du Commerce",
+            "ville": "Lyon",
+            "code_postal": "69002",
+            "pays": "France",
+            "telephone": "+33472456789",
+            "email": f"contact@fournitures-bureau-express.fr",
+            "site_web": "https://www.fournitures-bureau-express.fr",
+            "conditions_paiement": "45 jours",
+            "delai_livraison_moyen": 3,
+            "contacts": [
+                {
+                    "nom": "Martin",
+                    "prenom": "Sophie",
+                    "telephone": "+33612345678",
+                    "email": "s.martin@fournitures-bureau-express.fr",
+                    "poste": "Directrice commerciale"
+                }
+            ]
+        },
+        {
+            "nom": "Tech Solutions Pro",
+            "code_fournisseur": f"TSP-{uuid.uuid4().hex[:6]}",
+            "adresse": "123 Avenue de l'Innovation",
+            "ville": "Bordeaux",
+            "code_postal": "33000",
+            "pays": "France",
+            "telephone": "+33556789012",
+            "email": f"contact@techsolutionspro.com",
+            "site_web": "https://www.techsolutionspro.com",
+            "conditions_paiement": "30 jours",
+            "delai_livraison_moyen": 7,
+            "contacts": [
+                {
+                    "nom": "Dubois",
+                    "prenom": "Thomas",
+                    "telephone": "+33678901234",
+                    "email": "t.dubois@techsolutionspro.com",
+                    "poste": "Responsable grands comptes"
+                }
+            ]
+        }
+    ]
+    
+    supplier_ids = []
+    for supplier_data in suppliers:
+        success, message, data = make_request("post", "/fournisseurs", supplier_data, token=admin_token, expected_status=200)
+        if success and data and "id" in data:
+            print(f"Created supplier: {data['nom']}")
+            supplier_ids.append(data["id"])
+    
+    # Create additional articles for each supplier
+    article_ids = []
+    for supplier_id in supplier_ids:
+        articles = [
+            {
+                "reference": f"PAP-{uuid.uuid4().hex[:6]}",
+                "nom": "Papier A4 Premium",
+                "description": "Ramette de papier A4 80g/m² haute qualité",
+                "famille": "Papeterie",
+                "fournisseur_id": supplier_id,
+                "prix_unitaire": 4.99,
+                "unite": "ramette",
+                "seuil_min": 20,
+                "seuil_max": 100,
+                "stock_actuel": 15,
+                "duree_vie": 730,
+                "emplacement_stockage": "Étagère B2"
+            },
+            {
+                "reference": f"STY-{uuid.uuid4().hex[:6]}",
+                "nom": "Stylos à bille",
+                "description": "Lot de 50 stylos à bille bleus",
+                "famille": "Écriture",
+                "fournisseur_id": supplier_id,
+                "prix_unitaire": 12.50,
+                "unite": "lot",
+                "seuil_min": 5,
+                "seuil_max": 30,
+                "stock_actuel": 3,
+                "duree_vie": 365,
+                "emplacement_stockage": "Tiroir C3"
+            },
+            {
+                "reference": f"INF-{uuid.uuid4().hex[:6]}",
+                "nom": "Disque dur externe 1TB",
+                "description": "Disque dur externe USB 3.0 1TB",
+                "famille": "Informatique",
+                "fournisseur_id": supplier_id,
+                "prix_unitaire": 79.99,
+                "unite": "pièce",
+                "seuil_min": 3,
+                "seuil_max": 15,
+                "stock_actuel": 2,
+                "duree_vie": 1095,
+                "emplacement_stockage": "Armoire sécurisée D1"
+            }
+        ]
+        
+        for article_data in articles:
+            success, message, data = make_request("post", "/articles", article_data, token=admin_token, expected_status=200)
+            if success and data and "id" in data:
+                print(f"Created article: {data['nom']}")
+                article_ids.append(data["id"])
+    
+    # Create orders using the articles
+    if article_ids and supplier_ids:
+        for i, supplier_id in enumerate(supplier_ids):
+            # Select 2 articles for this supplier
+            order_articles = article_ids[i*3:(i+1)*3]
+            if order_articles:
+                commande_data = {
+                    "fournisseur_id": supplier_id,
+                    "lignes": [
+                        {
+                            "article_id": article_ids[0],
+                            "quantite": 30,
+                            "prix_unitaire": 4.99,
+                            "total": 149.70
+                        },
+                        {
+                            "article_id": article_ids[1] if len(article_ids) > 1 else article_ids[0],
+                            "quantite": 10,
+                            "prix_unitaire": 12.50,
+                            "total": 125.00
+                        }
+                    ],
+                    "date_livraison_prevue": (datetime.now() + timedelta(days=5)).isoformat(),
+                    "notes": "Commande urgente pour réapprovisionnement"
+                }
+                
+                success, message, data = make_request("post", "/commandes", commande_data, token=admin_token, expected_status=200)
+                if success and data and "id" in data:
+                    print(f"Created order: {data['numero_commande']}")
+    
+    # Create some alerts
+    for article_id in article_ids[:2]:  # Use first 2 articles
+        alerte_data = {
+            "type": "stock_bas",
+            "priorite": "high",
+            "titre": f"Stock bas - Réapprovisionnement urgent",
+            "message": f"Le stock de l'article est en dessous du seuil minimum. Veuillez commander rapidement.",
+            "article_id": article_id,
+            "lue": False
+        }
+        
+        success, message, data = make_request("post", "/alertes/test-create", alerte_data, token=admin_token, expected_status=200)
+        if success and data and "id" in data:
+            print(f"Created alert: {data['titre']}")
+    
+    print("Test data creation completed")
 
 if __name__ == "__main__":
     run_all_tests()
