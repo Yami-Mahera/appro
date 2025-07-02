@@ -1,53 +1,102 @@
-import { useEffect } from "react";
-import "./App.css";
+import React from 'react';
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-import axios from "axios";
+import { AuthProvider } from './hooks/useAuth';
+import ProtectedRoute from './presentation/components/ProtectedRoute';
+import Layout from './presentation/components/Layout';
+import Dashboard from './presentation/components/Dashboard';
+import Login from './presentation/screens/Login';
+import "./App.css";
 
-const BACKEND_URL = process.env.REACT_APP_BACKEND_URL;
-const API = `${BACKEND_URL}/api`;
+// Placeholder components for other routes
+const Fournisseurs = () => (
+  <div>
+    <h1 className="text-2xl font-bold text-gray-900 mb-4">Fournisseurs</h1>
+    <p className="text-gray-600">Interface de gestion des fournisseurs (en développement)</p>
+  </div>
+);
 
-const Home = () => {
-  const helloWorldApi = async () => {
-    try {
-      const response = await axios.get(`${API}/`);
-      console.log(response.data.message);
-    } catch (e) {
-      console.error(e, `errored out requesting / api`);
-    }
-  };
+const Articles = () => (
+  <div>
+    <h1 className="text-2xl font-bold text-gray-900 mb-4">Articles</h1>
+    <p className="text-gray-600">Interface de gestion des articles (en développement)</p>
+  </div>
+);
 
-  useEffect(() => {
-    helloWorldApi();
-  }, []);
+const Commandes = () => (
+  <div>
+    <h1 className="text-2xl font-bold text-gray-900 mb-4">Commandes</h1>
+    <p className="text-gray-600">Interface de gestion des commandes (en développement)</p>
+  </div>
+);
 
-  return (
-    <div>
-      <header className="App-header">
-        <a
-          className="App-link"
-          href="https://emergent.sh"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <img src="https://avatars.githubusercontent.com/in/1201222?s=120&u=2686cf91179bbafbc7a71bfbc43004cf9ae1acea&v=4" />
-        </a>
-        <p className="mt-5">Building something incredible ~!</p>
-      </header>
-    </div>
-  );
-};
+const Alertes = () => (
+  <div>
+    <h1 className="text-2xl font-bold text-gray-900 mb-4">Alertes</h1>
+    <p className="text-gray-600">Interface de gestion des alertes (en développement)</p>
+  </div>
+);
 
 function App() {
   return (
-    <div className="App">
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<Home />}>
-            <Route index element={<Home />} />
-          </Route>
-        </Routes>
-      </BrowserRouter>
-    </div>
+    <AuthProvider>
+      <div className="App">
+        <BrowserRouter>
+          <Routes>
+            <Route path="/login" element={<Login />} />
+            <Route
+              path="/"
+              element={
+                <ProtectedRoute>
+                  <Layout currentPath="/">
+                    <Dashboard />
+                  </Layout>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/fournisseurs"
+              element={
+                <ProtectedRoute>
+                  <Layout currentPath="/fournisseurs">
+                    <Fournisseurs />
+                  </Layout>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/articles"
+              element={
+                <ProtectedRoute>
+                  <Layout currentPath="/articles">
+                    <Articles />
+                  </Layout>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/commandes"
+              element={
+                <ProtectedRoute>
+                  <Layout currentPath="/commandes">
+                    <Commandes />
+                  </Layout>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/alertes"
+              element={
+                <ProtectedRoute>
+                  <Layout currentPath="/alertes">
+                    <Alertes />
+                  </Layout>
+                </ProtectedRoute>
+              }
+            />
+          </Routes>
+        </BrowserRouter>
+      </div>
+    </AuthProvider>
   );
 }
 
