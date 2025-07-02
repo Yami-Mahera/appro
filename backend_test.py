@@ -351,8 +351,8 @@ def test_alertes_api():
     
     # Test GET /alertes (list)
     response = make_request("get", "/alertes")
-    success = "error" not in response
-    log_test("alertes", "GET /alertes", success, response.get("error"))
+    success = isinstance(response, list) or ("error" not in response)
+    log_test("alertes", "GET /alertes", success, None if isinstance(response, list) else response.get("error"))
     
     # Test POST /alertes (create)
     response = make_request("post", "/alertes", test_alerte)
