@@ -430,6 +430,24 @@ async def get_alertes(
     alertes = await db.alertes.find(query).sort("created_at", -1).to_list(100)
     return [Alerte(**a) for a in alertes]
 
+@api_router.post("/alertes/test-create", response_model=Alerte)
+async def create_test_alerte(
+    alerte_data: dict,
+    current_user: User = Depends(get_current_user)
+):
+    alerte = Alerte(
+        type=alerte_data.get("type", "stock_bas"),
+        priorite=alerte_data.get("priorite", "high"),
+        titre=alerte_data.get("titre", "Test Alert"),
+        message=alerte_data.get("message", "This is a test alert"),
+        article_id=alerte_data.get("article_id"),
+        commande_id=alerte_data.get("commande_id"),
+        fournisseur_id=alerte_data.get("fournisseur_id"),
+        lue=alerte_data.get("lue", False)
+    )
+    await db.alertes.insert_one(alerte.dict())
+    return alerte
+
 @api_router.put("/alertes/{alerte_id}/marquer-lue")
 async def marquer_alerte_lue(
     alerte_id: str,
