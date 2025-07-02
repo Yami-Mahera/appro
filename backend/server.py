@@ -499,11 +499,10 @@ async def get_dashboard():
     nb_articles_total = await db.articles.count_documents({"actif": True})
     
     # Articles en alerte (stock <= seuil_alerte)
-    pipeline_alerte = [
-        {"$match": {"actif": True}},
-        {"$match": {"$expr": {"$lte": ["$stock_actuel", "$seuil_alerte"]}}}
-    ]
-    nb_articles_alerte = len(await db.articles.aggregate(pipeline_alerte).to_list(None))
+    nb_articles_alerte = await db.articles.count_documents({
+        "actif": True,
+        "$expr": {"$lte": ["$stock_actuel", "$seuil_alerte"]}
+    })
     
     # Articles en rupture
     nb_articles_rupture = await db.articles.count_documents({
@@ -521,14 +520,14 @@ async def get_dashboard():
     
     # Commandes en cours
     nb_commandes_en_cours = await db.commandes.count_documents({
-        "etat": {"$in": [EtatCommande.PASSEE, EtatCommande.CONFIRMEE, EtatCommande.PRODUCTION, EtatCommande.EXPEDIEE]}
+        "etat": {"$in": ["passee", "confirmee", "production", "expediee"]}
     })
     
     # Commandes en retard
     today = date.today()
     nb_commandes_retard = await db.commandes.count_documents({
         "date_livraison_prevue": {"$lt": today},
-        "etat": {"$nin": [EtatCommande.LIVREE, EtatCommande.FACTUREE, EtatCommande.ANNULEE]}
+        "etat": {"$nin": ["livree", "facturee", "annulee"]}
     })
     
     # Montant des commandes du mois
@@ -545,13 +544,13 @@ async def get_dashboard():
     
     # Alertes
     nb_alertes_critiques = await db.alertes.count_documents({
-        "type": TypeAlerte.CRITIQUE,
-        "statut": StatutAlerte.ACTIVE
+        "type": "critique",
+        "statut": "active"
     })
     
     nb_alertes_importantes = await db.alertes.count_documents({
-        "type": TypeAlerte.IMPORTANTE,
-        "statut": StatutAlerte.ACTIVE
+        "type": "importante",
+        "statut": "active"
     })
     
     return StatistiquesDashboard(
