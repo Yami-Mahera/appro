@@ -300,7 +300,10 @@ def test_commandes_api():
     
     # Test PUT /commandes/{id}/etat
     if created_resources["commande_id"]:
-        response = make_request("put", f"/commandes/{created_resources['commande_id']}/etat", {"nouvel_etat": "passee"})
+        etat_params = {
+            "nouvel_etat": "passee"
+        }
+        response = make_request("put", f"/commandes/{created_resources['commande_id']}/etat", params=etat_params)
         success = "error" not in response and "message" in response
         log_test("commandes", "PUT /commandes/{id}/etat", success, response.get("error"))
     
