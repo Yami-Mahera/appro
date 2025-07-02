@@ -364,11 +364,11 @@ def test_alertes_api():
     
     # Test PUT /alertes/{id}/traiter
     if created_resources["alerte_id"]:
-        traitement_data = {
+        traitement_params = {
             "actions_prises": "Commande passée au fournisseur",
             "traitee_par": "Système de test"
         }
-        response = make_request("put", f"/alertes/{created_resources['alerte_id']}/traiter", traitement_data)
+        response = make_request("put", f"/alertes/{created_resources['alerte_id']}/traiter", params=traitement_params)
         success = "error" not in response and "message" in response
         log_test("alertes", "PUT /alertes/{id}/traiter", success, response.get("error"))
     
