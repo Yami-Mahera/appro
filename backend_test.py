@@ -6,7 +6,7 @@ from datetime import datetime, timedelta
 from typing import Dict, List, Optional, Any
 
 # Configuration
-BASE_URL = "https://69cb1958-5549-4794-bc43-3b9b3f8e2dd7.preview.emergentagent.com/api"
+BASE_URL = "https://182b2eed-fea1-4c74-9971-2846104d9bf9.preview.emergentagent.com/api"
 ADMIN_USER = {
     "email": f"admin_{uuid.uuid4()}@test.com",
     "password": "Admin@123456",
