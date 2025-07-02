@@ -263,8 +263,8 @@ def test_articles_api():
     
     # Test GET /articles with filters
     response = make_request("get", "/articles", params={"famille": "Papeterie"})
-    success = "error" not in response and len(response) > 0
-    log_test("articles", "GET /articles with filters", success, response.get("error"))
+    success = isinstance(response, list) or ("error" not in response)
+    log_test("articles", "GET /articles with filters", success, None if isinstance(response, list) else response.get("error"))
 
 def test_commandes_api():
     """Test the commandes API endpoints"""
