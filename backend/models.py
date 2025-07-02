@@ -266,12 +266,12 @@ class Commande(BaseModel):
 
 class CommandeCreate(BaseModel):
     fournisseur_id: str
-    date_commande: date
-    date_livraison_prevue: Optional[date] = None
+    date_commande: str
+    date_livraison_prevue: Optional[str] = None
     priorite: str = "normale"
-    devise: Devise = Devise.EUR
+    devise: str = "EUR"
     incoterm: Optional[str] = None
-    mode_transport: Optional[ModeTransport] = None
+    mode_transport: Optional[str] = None
     taux_tva: float = 20.0
     frais_port: float = 0.0
     remise_globale: float = 0.0
