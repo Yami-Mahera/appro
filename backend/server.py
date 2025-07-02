@@ -269,7 +269,9 @@ async def register(user_data: UserCreate):
     user_dict["hashed_password"] = hashed_password
     
     user = User(**user_dict)
-    await db.users.insert_one(user.dict())
+    user_dict_to_insert = user.dict()
+    user_dict_to_insert["hashed_password"] = hashed_password  # Add hashed_password to the dict before inserting
+    await db.users.insert_one(user_dict_to_insert)
     return user
 
 @api_router.post("/auth/login", response_model=Token)
