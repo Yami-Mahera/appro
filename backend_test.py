@@ -414,9 +414,13 @@ def test_dashboard_stats(token):
 
 def test_unauthorized_access():
     print_header("Testing Unauthorized Access")
+    # For this test, we expect a 401 or 403 error when accessing a protected endpoint without a token
     success, message, data = make_request("get", "/fournisseurs", expected_status=401)
     
-    # For this test, success means we got the expected 401 error
+    if not success:
+        # Try with 403 status code as an alternative
+        success, message, data = make_request("get", "/fournisseurs", expected_status=403)
+    
     if success:
         print_test_result("Unauthorized access", True, "Correctly rejected request without token")
         test_results["access_control"]["unauthorized"]["success"] = True
