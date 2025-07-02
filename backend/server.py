@@ -11,7 +11,7 @@ from datetime import datetime, date, timedelta
 import uuid
 
 # Import all models
-from models import (
+from .models import (
     # Fournisseurs
     Fournisseur, FournisseurCreate, Contact, ContactCreate,
     # Articles
