@@ -314,9 +314,41 @@ async def create_fournisseur(
 
 @api_router.get("/fournisseurs", response_model=List[Fournisseur])
 async def get_fournisseurs(
+    search: Optional[str] = None,
+    sort_by: Optional[str] = "nom",
+    sort_order: Optional[str] = "asc",
+    ville: Optional[str] = None,
+    pays: Optional[str] = None,
+    active: Optional[bool] = True,
+    limit: Optional[int] = 1000,
+    skip: Optional[int] = 0,
     current_user: User = Depends(get_current_user)
 ):
-    fournisseurs = await db.fournisseurs.find({"active": True}).to_list(1000)
+    # Build query
+    query = {}
+    if active is not None:
+        query["active"] = active
+    
+    # Add search functionality
+    if search:
+        query["$or"] = [
+            {"nom": {"$regex": search, "$options": "i"}},
+            {"code_fournisseur": {"$regex": search, "$options": "i"}},
+            {"ville": {"$regex": search, "$options": "i"}},
+            {"email": {"$regex": search, "$options": "i"}}
+        ]
+    
+    # Add filters
+    if ville:
+        query["ville"] = {"$regex": ville, "$options": "i"}
+    if pays:
+        query["pays"] = {"$regex": pays, "$options": "i"}
+    
+    # Build sort criteria
+    sort_direction = 1 if sort_order == "asc" else -1
+    sort_criteria = [(sort_by, sort_direction)]
+    
+    fournisseurs = await db.fournisseurs.find(query).sort(sort_criteria).skip(skip).limit(limit).to_list(limit)
     return [Fournisseur(**f) for f in fournisseurs]
 
 @api_router.get("/fournisseurs/{fournisseur_id}", response_model=Fournisseur)
