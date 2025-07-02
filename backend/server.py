@@ -371,7 +371,10 @@ async def get_commande(commande_id: str):
     return Commande(**commande)
 
 @api_router.put("/commandes/{commande_id}/etat")
-async def update_etat_commande(commande_id: str, nouvel_etat: EtatCommande):
+async def update_etat_commande(
+    commande_id: str, 
+    nouvel_etat: str = Query(..., description="Nouvel état de la commande")
+):
     """Mettre à jour l'état d'une commande"""
     result = await db.commandes.update_one(
         {"id": commande_id},
