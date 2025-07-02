@@ -76,8 +76,8 @@ const Reporting: React.FC = () => {
   const exportToExcel = () => {
     // Export CSV simple
     let csvContent = '';
-    let headers = [];
-    let rows = [];
+    let headers: string[] = [];
+    let rows: (string | number)[][] = [];
 
     switch (activeReport) {
       case 'fournisseurs':
@@ -106,7 +106,7 @@ const Reporting: React.FC = () => {
     if (headers.length > 0) {
       csvContent = headers.join(',') + '\n';
       rows.forEach(row => {
-        csvContent += row.map(cell => `"${cell}"`).join(',') + '\n';
+        csvContent += row.map((cell: string | number) => `"${cell}"`).join(',') + '\n';
       });
 
       const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
