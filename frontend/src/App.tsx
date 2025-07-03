@@ -9,6 +9,7 @@ import FournisseursAdvanced from './presentation/screens/FournisseursAdvanced';
 import ArticlesAdvanced from './presentation/screens/ArticlesAdvanced';
 import CommandesAdvanced from './presentation/screens/CommandesAdvanced';
 import Reporting from './presentation/screens/Reporting';
+import UsersAdvanced from './presentation/screens/UsersAdvanced';
 import "./App.css";
 
 // Placeholder component for alertes (can be enhanced later)
