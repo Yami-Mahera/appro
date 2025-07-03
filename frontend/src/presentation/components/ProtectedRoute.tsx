@@ -5,6 +5,7 @@ import Login from '../screens/Login';
 interface ProtectedRouteProps {
   children: ReactNode;
   requiredRoles?: string[];
+  requiredRole?: string;
 }
 
 const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ 
