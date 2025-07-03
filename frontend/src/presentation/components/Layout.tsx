@@ -85,7 +85,9 @@ const Layout: React.FC<LayoutProps> = ({ children, currentPath = '/' }) => {
               <h1 className="text-xl font-bold text-gray-800">Gestion Appro</h1>
             </div>
             <nav className="mt-5 flex-1 px-2 bg-white space-y-1">
-              {navigation.map((item) => (
+              {navigation
+                .filter(item => !item.adminOnly || user?.role === 'administrateur')
+                .map((item) => (
                 <a
                   key={item.name}
                   href={item.href}
