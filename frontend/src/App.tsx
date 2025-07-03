@@ -87,6 +87,16 @@ function App() {
                 </ProtectedRoute>
               }
             />
+            <Route
+              path="/users"
+              element={
+                <ProtectedRoute requiredRole="administrateur">
+                  <Layout currentPath="/users">
+                    <UsersAdvanced />
+                  </Layout>
+                </ProtectedRoute>
+              }
+            />
           </Routes>
         </BrowserRouter>
       </div>
