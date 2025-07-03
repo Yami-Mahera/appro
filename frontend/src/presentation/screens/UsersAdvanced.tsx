@@ -377,7 +377,7 @@ const UsersAdvanced: React.FC = () => {
                           <PencilIcon className="w-4 h-4" />
                         </button>
                         <button
-                          onClick={() => handlePasswordReset(user)}
+                          onClick={() => openPasswordResetModal(user)}
                           className="text-orange-600 hover:text-orange-900"
                           title="Réinitialiser le mot de passe"
                         >
