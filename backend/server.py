@@ -430,10 +430,13 @@ async def delete_user(
     
     return {"message": "User deleted successfully"}
 
+class PasswordResetRequest(BaseModel):
+    new_password: str
+
 @api_router.put("/users/{user_id}/reset-password")
 async def reset_user_password(
     user_id: str,
-    new_password: str,
+    password_data: PasswordResetRequest,
     current_user: User = Depends(require_roles([UserRole.ADMIN]))
 ):
     # Check if user exists
@@ -442,7 +445,7 @@ async def reset_user_password(
         raise HTTPException(status_code=404, detail="User not found")
     
     # Hash new password
-    hashed_password = pwd_context.hash(new_password)
+    hashed_password = pwd_context.hash(password_data.new_password)
     
     # Update password
     await db.users.update_one(
