@@ -30,6 +30,7 @@ type SortField = 'nom' | 'prenom' | 'email' | 'role' | 'created_at';
 type SortOrder = 'asc' | 'desc';
 
 const UsersAdvanced: React.FC = () => {
+  const { user: currentUser } = useAuth();
   const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -40,6 +41,17 @@ const UsersAdvanced: React.FC = () => {
   const [viewingUser, setViewingUser] = useState<User | null>(null);
   const [resetPasswordUser, setResetPasswordUser] = useState<User | null>(null);
   const [showFilters, setShowFilters] = useState(false);
+
+  // Vérifier si l'utilisateur actuel est administrateur
+  const isAdmin = currentUser?.role === 'administrateur';
+
+  // Rediriger si pas admin
+  useEffect(() => {
+    if (currentUser && !isAdmin) {
+      window.location.href = '/';
+      return;
+    }
+  }, [currentUser, isAdmin]);
   
   // Search and filter states
   const [searchTerm, setSearchTerm] = useState('');
