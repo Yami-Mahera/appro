@@ -588,14 +588,19 @@ async def get_fournisseurs_report(
         },
         {
             "$addFields": {
-                "total_articles": {"$size": "$articles"},
-                "total_commandes": {"$size": "$commandes"},
+                "total_articles": {"$size": {"$ifNull": ["$articles", []]}},
+                "total_commandes": {"$size": {"$ifNull": ["$commandes", []]}},
                 "valeur_stock": {
                     "$sum": {
                         "$map": {
-                            "input": "$articles",
+                            "input": {"$ifNull": ["$articles", []]},
                             "as": "article",
-                            "in": {"$multiply": ["$$article.stock_actuel", "$$article.prix_unitaire"]}
+                            "in": {
+                                "$multiply": [
+                                    {"$ifNull": ["$$article.stock_actuel", 0]}, 
+                                    {"$ifNull": ["$$article.prix_unitaire", 0]}
+                                ]
+                            }
                         }
                     }
                 }
