@@ -659,15 +659,15 @@ async def get_articles_report(
         },
         {
             "$addFields": {
-                "fournisseur_nom": "$fournisseur.nom",
-                "valeur_stock": {"$multiply": ["$stock_actuel", "$prix_unitaire"]},
+                "fournisseur_nom": {"$ifNull": ["$fournisseur.nom", "Fournisseur inconnu"]},
+                "valeur_stock": {"$multiply": [{"$ifNull": ["$stock_actuel", 0]}, {"$ifNull": ["$prix_unitaire", 0]}]},
                 "stock_status": {
                     "$cond": {
-                        "if": {"$lte": ["$stock_actuel", "$seuil_min"]},
+                        "if": {"$lte": [{"$ifNull": ["$stock_actuel", 0]}, {"$ifNull": ["$seuil_min", 0]}]},
                         "then": "Critique",
                         "else": {
                             "$cond": {
-                                "if": {"$lte": ["$stock_actuel", {"$multiply": ["$seuil_min", 1.5]}]},
+                                "if": {"$lte": [{"$ifNull": ["$stock_actuel", 0]}, {"$multiply": [{"$ifNull": ["$seuil_min", 0]}, 1.5]}]},
                                 "then": "Bas",
                                 "else": "Normal"
                             }
