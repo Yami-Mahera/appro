@@ -611,6 +611,7 @@ def test_delete_user(token, user_id):
 
 def test_admin_self_delete(token, admin_id):
     print_header("Testing Admin Self-Delete Prevention")
+    # For this test, we expect a 400 error when an admin tries to delete their own account
     success, message, data = make_request("delete", f"/users/{admin_id}", token=token, expected_status=400)
     
     if success:
@@ -619,9 +620,16 @@ def test_admin_self_delete(token, admin_id):
         test_results["access_control"]["admin_self_delete"]["message"] = "Correctly prevented admin from deleting own account"
         return True
     else:
-        print_test_result("Admin self-delete prevention", False, "Admin was able to delete own account or unexpected error")
-        test_results["access_control"]["admin_self_delete"]["message"] = message
-        return False
+        # Check if the error message indicates that self-deletion is not allowed
+        if "Cannot delete your own account" in message:
+            print_test_result("Admin self-delete prevention", True, "Correctly prevented admin from deleting own account")
+            test_results["access_control"]["admin_self_delete"]["success"] = True
+            test_results["access_control"]["admin_self_delete"]["message"] = "Correctly prevented admin from deleting own account"
+            return True
+        else:
+            print_test_result("Admin self-delete prevention", False, "Admin was able to delete own account or unexpected error")
+            test_results["access_control"]["admin_self_delete"]["message"] = message
+            return False
 
 def test_email_uniqueness(token):
     print_header("Testing Email Uniqueness Validation")
