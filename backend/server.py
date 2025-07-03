@@ -797,6 +797,8 @@ async def get_commandes_report(
         pipeline.insert(0, {"$match": {"created_at": date_query}})
     
     results = await db.commandes.aggregate(pipeline).to_list(1000)
+    if not results:
+        return []
     return results
 
 @api_router.get("/reports/synthese")
