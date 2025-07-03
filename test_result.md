@@ -321,3 +321,5 @@ test_plan:
 agent_communication:
   - agent: "main"
     message: "Backend complètement implémenté selon GitHub. Frontend partiellement migré - fournisseurs terminés. Prochaine étape: Articles, Commandes, Reporting"
+  - agent: "main"
+    message: "Analyzing current state after GitHub migration. Need to test backend issues (orders system and reporting API) and implement missing frontend interfaces (Articles, Orders, Reporting). Starting with backend testing to confirm current status."
