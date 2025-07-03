@@ -744,11 +744,20 @@ async def get_commandes_report(
         },
         {
             "$addFields": {
-                "fournisseur_nom": "$fournisseur.nom",
-                "created_by_name": {"$concat": ["$user.prenom", " ", "$user.nom"]},
+                "fournisseur_nom": {"$ifNull": ["$fournisseur.nom", "Fournisseur inconnu"]},
+                "created_by_name": {
+                    "$concat": [
+                        {"$ifNull": ["$user.prenom", ""]}, 
+                        " ", 
+                        {"$ifNull": ["$user.nom", "Utilisateur inconnu"]}
+                    ]
+                },
                 "delai_livraison": {
                     "$cond": {
-                        "if": {"$and": ["$date_commande", "$date_livraison_reelle"]},
+                        "if": {"$and": [
+                            {"$ne": ["$date_commande", None]}, 
+                            {"$ne": ["$date_livraison_reelle", None]}
+                        ]},
                         "then": {
                             "$divide": [
                                 {"$subtract": ["$date_livraison_reelle", "$date_commande"]},
