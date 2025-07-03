@@ -7,6 +7,7 @@ import {
   DocumentTextIcon,
   ExclamationTriangleIcon,
   ChartBarIcon,
+  UserGroupIcon,
   Bars3Icon,
   XMarkIcon,
   UserIcon,
@@ -21,6 +22,7 @@ const navigation = [
   { name: 'Commandes', href: '/commandes', icon: DocumentTextIcon },
   { name: 'Reporting', href: '/reporting', icon: ChartBarIcon },
   { name: 'Alertes', href: '/alertes', icon: ExclamationTriangleIcon },
+  { name: 'Utilisateurs', href: '/users', icon: UserGroupIcon, adminOnly: true },
 ];
 
 interface LayoutProps {
