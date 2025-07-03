@@ -112,6 +112,12 @@ def make_request(method, endpoint, data=None, token=None, params=None, expected_
         headers["Authorization"] = f"Bearer {token}"
     
     try:
+        print_info(f"Making {method.upper()} request to {url}")
+        if data:
+            print_info(f"Request data: {json.dumps(data, indent=2)}")
+        if params:
+            print_info(f"Request params: {params}")
+            
         if method.lower() == "get":
             response = requests.get(url, headers=headers, params=params)
         elif method.lower() == "post":
@@ -123,6 +129,8 @@ def make_request(method, endpoint, data=None, token=None, params=None, expected_
         else:
             raise ValueError(f"Unsupported HTTP method: {method}")
         
+        print_info(f"Response status: {response.status_code}")
+        
         if response.status_code != expected_status:
             print_error(f"Expected status {expected_status}, got {response.status_code}")
             print_error(f"Response: {response.text}")
@@ -131,7 +139,12 @@ def make_request(method, endpoint, data=None, token=None, params=None, expected_
         if response.status_code == 204:  # No content
             return True
         
-        return response.json()
+        try:
+            json_response = response.json()
+            return json_response
+        except json.JSONDecodeError:
+            print_error(f"Failed to parse JSON response: {response.text}")
+            return None
     except Exception as e:
         print_error(f"Request failed: {str(e)}")
         return None
