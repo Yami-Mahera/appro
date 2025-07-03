@@ -333,3 +333,5 @@ agent_communication:
     message: "Backend complètement implémenté selon GitHub. Frontend partiellement migré - fournisseurs terminés. Prochaine étape: Articles, Commandes, Reporting"
   - agent: "main"
     message: "Analyzing current state after GitHub migration. Need to test backend issues (orders system and reporting API) and implement missing frontend interfaces (Articles, Orders, Reporting). Starting with backend testing to confirm current status."
+  - agent: "testing"
+    message: "Tests backend effectués. Deux problèmes critiques identifiés: 1) L'endpoint GET /api/articles/{article_id} est manquant, ce qui empêche la création de commandes. 2) Les endpoints de reporting /reports/fournisseurs et /reports/articles renvoient des erreurs 500, probablement liées aux pipelines d'agrégation MongoDB. Le reste du backend fonctionne correctement."
