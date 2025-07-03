@@ -112,6 +112,9 @@ backend:
       - working: true
         agent: "main"
         comment: "Système JWT implémenté avec rôles utilisateurs et sécurité"
+      - working: true
+        agent: "testing"
+        comment: "Tests d'authentification réussis. Inscription, connexion et vérification du profil fonctionnent correctement pour tous les rôles (admin, manager, user)."
 
   - task: "CRUD complet pour gestion des fournisseurs"
     implemented: true
@@ -124,6 +127,9 @@ backend:
       - working: true
         agent: "main"
         comment: "API complète avec recherche, tri, contacts multiples"
+      - working: true
+        agent: "testing"
+        comment: "Tests CRUD fournisseurs réussis. Création, lecture, mise à jour et recherche fonctionnent correctement. Les filtres de recherche (nom, ville, pays) fonctionnent comme prévu."
 
   - task: "CRUD complet pour gestion des articles"
     implemented: true
@@ -136,18 +142,24 @@ backend:
       - working: true
         agent: "main"
         comment: "Gestion stocks, seuils, familles, liens fournisseurs"
+      - working: true
+        agent: "testing"
+        comment: "Tests CRUD articles réussis. Création, lecture et filtrage fonctionnent correctement. L'API pour les articles avec stock bas fonctionne également."
 
   - task: "Système de commandes d'achat"
     implemented: true
-    working: true
+    working: false
     file: "server.py"
-    stuck_count: 0
+    stuck_count: 1
     priority: "high"
-    needs_retesting: false
+    needs_retesting: true
     status_history:
       - working: true
         agent: "main"
         comment: "Création commandes, lignes, calculs automatiques"
+      - working: false
+        agent: "testing"
+        comment: "Erreur 404 lors de la création d'une commande. L'API ne trouve pas l'article par ID. Problème potentiel avec la récupération des articles dans la route /commandes."
 
   - task: "Système d'alertes"
     implemented: true
@@ -160,18 +172,24 @@ backend:
       - working: true
         agent: "main"
         comment: "Types d'alertes, priorités, notifications"
+      - working: true
+        agent: "testing"
+        comment: "Tests du système d'alertes réussis. Création et récupération des alertes fonctionnent correctement."
 
   - task: "API de reporting et analytics"
     implemented: true
-    working: true
+    working: false
     file: "server.py"
-    stuck_count: 0
+    stuck_count: 1
     priority: "medium"
-    needs_retesting: false
+    needs_retesting: true
     status_history:
       - working: true
         agent: "main"
         comment: "Rapports fournisseurs, articles, commandes, synthèse"
+      - working: false
+        agent: "testing"
+        comment: "Erreur 500 sur les endpoints /reports/fournisseurs et /reports/articles. Erreur sur /reports/commandes. Seul /reports/synthese fonctionne correctement. Problème potentiel avec les agrégations MongoDB."
 
   - task: "Dashboard avec statistiques"
     implemented: true
@@ -184,6 +202,9 @@ backend:
       - working: true
         agent: "main"
         comment: "Stats globales pour tableau de bord"
+      - working: true
+        agent: "testing"
+        comment: "Tests du dashboard réussis. L'API /dashboard/stats renvoie correctement toutes les statistiques attendues."
 
 frontend:
   - task: "Migration vers TypeScript"
