@@ -11,7 +11,7 @@ import os
 from pprint import pprint
 
 # Get the backend URL from the frontend .env file
-BACKEND_URL = "https://75c67791-ffcc-44f2-a064-6752c60cfec9.preview.emergentagent.com/api"
+BACKEND_URL = "https://8a14b788-bf4b-4aff-be7d-f8941fcf1e77.preview.emergentagent.com/api"
 
 # Test data
 test_users = {
