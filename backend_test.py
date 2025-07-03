@@ -768,6 +768,12 @@ def run_all_tests():
     # Test unauthorized access first
     test_unauthorized_access()
     
+    # Register users first if they don't exist
+    print_header("Registering Test Users")
+    admin_registered = test_auth_register(ADMIN_USER)
+    manager_registered = test_auth_register(MANAGER_USER)
+    user_registered = test_auth_register(NORMAL_USER)
+    
     # Test authentication with existing users
     print_header("Testing Authentication with Existing Users")
     admin_token = test_auth_login(ADMIN_USER)
