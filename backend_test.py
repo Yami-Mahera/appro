@@ -972,5 +972,52 @@ def run_all_tests():
     else:
         print_error(f"{test_results['failed']} tests failed.")
 
+def run_focused_tests():
+    """Run only the tests for the failing endpoints identified in test_result.md"""
+    print_header("FOCUSED BACKEND API TESTING")
+    print_info(f"Testing backend API at: {BACKEND_URL}")
+    print_info("Focusing on failing endpoints identified in test_result.md")
+    
+    # Authentication tests (needed for tokens)
+    run_test("User Registration", test_register)
+    run_test("User Login", test_login)
+    
+    # Article tests (needed for commande tests)
+    run_test("Create Article", test_create_article)
+    
+    # Fournisseur tests (needed for commande tests)
+    run_test("Create Fournisseur", test_create_fournisseur)
+    
+    # Priority 1: Purchase Orders System
+    print_header("PRIORITY 1: PURCHASE ORDERS SYSTEM")
+    run_test("Create Commande", test_create_commande)
+    run_test("Get Commandes", test_get_commandes)
+    
+    # Priority 2: Reporting API
+    print_header("PRIORITY 2: REPORTING API")
+    run_test("Reporting Fournisseurs", test_reporting_fournisseurs)
+    run_test("Reporting Articles", test_reporting_articles)
+    run_test("Reporting Commandes", test_reporting_commandes)
+    run_test("Reporting Synthese", test_reporting_synthese)
+    
+    # Print summary
+    print_header("TEST SUMMARY")
+    print(f"Total tests: {test_results['total']}")
+    print(f"Passed: {test_results['passed']}")
+    print(f"Failed: {test_results['failed']}")
+    print(f"Skipped: {test_results['skipped']}")
+    
+    success_rate = test_results['passed'] / test_results['total'] * 100 if test_results['total'] > 0 else 0
+    print(f"Success rate: {success_rate:.2f}%")
+    
+    if test_results['failed'] == 0:
+        print_success("All tests passed successfully!")
+    else:
+        print_error(f"{test_results['failed']} tests failed.")
+
 if __name__ == "__main__":
-    run_all_tests()
+    # Run focused tests by default
+    run_focused_tests()
+    
+    # Uncomment to run all tests
+    # run_all_tests()
