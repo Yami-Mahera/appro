@@ -61,6 +61,14 @@ test_results = {
         "login": {"success": False, "message": "Not tested"},
         "me": {"success": False, "message": "Not tested"}
     },
+    "users": {
+        "list": {"success": False, "message": "Not tested"},
+        "create": {"success": False, "message": "Not tested"},
+        "get": {"success": False, "message": "Not tested"},
+        "update": {"success": False, "message": "Not tested"},
+        "reset_password": {"success": False, "message": "Not tested"},
+        "delete": {"success": False, "message": "Not tested"}
+    },
     "fournisseurs": {
         "create": {"success": False, "message": "Not tested"},
         "list": {"success": False, "message": "Not tested"},
@@ -85,7 +93,13 @@ test_results = {
     },
     "access_control": {
         "unauthorized": {"success": False, "message": "Not tested"},
-        "role_based": {"success": False, "message": "Not tested"}
+        "role_based": {"success": False, "message": "Not tested"},
+        "admin_self_delete": {"success": False, "message": "Not tested"}
+    },
+    "validations": {
+        "email_uniqueness": {"success": False, "message": "Not tested"},
+        "invalid_email": {"success": False, "message": "Not tested"},
+        "password_validation": {"success": False, "message": "Not tested"}
     }
 }
 
