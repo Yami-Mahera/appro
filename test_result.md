@@ -183,9 +183,9 @@ backend:
     implemented: true
     working: false
     file: "server.py"
-    stuck_count: 1
+    stuck_count: 2
     priority: "medium"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: true
         agent: "main"
@@ -193,6 +193,9 @@ backend:
       - working: false
         agent: "testing"
         comment: "Erreur 500 sur les endpoints /reports/fournisseurs et /reports/articles. Erreur sur /reports/commandes. Seul /reports/synthese fonctionne correctement. Problème potentiel avec les agrégations MongoDB."
+      - working: false
+        agent: "testing"
+        comment: "Tests détaillés confirment que les endpoints /reports/fournisseurs et /reports/articles renvoient des erreurs 500 (Internal Server Error). L'endpoint /reports/commandes renvoie un code 200 mais échoue à renvoyer des données valides. Seul /reports/synthese fonctionne correctement. Le problème est probablement lié aux pipelines d'agrégation MongoDB dans les routes de reporting."
 
   - task: "Dashboard avec statistiques"
     implemented: true
