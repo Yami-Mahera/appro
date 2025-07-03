@@ -2,6 +2,7 @@ import requests
 import json
 import time
 import uuid
+import re
 from datetime import datetime, timedelta
 from typing import Dict, List, Optional, Any
 
@@ -9,21 +10,21 @@ from typing import Dict, List, Optional, Any
 BASE_URL = "https://8e9cb52f-5d8f-42e5-bc26-d323127231c4.preview.emergentagent.com/api"
 ADMIN_USER = {
     "email": "admin@test.com",
-    "password": "admin123",
+    "password": "password123",
     "nom": "Admin",
     "prenom": "Test",
     "role": "administrateur"
 }
 MANAGER_USER = {
     "email": "manager@test.com",
-    "password": "manager123",
+    "password": "password123",
     "nom": "Manager",
     "prenom": "Test",
     "role": "manager"
 }
 NORMAL_USER = {
     "email": "user@test.com",
-    "password": "user123",
+    "password": "password123",
     "nom": "User",
     "prenom": "Test",
     "role": "utilisateur"
