@@ -148,6 +148,8 @@ def make_request(method, endpoint, data=None, token=None, expected_status=200):
             response = requests.post(url, json=data, headers=headers)
         elif method.lower() == "put":
             response = requests.put(url, json=data, headers=headers)
+        elif method.lower() == "delete":
+            response = requests.delete(url, headers=headers)
         else:
             return False, f"Unsupported method: {method}", None
         
