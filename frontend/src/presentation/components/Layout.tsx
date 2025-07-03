@@ -75,16 +75,46 @@ const Layout: React.FC<LayoutProps> = ({ children, currentPath = '/' }) => {
               ))}
             </nav>
           </div>
+          {/* User section mobile */}
+          <div className="flex-shrink-0 border-t border-gray-200 p-4">
+            <div className="flex items-center">
+              <div className="w-8 h-8 bg-gradient-to-br from-blue-400 to-purple-500 rounded-full flex items-center justify-center mr-3">
+                <span className="text-xs font-medium text-white">
+                  {user?.prenom?.[0]}{user?.nom?.[0]}
+                </span>
+              </div>
+              <div className="flex-1 min-w-0">
+                <p className="text-sm font-medium text-gray-900 truncate">
+                  {user?.prenom} {user?.nom}
+                </p>
+                <p className="text-xs text-gray-500 truncate">{user?.role}</p>
+              </div>
+              <button
+                onClick={logout}
+                className="ml-2 p-1 text-gray-400 hover:text-red-500 transition-colors duration-200"
+                title="Se déconnecter"
+              >
+                <ArrowRightOnRectangleIcon className="h-5 w-5" />
+              </button>
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* Static sidebar for desktop */}
-      <div className="hidden md:flex md:w-64 md:flex-col md:fixed md:inset-y-0">
-        <div className="flex-1 flex flex-col min-h-0 border-r border-gray-200 bg-white">
-          <div className="flex-1 flex flex-col pt-5 pb-4 overflow-y-auto">
-            <div className="flex items-center flex-shrink-0 px-4">
-              <h1 className="text-xl font-bold text-gray-800">Gestion Appro</h1>
+      <div className="hidden md:flex md:w-72 md:flex-col md:fixed md:inset-y-0">
+        <div className="flex-1 flex flex-col min-h-0 bg-white shadow-xl border-r border-gray-100">
+          <div className="flex-1 flex flex-col pt-8 pb-4 overflow-y-auto custom-scrollbar">
+            <div className="flex items-center flex-shrink-0 px-6 mb-10">
+              <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl flex items-center justify-center mr-4 shadow-lg">
+                <HomeIcon className="w-7 h-7 text-white" />
+              </div>
+              <div>
+                <h1 className="text-xl font-bold text-gray-800">Gestion Appro</h1>
+                <p className="text-sm text-gray-500">Système de gestion</p>
+              </div>
             </div>
-            <nav className="mt-5 flex-1 px-2 bg-white space-y-1">
+            <nav className="flex-1 px-4 space-y-2">
               {navigation
                 .filter(item => !item.adminOnly || user?.role === 'administrateur')
                 .map((item) => (
@@ -92,14 +122,12 @@ const Layout: React.FC<LayoutProps> = ({ children, currentPath = '/' }) => {
                   key={item.name}
                   href={item.href}
                   className={classNames(
-                    currentPath === item.href
-                      ? 'bg-blue-100 text-blue-900'
-                      : 'text-gray-600 hover:bg-gray-50 hover:text-gray-900',
-                    'group flex items-center px-2 py-2 text-sm font-medium rounded-md'
+                    'sidebar-link',
+                    currentPath === item.href ? 'active' : ''
                   )}
                 >
-                  <item.icon className="mr-3 h-6 w-6" />
-                  {item.name}
+                  <item.icon className="mr-4 h-5 w-5" />
+                  <span className="font-medium">{item.name}</span>
                 </a>
               ))}
             </nav>
