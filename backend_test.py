@@ -112,6 +112,10 @@ tokens = {
 
 # IDs for created resources
 created_ids = {
+    "user": None,
+    "user_admin": None,
+    "user_manager": None,
+    "user_normal": None,
     "fournisseur": None,
     "article": None,
     "commande": None,
