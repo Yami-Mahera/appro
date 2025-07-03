@@ -150,9 +150,9 @@ backend:
     implemented: true
     working: false
     file: "server.py"
-    stuck_count: 1
+    stuck_count: 2
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: true
         agent: "main"
@@ -160,6 +160,9 @@ backend:
       - working: false
         agent: "testing"
         comment: "Erreur 404 lors de la création d'une commande. L'API ne trouve pas l'article par ID. Problème potentiel avec la récupération des articles dans la route /commandes."
+      - working: false
+        agent: "testing"
+        comment: "Problème identifié: L'endpoint GET /api/articles/{article_id} n'existe pas dans le code. La route pour récupérer un article par ID est manquante, ce qui cause l'échec de la création de commandes qui dépend de cette fonctionnalité."
 
   - task: "Système d'alertes"
     implemented: true
