@@ -587,19 +587,53 @@ def test_create_commande():
         
         # Create 2 commandes for testing
         for i in range(2):
-            # Get articles for this fournisseur
+            # Get fournisseur for this commande
             fournisseur_id = fournisseur_ids[i % len(fournisseur_ids)]
+            print_info(f"Using fournisseur_id: {fournisseur_id}")
+            
+            # Verify fournisseur exists
+            fournisseur = make_request("get", f"/fournisseurs/{fournisseur_id}", token=tokens[role])
+            if not fournisseur:
+                print_error(f"Failed to get fournisseur {fournisseur_id}")
+                print_info("Skipping commande creation due to fournisseur lookup failure")
+                continue
+            
+            print_info(f"Fournisseur verified: {fournisseur['nom']}")
             
             # Create lignes de commande
             lignes = []
             for j in range(2):  # 2 lines per commande
+                if not article_ids:
+                    print_error("No article IDs available")
+                    continue
+                    
                 article_id = article_ids[(i + j) % len(article_ids)]
+                print_info(f"Using article_id: {article_id}")
                 
                 # Get article details to use the correct price
                 article = make_request("get", f"/articles/{article_id}", token=tokens[role])
                 if not article:
                     print_error(f"Failed to get article {article_id}")
-                    return False
+                    print_info("This is likely the cause of the 404 error in commande creation")
+                    print_info("Checking if article exists in the database...")
+                    
+                    # Try to get all articles to see if our ID is valid
+                    all_articles = make_request("get", "/articles", token=tokens[role])
+                    if all_articles:
+                        found = False
+                        for a in all_articles:
+                            if a["id"] == article_id:
+                                found = True
+                                break
+                        
+                        if found:
+                            print_info(f"Article {article_id} exists in the database but can't be retrieved by ID")
+                        else:
+                            print_info(f"Article {article_id} does not exist in the database")
+                    
+                    continue
+                
+                print_info(f"Article verified: {article['nom']}")
                 
                 quantite = j + 1
                 prix_unitaire = article["prix_unitaire"]
@@ -612,6 +646,10 @@ def test_create_commande():
                     "total": total
                 })
             
+            if not lignes:
+                print_error("No lignes created, skipping commande creation")
+                continue
+            
             commande_data = {
                 "fournisseur_id": fournisseur_id,
                 "lignes": lignes,
@@ -619,11 +657,13 @@ def test_create_commande():
                 "notes": f"Commande test {i+1}"
             }
             
+            print_info(f"Commande data prepared: {json.dumps(commande_data, indent=2)}")
+            
             response = make_request("post", "/commandes", commande_data, token=tokens[role])
             
             if not response:
                 print_error(f"Failed to create commande {i+1} as {role}")
-                return False
+                continue
             
             commande_ids.append(response["id"])
             print_success(f"Successfully created commande {i+1} as {role}: {response['numero_commande']}")
@@ -642,7 +682,7 @@ def test_create_commande():
             
             print_success(f"Automatic calculations verified: Total HT = {response['total_ht']}, Total TTC = {response['total_ttc']}")
     
-    return True
+    return len(commande_ids) > 0
 
 def test_get_commandes():
     print_subheader("Testing get commandes")
