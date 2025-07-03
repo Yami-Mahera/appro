@@ -413,13 +413,16 @@ const UsersAdvanced: React.FC = () => {
                         >
                           <KeyIcon className="w-4 h-4" />
                         </button>
-                        <button
-                          onClick={() => handleDelete(user)}
-                          className="text-red-600 hover:text-red-900"
-                          title="Supprimer"
-                        >
-                          <TrashIcon className="w-4 h-4" />
-                        </button>
+                        {/* Empêcher la suppression de son propre compte */}
+                        {user.id !== currentUser?.id && (
+                          <button
+                            onClick={() => handleDelete(user)}
+                            className="text-red-600 hover:text-red-900"
+                            title="Supprimer"
+                          >
+                            <TrashIcon className="w-4 h-4" />
+                          </button>
+                        )}
                       </div>
                     </td>
                   </tr>
