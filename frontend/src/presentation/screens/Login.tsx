@@ -1,9 +1,10 @@
-import React, { useState } from 'react';
-import { useAuth } from '../../hooks/useAuth';
-import { useForm } from 'react-hook-form';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { loginSchema, LoginData } from '../../common/validators/schemas';
-import { EyeIcon, EyeSlashIcon } from '@heroicons/react/24/outline';
+import React, { useState } from "react";
+import { useAuth } from "../../hooks/useAuth";
+import { useForm } from "react-hook-form";
+import { zodResolver } from "@hookform/resolvers/zod";
+import { loginSchema, LoginData } from "../../common/validators/schemas";
+import { EyeIcon, EyeSlashIcon } from "@heroicons/react/24/outline";
+import { images } from "../../data/constants/images";
 
 const Login: React.FC = () => {
   const { login } = useAuth();
@@ -22,12 +23,12 @@ const Login: React.FC = () => {
   const onSubmit = async (data: LoginData) => {
     setLoading(true);
     setError(null);
-    
+
     try {
       await login(data.email, data.password);
       // Redirect will be handled by the auth context
     } catch (err: any) {
-      setError(err.response?.data?.detail || 'Erreur de connexion');
+      setError(err.response?.data?.detail || "Erreur de connexion");
     } finally {
       setLoading(false);
     }
@@ -37,12 +38,15 @@ const Login: React.FC = () => {
     <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-md w-full space-y-8">
         <div>
-          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
+          {/* <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
             Connexion à votre compte
-          </h2>
-          <p className="mt-2 text-center text-sm text-gray-600">
-            Outil de Gestion des Approvisionnements
-          </p>
+          </h2> */}
+          <div className="w-30 h-30 flex items-center justify-center mb-4">
+            <img src={images.logo} alt="logo star" loading="lazy" />
+          </div>
+          <h1 className="mt-2 text-center text-sm text-gray-600">
+            GESTION DES APPROVISIONNEMENTS ET DES COMMANDES
+          </h1>
         </div>
         <form className="mt-8 space-y-6" onSubmit={handleSubmit(onSubmit)}>
           {error && (
@@ -50,34 +54,42 @@ const Login: React.FC = () => {
               <div className="text-sm text-red-700">{error}</div>
             </div>
           )}
-          
+
           <div className="space-y-4">
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-gray-700">
+              <label
+                htmlFor="email"
+                className="block text-sm font-medium text-gray-700"
+              >
                 Adresse email
               </label>
               <div className="mt-1">
                 <input
-                  {...register('email')}
+                  {...register("email")}
                   type="email"
                   autoComplete="email"
                   className="appearance-none relative block w-full px-3 py-2 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
                   placeholder="votre.email@exemple.com"
                 />
                 {errors.email && (
-                  <p className="mt-1 text-sm text-red-600">{errors.email.message}</p>
+                  <p className="mt-1 text-sm text-red-600">
+                    {errors.email.message}
+                  </p>
                 )}
               </div>
             </div>
-            
+
             <div>
-              <label htmlFor="password" className="block text-sm font-medium text-gray-700">
+              <label
+                htmlFor="password"
+                className="block text-sm font-medium text-gray-700"
+              >
                 Mot de passe
               </label>
               <div className="mt-1 relative">
                 <input
-                  {...register('password')}
-                  type={showPassword ? 'text' : 'password'}
+                  {...register("password")}
+                  type={showPassword ? "text" : "password"}
                   autoComplete="current-password"
                   className="appearance-none relative block w-full px-3 py-2 pr-10 border border-gray-300 placeholder-gray-500 text-gray-900 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 focus:z-10 sm:text-sm"
                   placeholder="Votre mot de passe"
@@ -94,7 +106,9 @@ const Login: React.FC = () => {
                   )}
                 </button>
                 {errors.password && (
-                  <p className="mt-1 text-sm text-red-600">{errors.password.message}</p>
+                  <p className="mt-1 text-sm text-red-600">
+                    {errors.password.message}
+                  </p>
                 )}
               </div>
             </div>
@@ -109,7 +123,7 @@ const Login: React.FC = () => {
               {loading ? (
                 <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white"></div>
               ) : (
-                'Se connecter'
+                "Se connecter"
               )}
             </button>
           </div>

@@ -1,6 +1,6 @@
-import React, { useState, ReactNode } from 'react';
-import { useAuth } from '../../hooks/useAuth';
-import { 
+import React, { useState, ReactNode } from "react";
+import { useAuth } from "../../hooks/useAuth";
+import {
   HomeIcon,
   BuildingOfficeIcon,
   CubeIcon,
@@ -11,18 +11,24 @@ import {
   Bars3Icon,
   XMarkIcon,
   UserIcon,
-  ArrowRightOnRectangleIcon
-} from '@heroicons/react/24/outline';
-import { classNames } from '../../common/utils';
+  ArrowRightOnRectangleIcon,
+} from "@heroicons/react/24/outline";
+import { classNames } from "../../common/utils";
+import { images } from "../../data/constants/images";
 
 const navigation = [
-  { name: 'Dashboard', href: '/', icon: HomeIcon },
-  { name: 'Fournisseurs', href: '/fournisseurs', icon: BuildingOfficeIcon },
-  { name: 'Articles', href: '/articles', icon: CubeIcon },
-  { name: 'Commandes', href: '/commandes', icon: DocumentTextIcon },
-  { name: 'Reporting', href: '/reporting', icon: ChartBarIcon },
-  { name: 'Alertes', href: '/alertes', icon: ExclamationTriangleIcon },
-  { name: 'Utilisateurs', href: '/users', icon: UserGroupIcon, adminOnly: true },
+  { name: "Dashboard", href: "/", icon: HomeIcon },
+  { name: "Fournisseurs", href: "/fournisseurs", icon: BuildingOfficeIcon },
+  { name: "Articles", href: "/articles", icon: CubeIcon },
+  { name: "Commandes", href: "/commandes", icon: DocumentTextIcon },
+  { name: "Reporting", href: "/reporting", icon: ChartBarIcon },
+  { name: "Alertes", href: "/alertes", icon: ExclamationTriangleIcon },
+  {
+    name: "Utilisateurs",
+    href: "/users",
+    icon: UserGroupIcon,
+    adminOnly: true,
+  },
 ];
 
 interface LayoutProps {
@@ -30,17 +36,22 @@ interface LayoutProps {
   currentPath?: string;
 }
 
-const Layout: React.FC<LayoutProps> = ({ children, currentPath = '/' }) => {
+const Layout: React.FC<LayoutProps> = ({ children, currentPath = "/" }) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const { user, logout } = useAuth();
 
   return (
     <div className="h-screen flex bg-gradient-to-br from-gray-50 via-white to-blue-50">
       {/* Mobile menu */}
-      <div className={classNames(
-        sidebarOpen ? 'fixed inset-0 flex z-40 md:hidden' : 'hidden'
-      )}>
-        <div className="modal-overlay" onClick={() => setSidebarOpen(false)}></div>
+      <div
+        className={classNames(
+          sidebarOpen ? "fixed inset-0 flex z-40 md:hidden" : "hidden"
+        )}
+      >
+        <div
+          className="modal-overlay"
+          onClick={() => setSidebarOpen(false)}
+        ></div>
         <div className="relative flex-1 flex flex-col max-w-xs w-full bg-white shadow-2xl">
           <div className="absolute top-0 right-0 -mr-12 pt-2">
             <button
@@ -55,24 +66,28 @@ const Layout: React.FC<LayoutProps> = ({ children, currentPath = '/' }) => {
               <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center mr-3">
                 <HomeIcon className="w-6 h-6 text-white" />
               </div>
-              <h1 className="text-xl font-bold text-gray-800">Gestion Appro</h1>
+              <h1 className="text-xl font-bold text-gray-800">
+                Gestion Approovisionnements
+              </h1>
             </div>
             <nav className="px-4 space-y-2">
               {navigation
-                .filter(item => !item.adminOnly || user?.role === 'administrateur')
+                .filter(
+                  (item) => !item.adminOnly || user?.role === "administrateur"
+                )
                 .map((item) => (
-                <a
-                  key={item.name}
-                  href={item.href}
-                  className={classNames(
-                    'sidebar-link',
-                    currentPath === item.href ? 'active' : ''
-                  )}
-                >
-                  <item.icon className="mr-3 h-5 w-5" />
-                  {item.name}
-                </a>
-              ))}
+                  <a
+                    key={item.name}
+                    href={item.href}
+                    className={classNames(
+                      "sidebar-link",
+                      currentPath === item.href ? "active" : ""
+                    )}
+                  >
+                    <item.icon className="mr-3 h-5 w-5" />
+                    {item.name}
+                  </a>
+                ))}
             </nav>
           </div>
           {/* User section mobile */}
@@ -80,7 +95,8 @@ const Layout: React.FC<LayoutProps> = ({ children, currentPath = '/' }) => {
             <div className="flex items-center">
               <div className="w-8 h-8 bg-gradient-to-br from-blue-400 to-purple-500 rounded-full flex items-center justify-center mr-3">
                 <span className="text-xs font-medium text-white">
-                  {user?.prenom?.[0]}{user?.nom?.[0]}
+                  {user?.prenom?.[0]}
+                  {user?.nom?.[0]}
                 </span>
               </div>
               <div className="flex-1 min-w-0">
@@ -106,46 +122,52 @@ const Layout: React.FC<LayoutProps> = ({ children, currentPath = '/' }) => {
         <div className="flex-1 flex flex-col min-h-0 bg-white shadow-xl border-r border-gray-100">
           <div className="flex-1 flex flex-col pt-8 pb-4 overflow-y-auto custom-scrollbar">
             <div className="flex items-center flex-shrink-0 px-6 mb-10">
-              <div className="w-12 h-12 bg-gradient-to-br from-blue-500 to-purple-600 rounded-2xl flex items-center justify-center mr-4 shadow-lg">
-                <HomeIcon className="w-7 h-7 text-white" />
+              <div className="w-20 h-20 flex items-center justify-center">
+                <img src={images.logo} alt="logo star" loading="lazy" />
               </div>
-              <div>
-                <h1 className="text-xl font-bold text-gray-800">Gestion Appro</h1>
-                <p className="text-sm text-gray-500">Système de gestion</p>
+              <div className="flex items-center">
+                <h1 className="ml-3 text-lg font-semibold text-gray-900">
+                  Gestion des approvisionnements
+                </h1>
               </div>
             </div>
             <nav className="flex-1 px-4 space-y-2">
               {navigation
-                .filter(item => !item.adminOnly || user?.role === 'administrateur')
+                .filter(
+                  (item) => !item.adminOnly || user?.role === "administrateur"
+                )
                 .map((item) => (
-                <a
-                  key={item.name}
-                  href={item.href}
-                  className={classNames(
-                    'sidebar-link',
-                    currentPath === item.href ? 'active' : ''
-                  )}
-                >
-                  <item.icon className="mr-4 h-5 w-5" />
-                  <span className="font-medium">{item.name}</span>
-                </a>
-              ))}
+                  <a
+                    key={item.name}
+                    href={item.href}
+                    className={classNames(
+                      "sidebar-link",
+                      currentPath === item.href ? "active" : ""
+                    )}
+                  >
+                    <item.icon className="mr-4 h-5 w-5" />
+                    <span className="font-medium">{item.name}</span>
+                  </a>
+                ))}
             </nav>
           </div>
-          
+
           {/* User section desktop */}
           <div className="flex-shrink-0 border-t border-gray-100 p-6">
             <div className="flex items-center">
               <div className="w-10 h-10 bg-gradient-to-br from-blue-400 to-purple-500 rounded-xl flex items-center justify-center mr-4 shadow-md">
                 <span className="text-sm font-medium text-white">
-                  {user?.prenom?.[0]}{user?.nom?.[0]}
+                  {user?.prenom?.[0]}
+                  {user?.nom?.[0]}
                 </span>
               </div>
               <div className="flex-1 min-w-0">
                 <p className="text-sm font-semibold text-gray-900 truncate">
                   {user?.prenom} {user?.nom}
                 </p>
-                <p className="text-xs text-gray-500 truncate capitalize">{user?.role}</p>
+                <p className="text-xs text-gray-500 truncate capitalize">
+                  {user?.role}
+                </p>
               </div>
               <button
                 onClick={logout}
@@ -170,13 +192,11 @@ const Layout: React.FC<LayoutProps> = ({ children, currentPath = '/' }) => {
             <Bars3Icon className="h-6 w-6" />
           </button>
         </div>
-        
+
         {/* Page content */}
         <main className="flex-1 relative overflow-y-auto focus:outline-none custom-scrollbar">
           <div className="p-6 lg:p-8">
-            <div className="animate-slideIn">
-              {children}
-            </div>
+            <div className="animate-slideIn">{children}</div>
           </div>
         </main>
       </div>
