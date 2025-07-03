@@ -309,6 +309,149 @@ async def login(user_credentials: UserLogin):
 async def get_current_user_info(current_user: User = Depends(get_current_user)):
     return current_user
 
+# Users Management Routes
+@api_router.get("/users", response_model=List[User])
+async def get_users(
+    search: Optional[str] = None,
+    sort_by: Optional[str] = "nom",
+    sort_order: Optional[str] = "asc",
+    role: Optional[UserRole] = None,
+    active: Optional[bool] = None,
+    limit: Optional[int] = 1000,
+    skip: Optional[int] = 0,
+    current_user: User = Depends(require_roles([UserRole.ADMIN]))
+):
+    # Build query
+    query = {}
+    if active is not None:
+        query["active"] = active
+    if role:
+        query["role"] = role
+    
+    # Add search functionality
+    if search:
+        query["$or"] = [
+            {"nom": {"$regex": search, "$options": "i"}},
+            {"prenom": {"$regex": search, "$options": "i"}},
+            {"email": {"$regex": search, "$options": "i"}}
+        ]
+    
+    # Build sort criteria
+    sort_direction = 1 if sort_order == "asc" else -1
+    sort_criteria = [(sort_by, sort_direction)]
+    
+    users = await db.users.find(query).sort(sort_criteria).skip(skip).limit(limit).to_list(limit)
+    return [User(**u) for u in users]
+
+@api_router.post("/users", response_model=User)
+async def create_user(
+    user_data: UserCreate,
+    current_user: User = Depends(require_roles([UserRole.ADMIN]))
+):
+    # Check if user exists
+    existing_user = await db.users.find_one({"email": user_data.email})
+    if existing_user:
+        raise HTTPException(status_code=400, detail="Email already registered")
+    
+    # Hash password
+    hashed_password = pwd_context.hash(user_data.password)
+    
+    # Create user
+    user_dict = user_data.dict(exclude={"password"})
+    user = User(**user_dict)
+    user_with_password = user.dict()
+    user_with_password["hashed_password"] = hashed_password
+    
+    await db.users.insert_one(user_with_password)
+    return user
+
+@api_router.get("/users/{user_id}", response_model=User)
+async def get_user(
+    user_id: str,
+    current_user: User = Depends(require_roles([UserRole.ADMIN]))
+):
+    user = await db.users.find_one({"id": user_id})
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    return User(**user)
+
+@api_router.put("/users/{user_id}", response_model=User)
+async def update_user(
+    user_id: str,
+    user_data: UserUpdate,
+    current_user: User = Depends(require_roles([UserRole.ADMIN]))
+):
+    # Check if user exists
+    existing_user = await db.users.find_one({"id": user_id})
+    if not existing_user:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    # Check email uniqueness if email is being updated
+    if user_data.email and user_data.email != existing_user["email"]:
+        email_exists = await db.users.find_one({"email": user_data.email, "id": {"$ne": user_id}})
+        if email_exists:
+            raise HTTPException(status_code=400, detail="Email already in use")
+    
+    # Update only provided fields
+    update_data = {}
+    for field, value in user_data.dict(exclude_unset=True).items():
+        update_data[field] = value
+    
+    if update_data:
+        update_data["updated_at"] = datetime.utcnow()
+        await db.users.update_one(
+            {"id": user_id},
+            {"$set": update_data}
+        )
+    
+    # Return updated user
+    updated_user = await db.users.find_one({"id": user_id})
+    return User(**updated_user)
+
+@api_router.delete("/users/{user_id}")
+async def delete_user(
+    user_id: str,
+    current_user: User = Depends(require_roles([UserRole.ADMIN]))
+):
+    # Check if user exists
+    user = await db.users.find_one({"id": user_id})
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    # Prevent admin from deleting themselves
+    if user_id == current_user.id:
+        raise HTTPException(status_code=400, detail="Cannot delete your own account")
+    
+    # Soft delete - mark as inactive
+    await db.users.update_one(
+        {"id": user_id},
+        {"$set": {"active": False, "updated_at": datetime.utcnow()}}
+    )
+    
+    return {"message": "User deleted successfully"}
+
+@api_router.put("/users/{user_id}/reset-password")
+async def reset_user_password(
+    user_id: str,
+    new_password: str,
+    current_user: User = Depends(require_roles([UserRole.ADMIN]))
+):
+    # Check if user exists
+    user = await db.users.find_one({"id": user_id})
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    
+    # Hash new password
+    hashed_password = pwd_context.hash(new_password)
+    
+    # Update password
+    await db.users.update_one(
+        {"id": user_id},
+        {"$set": {"hashed_password": hashed_password, "updated_at": datetime.utcnow()}}
+    )
+    
+    return {"message": "Password reset successfully"}
+
 # Fournisseur Routes
 @api_router.post("/fournisseurs", response_model=Fournisseur)
 async def create_fournisseur(
