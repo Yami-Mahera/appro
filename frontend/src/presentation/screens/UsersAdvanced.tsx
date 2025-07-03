@@ -13,6 +13,7 @@ import {
   UserCircleIcon
 } from '@heroicons/react/24/outline';
 import ApiService from '../../services/api';
+import { useAuth } from '../../hooks/useAuth';
 
 interface User {
   id: string;
