@@ -768,36 +768,88 @@ def run_all_tests():
     # Test unauthorized access first
     test_unauthorized_access()
     
-    # Test authentication
-    admin_registered = test_auth_register(ADMIN_USER)
-    if admin_registered:
-        admin_token = test_auth_login(ADMIN_USER)
-        if admin_token:
-            test_auth_me(admin_token, ADMIN_USER["email"])
+    # Test authentication with existing users
+    print_header("Testing Authentication with Existing Users")
+    admin_token = test_auth_login(ADMIN_USER)
+    if admin_token:
+        test_auth_me(admin_token, ADMIN_USER["email"])
+        tokens["admin"] = admin_token
+    else:
+        print("Admin authentication failed, cannot proceed with further tests")
+        print_summary()
+        return
     
-    # Register manager user
-    manager_registered = test_auth_register(MANAGER_USER)
-    if manager_registered:
-        manager_token = test_auth_login(MANAGER_USER)
-        if manager_token:
-            test_auth_me(manager_token, MANAGER_USER["email"])
+    # Test manager authentication
+    manager_token = test_auth_login(MANAGER_USER)
+    if manager_token:
+        test_auth_me(manager_token, MANAGER_USER["email"])
+        tokens["manager"] = manager_token
     
-    # Register a normal user
-    user_registered = test_auth_register(NORMAL_USER)
-    if user_registered:
-        user_token = test_auth_login(NORMAL_USER)
-        if user_token:
-            test_auth_me(user_token, NORMAL_USER["email"])
+    # Test normal user authentication
+    user_token = test_auth_login(NORMAL_USER)
+    if user_token:
+        test_auth_me(user_token, NORMAL_USER["email"])
+        tokens["user"] = user_token
     
     # Test role-based access control
     if tokens["user"]:
         test_role_based_access()
     
-    # If admin authentication failed, we can't test the rest
-    if not tokens["admin"]:
-        print("Admin authentication failed, cannot proceed with further tests")
-        print_summary()
-        return
+    # Test user management APIs
+    print_header("Testing User Management APIs")
+    
+    # Test listing users (admin only)
+    test_list_users(tokens["admin"])
+    
+    # Test creating users with different roles
+    admin_user_id = test_create_user(tokens["admin"], "administrateur")
+    manager_user_id = test_create_user(tokens["admin"], "manager")
+    normal_user_id = test_create_user(tokens["admin"], "utilisateur")
+    
+    # Test getting a specific user
+    if normal_user_id:
+        test_get_user(tokens["admin"], normal_user_id)
+    
+    # Test updating a user
+    if manager_user_id:
+        test_update_user(tokens["admin"], manager_user_id)
+    
+    # Test resetting a user's password
+    if normal_user_id:
+        test_reset_user_password(tokens["admin"], normal_user_id)
+    
+    # Test admin self-delete prevention
+    if tokens["admin"]:
+        # Get the current admin's ID from /auth/me
+        success, message, admin_data = make_request("get", "/auth/me", token=tokens["admin"], expected_status=200)
+        if success and admin_data and "id" in admin_data:
+            test_admin_self_delete(tokens["admin"], admin_data["id"])
+    
+    # Test deleting a user
+    if normal_user_id:
+        test_delete_user(tokens["admin"], normal_user_id)
+    
+    # Test validations
+    test_email_uniqueness(tokens["admin"])
+    test_invalid_email(tokens["admin"])
+    test_password_validation(tokens["admin"])
+    
+    # Test access control with non-admin users
+    if tokens["manager"]:
+        print_header("Testing Access Control with Manager User")
+        success, message, data = make_request("get", "/users", token=tokens["manager"], expected_status=403)
+        if success:
+            print_test_result("Manager access to users API", True, "Correctly rejected manager access to users API")
+        else:
+            print_test_result("Manager access to users API", False, "Manager was able to access users API or unexpected error")
+    
+    if tokens["user"]:
+        print_header("Testing Access Control with Normal User")
+        success, message, data = make_request("get", "/users", token=tokens["user"], expected_status=403)
+        if success:
+            print_test_result("Normal user access to users API", True, "Correctly rejected normal user access to users API")
+        else:
+            print_test_result("Normal user access to users API", False, "Normal user was able to access users API or unexpected error")
     
     # Test fournisseurs
     fournisseur_id = test_create_fournisseur(tokens["admin"])
@@ -825,9 +877,6 @@ def run_all_tests():
     
     # Test dashboard
     test_dashboard_stats(tokens["admin"])
-    
-    # Create additional test data
-    create_test_data(tokens["admin"])
     
     # Print summary
     print_summary()
