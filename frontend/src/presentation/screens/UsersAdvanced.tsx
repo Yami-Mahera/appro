@@ -148,6 +148,12 @@ const UsersAdvanced: React.FC = () => {
   };
 
   const handleDelete = async (user: User) => {
+    // Empêcher la suppression de son propre compte
+    if (user.id === currentUser?.id) {
+      setError('Vous ne pouvez pas supprimer votre propre compte');
+      return;
+    }
+    
     if (window.confirm(`Êtes-vous sûr de vouloir supprimer l'utilisateur ${user.prenom} ${user.nom} ?`)) {
       try {
         await ApiService.deleteUser(user.id);
