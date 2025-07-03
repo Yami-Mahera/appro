@@ -88,7 +88,7 @@ def login():
     print_subheader("Logging in as admin")
     
     login_data = {
-        "email": "admin@test.com",
+        "email": "admin_1751542850@test.com",
         "password": "Admin@123456"
     }
     
