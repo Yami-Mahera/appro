@@ -174,7 +174,7 @@ const UsersAdvanced: React.FC = () => {
     setShowModal(true);
   };
 
-  const handlePasswordReset = (user: User) => {
+  const openPasswordResetModal = (user: User) => {
     setResetPasswordUser(user);
     setPasswordData({ newPassword: '', confirmPassword: '' });
     setShowPasswordModal(true);
