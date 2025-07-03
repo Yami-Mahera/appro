@@ -810,6 +810,17 @@ def test_reporting_fournisseurs():
         
         if not response:
             print_error(f"Failed to get fournisseurs report as {role}")
+            print_info("This endpoint is reported to be failing with 500 error")
+            print_info("Checking MongoDB aggregation pipeline...")
+            
+            # Try to get regular fournisseurs to see if the base collection is accessible
+            fournisseurs = make_request("get", "/fournisseurs", token=token)
+            if fournisseurs:
+                print_info(f"Regular fournisseurs endpoint works, found {len(fournisseurs)} fournisseurs")
+                print_info("Issue is likely in the aggregation pipeline for the report")
+            else:
+                print_info("Regular fournisseurs endpoint also fails, possible database connectivity issue")
+            
             return False
         
         print_success(f"Successfully got fournisseurs report as {role}: {len(response)} fournisseurs")
@@ -827,6 +838,17 @@ def test_reporting_articles():
         
         if not response:
             print_error(f"Failed to get articles report as {role}")
+            print_info("This endpoint is reported to be failing with 500 error")
+            print_info("Checking MongoDB aggregation pipeline...")
+            
+            # Try to get regular articles to see if the base collection is accessible
+            articles = make_request("get", "/articles", token=token)
+            if articles:
+                print_info(f"Regular articles endpoint works, found {len(articles)} articles")
+                print_info("Issue is likely in the aggregation pipeline for the report")
+            else:
+                print_info("Regular articles endpoint also fails, possible database connectivity issue")
+            
             return False
         
         print_success(f"Successfully got articles report as {role}: {len(response)} articles")
@@ -844,6 +866,17 @@ def test_reporting_commandes():
         
         if not response:
             print_error(f"Failed to get commandes report as {role}")
+            print_info("This endpoint is reported to be failing with 500 error")
+            print_info("Checking MongoDB aggregation pipeline...")
+            
+            # Try to get regular commandes to see if the base collection is accessible
+            commandes = make_request("get", "/commandes", token=token)
+            if commandes:
+                print_info(f"Regular commandes endpoint works, found {len(commandes)} commandes")
+                print_info("Issue is likely in the aggregation pipeline for the report")
+            else:
+                print_info("Regular commandes endpoint also fails, possible database connectivity issue")
+            
             return False
         
         print_success(f"Successfully got commandes report as {role}: {len(response)} commandes")
