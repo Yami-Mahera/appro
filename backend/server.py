@@ -70,6 +70,13 @@ class UserCreate(BaseModel):
     prenom: str
     role: UserRole = UserRole.USER
 
+class UserUpdate(BaseModel):
+    email: Optional[EmailStr] = None
+    nom: Optional[str] = None
+    prenom: Optional[str] = None
+    role: Optional[UserRole] = None
+    active: Optional[bool] = None
+
 class UserLogin(BaseModel):
     email: EmailStr
     password: str
