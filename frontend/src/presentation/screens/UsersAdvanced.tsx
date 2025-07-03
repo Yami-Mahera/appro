@@ -238,6 +238,17 @@ const UsersAdvanced: React.FC = () => {
     );
   }
 
+  // Si pas admin, afficher message d'erreur
+  if (!isAdmin) {
+    return (
+      <div className="flex flex-col items-center justify-center h-64">
+        <ShieldCheckIcon className="w-16 h-16 text-red-500 mb-4" />
+        <h2 className="text-xl font-semibold text-gray-900 mb-2">Accès refusé</h2>
+        <p className="text-gray-600">Vous devez être administrateur pour accéder à cette page.</p>
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
