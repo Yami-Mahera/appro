@@ -441,6 +441,17 @@ async def get_articles_stock_bas(
     }).to_list(1000)
     return [Article(**a) for a in articles]
 
+# Get article by ID
+@api_router.get("/articles/{article_id}", response_model=Article)
+async def get_article(
+    article_id: str,
+    current_user: User = Depends(get_current_user)
+):
+    article = await db.articles.find_one({"id": article_id})
+    if not article:
+        raise HTTPException(status_code=404, detail="Article not found")
+    return Article(**article)
+
 # Commandes Routes
 @api_router.post("/commandes", response_model=Commande)
 async def create_commande(
