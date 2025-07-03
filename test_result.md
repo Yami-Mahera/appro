@@ -311,12 +311,16 @@ metadata:
 
 test_plan:
   current_focus:
+    - "Système de commandes d'achat"
+    - "API de reporting et analytics"
     - "Interface de gestion des articles"
     - "Interface de gestion des commandes"
     - "Interface de reporting"
-  stuck_tasks: []
+  stuck_tasks:
+    - "Système de commandes d'achat"
+    - "API de reporting et analytics"
   test_all: false
-  test_priority: "high_first"
+  test_priority: "stuck_first"
 
 agent_communication:
   - agent: "main"
