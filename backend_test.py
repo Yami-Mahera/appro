@@ -787,34 +787,47 @@ def run_all_tests():
     # Test unauthorized access first
     test_unauthorized_access()
     
-    # Register users first if they don't exist
-    print_header("Registering Test Users")
-    admin_registered = test_auth_register(ADMIN_USER)
-    manager_registered = test_auth_register(MANAGER_USER)
-    user_registered = test_auth_register(NORMAL_USER)
-    
-    # Test authentication with existing users
+    # Try to login with existing users first
     print_header("Testing Authentication with Existing Users")
     admin_token = test_auth_login(ADMIN_USER)
+    manager_token = test_auth_login(MANAGER_USER)
+    user_token = test_auth_login(NORMAL_USER)
+    
+    # Register users only if login failed
+    if not admin_token:
+        print_header("Registering Admin User")
+        admin_registered = test_auth_register(ADMIN_USER)
+        if admin_registered:
+            admin_token = test_auth_login(ADMIN_USER)
+    
+    if not manager_token:
+        print_header("Registering Manager User")
+        manager_registered = test_auth_register(MANAGER_USER)
+        if manager_registered:
+            manager_token = test_auth_login(MANAGER_USER)
+    
+    if not user_token:
+        print_header("Registering Normal User")
+        user_registered = test_auth_register(NORMAL_USER)
+        if user_registered:
+            user_token = test_auth_login(NORMAL_USER)
+    
+    # Store tokens
     if admin_token:
-        test_auth_me(admin_token, ADMIN_USER["email"])
         tokens["admin"] = admin_token
+        test_auth_me(admin_token, ADMIN_USER["email"])
     else:
         print("Admin authentication failed, cannot proceed with further tests")
         print_summary()
         return
     
-    # Test manager authentication
-    manager_token = test_auth_login(MANAGER_USER)
     if manager_token:
-        test_auth_me(manager_token, MANAGER_USER["email"])
         tokens["manager"] = manager_token
+        test_auth_me(manager_token, MANAGER_USER["email"])
     
-    # Test normal user authentication
-    user_token = test_auth_login(NORMAL_USER)
     if user_token:
-        test_auth_me(user_token, NORMAL_USER["email"])
         tokens["user"] = user_token
+        test_auth_me(user_token, NORMAL_USER["email"])
     
     # Test role-based access control
     if tokens["user"]:
