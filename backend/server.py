@@ -1,5 +1,6 @@
-from fastapi import FastAPI, APIRouter, Depends, HTTPException, status
+from fastapi import FastAPI, APIRouter, Depends, HTTPException, status, Response
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
+from fastapi.responses import FileResponse, StreamingResponse
 from dotenv import load_dotenv
 from starlette.middleware.cors import CORSMiddleware
 from motor.motor_asyncio import AsyncIOMotorClient
@@ -13,6 +14,23 @@ from datetime import datetime, timedelta
 from passlib.context import CryptContext
 import jwt
 from enum import Enum
+import pandas as pd
+import openpyxl
+from openpyxl.styles import Font, PatternFill, Alignment
+from reportlab.lib.pagesizes import letter, A4
+from reportlab.platypus import SimpleDocTemplate, Table, TableStyle, Paragraph, Spacer
+from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
+from reportlab.lib import colors
+from reportlab.lib.units import inch
+import matplotlib.pyplot as plt
+import seaborn as sns
+import plotly.graph_objects as go
+import plotly.express as px
+import io
+import base64
+import csv
+from fpdf import FPDF
+import tempfile
 
 
 ROOT_DIR = Path(__file__).parent
