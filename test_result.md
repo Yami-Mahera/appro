@@ -318,6 +318,96 @@ backend:
         agent: "testing"
         comment: "Les APIs pour les prévisions de consommation fonctionnent correctement. L'endpoint POST /api/stock/previsions permet de créer une prévision avec toutes les informations nécessaires. L'endpoint GET /api/stock/previsions/{article_id} retourne correctement les prévisions pour un article donné, avec la possibilité de filtrer par période."
 
+  - task: "APIs d'Export de Données"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Implémenté les endpoints pour exporter les données en Excel, CSV et PDF"
+      - working: true
+        agent: "testing"
+        comment: "Les APIs d'export de données fonctionnent correctement. Les endpoints /api/export/fournisseurs/excel, /api/export/articles/csv et /api/export/commandes/pdf génèrent correctement les fichiers dans les formats demandés. Les fichiers contiennent toutes les données attendues et sont correctement formatés."
+
+  - task: "APIs KPIs"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Implémenté les endpoints pour calculer et récupérer les KPIs"
+      - working: true
+        agent: "testing"
+        comment: "Les APIs KPIs fonctionnent correctement. Les endpoints /api/kpis/taux-service-client, /api/kpis/delai-moyen-livraison et /api/kpis/synthese retournent les données attendues. Les calculs sont cohérents et les données sont correctement formatées."
+
+  - task: "APIs Power BI"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Implémenté les endpoints pour l'intégration avec Power BI"
+      - working: true
+        agent: "testing"
+        comment: "Les APIs Power BI fonctionnent correctement. Les endpoints /api/powerbi/datasets et /api/powerbi/data/fournisseurs retournent les données attendues dans le format requis pour l'intégration avec Power BI."
+
+  - task: "APIs Variations"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Implémenté les endpoints pour analyser les variations et écarts"
+      - working: true
+        agent: "testing"
+        comment: "Les APIs Variations fonctionnent correctement. Les endpoints /api/variations/ecarts et /api/variations/previsions-vs-realisations/{article_id} retournent les données attendues. Les calculs d'écarts sont cohérents et les données sont correctement formatées."
+
+  - task: "API Validation Avancée des Commandes"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Implémenté l'endpoint pour la validation avancée des commandes"
+      - working: true
+        agent: "testing"
+        comment: "L'API de validation avancée des commandes fonctionne correctement. L'endpoint /api/commandes/validation-avancee permet de valider une commande en vérifiant toutes les contraintes spécifiées. Les validations sont correctement effectuées et les résultats sont cohérents."
+
+  - task: "APIs Dashboards Personnalisés"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Implémenté les endpoints pour créer et gérer des dashboards personnalisés"
+      - working: true
+        agent: "testing"
+        comment: "Les APIs Dashboards Personnalisés fonctionnent correctement. Les endpoints /api/dashboards/personnalises et /api/dashboards/widgets-disponibles retournent les données attendues. La création de dashboards personnalisés fonctionne comme prévu et les widgets disponibles sont correctement listés."
+
 frontend:
   - task: "Architecture TypeScript modulaire"
     implemented: true
