@@ -520,11 +520,14 @@ frontend:
     file: "/app/frontend/src/presentation/components/StockEvolutionChart.tsx"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
         comment: "Créé le composant StockEvolutionChart avec graphique sophistiqué selon les spécifications : courbes pointillés (rouge/vert/rose), zone grise d'écartement, annotations (ETA, CMD-P, MODE=M, etc.), métriques CMS/CMC/QM"
+      - working: true
+        agent: "testing"
+        comment: "Le composant StockEvolutionChart fonctionne correctement. Le graphique affiche les courbes pointillées, la zone d'écartement et les annotations comme spécifié. Les métriques CMS, CMC et QM sont correctement calculées et affichées."
 
   - task: "Composants UI avancés"
     implemented: true
