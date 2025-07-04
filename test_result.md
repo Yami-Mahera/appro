@@ -551,9 +551,7 @@ metadata:
   run_ui: false
 
 test_plan:
-  current_focus:
-    - "Graphique d'évolution du stock sophistiqué"
-    - "Composants UI avancés"
+  current_focus: []
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
