@@ -102,7 +102,7 @@
 # Testing Data - Main Agent and testing sub agent both should log testing data below this section
 #====================================================================================================
 
-user_problem_statement: "Créer un outil de gestion des approvisionnements et des commandes avec dashboard analytics, fournisseurs, articles, commandes, alertes. Interface moderne avec Tailwind CSS basée sur l'architecture du projet GitHub https://github.com/Yami-Mahera/appro/tree/based. NOUVEAU: Implémentation d'un système avancé de gestion des stocks avec graphique d'évolution sophistiqué selon les modalités de calcul CMS, CMC, QM et seuils d'alerte avancés."
+user_problem_statement: "Créer un outil de gestion des approvisionnements et des commandes avec dashboard analytics, fournisseurs, articles, commandes, alertes. Interface moderne avec Tailwind CSS basée sur l'architecture du projet GitHub https://github.com/Yami-Mahera/appro/tree/based. NOUVEAU: Implémentation d'un système avancé de gestion des stocks avec graphique d'évolution sophistiqué selon les modalités de calcul CMS, CMC, QM et seuils d'alerte avancés. PHASE 1: Implémentation des 3 tableaux principaux selon les images fournies: Tableau de projection de la couverture de stock, Tableau de simulation de commande, Tableau de suivi des commandes en cours."
 
 backend:
   - task: "Modèles de données MongoDB"
@@ -408,96 +408,6 @@ backend:
         agent: "testing"
         comment: "APIs tableaux de bord personnalisés testées avec succès. Création, gestion, et récupération des widgets fonctionnent parfaitement avec support configuration avancée."
 
-  - task: "APIs d'Export de Données"
-    implemented: true
-    working: true
-    file: "/app/backend/server.py"
-    stuck_count: 0
-    priority: "high"
-    needs_retesting: false
-    status_history:
-      - working: "NA"
-        agent: "main"
-        comment: "Implémenté les endpoints pour exporter les données en Excel, CSV et PDF"
-      - working: true
-        agent: "testing"
-        comment: "Les APIs d'export de données fonctionnent correctement. Les endpoints /api/export/fournisseurs/excel, /api/export/articles/csv et /api/export/commandes/pdf génèrent correctement les fichiers dans les formats demandés. Les fichiers contiennent toutes les données attendues et sont correctement formatés."
-
-  - task: "APIs KPIs"
-    implemented: true
-    working: true
-    file: "/app/backend/server.py"
-    stuck_count: 0
-    priority: "high"
-    needs_retesting: false
-    status_history:
-      - working: "NA"
-        agent: "main"
-        comment: "Implémenté les endpoints pour calculer et récupérer les KPIs"
-      - working: true
-        agent: "testing"
-        comment: "Les APIs KPIs fonctionnent correctement. Les endpoints /api/kpis/taux-service-client, /api/kpis/delai-moyen-livraison et /api/kpis/synthese retournent les données attendues. Les calculs sont cohérents et les données sont correctement formatées."
-
-  - task: "APIs Power BI"
-    implemented: true
-    working: true
-    file: "/app/backend/server.py"
-    stuck_count: 0
-    priority: "high"
-    needs_retesting: false
-    status_history:
-      - working: "NA"
-        agent: "main"
-        comment: "Implémenté les endpoints pour l'intégration avec Power BI"
-      - working: true
-        agent: "testing"
-        comment: "Les APIs Power BI fonctionnent correctement. Les endpoints /api/powerbi/datasets et /api/powerbi/data/fournisseurs retournent les données attendues dans le format requis pour l'intégration avec Power BI."
-
-  - task: "APIs Variations"
-    implemented: true
-    working: true
-    file: "/app/backend/server.py"
-    stuck_count: 0
-    priority: "high"
-    needs_retesting: false
-    status_history:
-      - working: "NA"
-        agent: "main"
-        comment: "Implémenté les endpoints pour analyser les variations et écarts"
-      - working: true
-        agent: "testing"
-        comment: "Les APIs Variations fonctionnent correctement. Les endpoints /api/variations/ecarts et /api/variations/previsions-vs-realisations/{article_id} retournent les données attendues. Les calculs d'écarts sont cohérents et les données sont correctement formatées."
-
-  - task: "API Validation Avancée des Commandes"
-    implemented: true
-    working: true
-    file: "/app/backend/server.py"
-    stuck_count: 0
-    priority: "high"
-    needs_retesting: false
-    status_history:
-      - working: "NA"
-        agent: "main"
-        comment: "Implémenté l'endpoint pour la validation avancée des commandes"
-      - working: true
-        agent: "testing"
-        comment: "L'API de validation avancée des commandes fonctionne correctement. L'endpoint /api/commandes/validation-avancee permet de valider une commande en vérifiant toutes les contraintes spécifiées. Les validations sont correctement effectuées et les résultats sont cohérents."
-
-  - task: "APIs Dashboards Personnalisés"
-    implemented: true
-    working: true
-    file: "/app/backend/server.py"
-    stuck_count: 0
-    priority: "high"
-    needs_retesting: false
-    status_history:
-      - working: "NA"
-        agent: "main"
-        comment: "Implémenté les endpoints pour créer et gérer des dashboards personnalisés"
-      - working: true
-        agent: "testing"
-        comment: "Les APIs Dashboards Personnalisés fonctionnent correctement. Les endpoints /api/dashboards/personnalises et /api/dashboards/widgets-disponibles retournent les données attendues. La création de dashboards personnalisés fonctionne comme prévu et les widgets disponibles sont correctement listés."
-
 frontend:
   - task: "Architecture TypeScript modulaire"
     implemented: true
@@ -634,6 +544,78 @@ frontend:
         agent: "testing"
         comment: "Les composants UI avancés fonctionnent correctement. Les composants Card, Select et Button sont bien implémentés et supportent correctement le graphique d'évolution du stock."
 
+  - task: "Tableau de projection de la couverture de stock"
+    implemented: true
+    working: "NA"
+    file: "/app/frontend/src/presentation/components/TableauProjectionCouverture.tsx"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Créé le composant TableauProjectionCouverture avec affichage des semaines, stock début/fin, QM prévisionnelle, calculs CMS/CMC/QM intégrés, couleurs d'alertes et lignes détaillées extensibles"
+
+  - task: "Tableau de simulation de commande"
+    implemented: true
+    working: "NA"
+    file: "/app/frontend/src/presentation/components/TableauSimulationCommande.tsx"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Créé le composant TableauSimulationCommande avec interface de simulation, calculs en temps réel des quantités, validation des contraintes, métriques CMS/CMC/QM et résumé de simulation"
+
+  - task: "Tableau de suivi des commandes en cours"
+    implemented: true
+    working: "NA"
+    file: "/app/frontend/src/presentation/components/TableauSuiviCommandes.tsx"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Créé le composant TableauSuiviCommandes avec suivi temps réel, alertes de retard, statuts, filtres avancés, statistiques rapides et modal de détails"
+
+  - task: "Page Gestion Stocks Avancée"
+    implemented: true
+    working: "NA"
+    file: "/app/frontend/src/presentation/screens/GestionStocksAvancee.tsx"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Créé la page GestionStocksAvancee qui combine les 3 tableaux avec navigation par onglets et rappel des modalités de calcul CMS/CMC/QM"
+
+  - task: "Extension API Service pour nouveaux endpoints"
+    implemented: true
+    working: "NA"
+    file: "/app/frontend/src/services/api.ts"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Étendu le service API avec nouvelles méthodes pour validation commandes avancée, KPIs, export données, Power BI, variations, dashboards personnalisés"
+
+  - task: "Intégration navigation - route Stocks Avancés"
+    implemented: true
+    working: "NA"
+    file: "/app/frontend/src/App.tsx, /app/frontend/src/presentation/components/Layout.tsx"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Ajouté la route /stocks-avances dans App.tsx et le lien de navigation 'Stocks Avancés' dans Layout.tsx avec icône Squares2X2Icon"
+
 metadata:
   created_by: "main_agent"
   version: "1.0"
@@ -641,17 +623,17 @@ metadata:
   run_ui: false
 
 test_plan:
-  current_focus: []
+  current_focus:
+    - "Tableau de projection de la couverture de stock"
+    - "Tableau de simulation de commande"
+    - "Tableau de suivi des commandes en cours"
+    - "Page Gestion Stocks Avancée"
+    - "Extension API Service pour nouveaux endpoints"
+    - "Intégration navigation - route Stocks Avancés"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
 
 agent_communication:
   - agent: "main"
-    message: "IMPLÉMENTATION COMPLÈTE DU SYSTÈME AVANCÉ DE REPORTING, ANALYTICS ET GESTION DES ALERTES terminée ! Backend : 24 nouvelles APIs implémentées et testées incluant exports multi-formats (Excel/PDF/CSV), KPIs spécifiques, interface Power BI, suivi des variations, validation commandes avancée, et tableaux de bord personnalisés. Toutes les modalités de calcul sophistiquées (CMS, CMC, QM) intégrées. Tous les tests backend passent ✅. Prêt pour développement frontend."
-  - agent: "testing"
-    message: "Tests complets des nouvelles APIs de gestion avancée des stocks effectués. Toutes les APIs fonctionnent correctement : POST /api/stock/mouvements pour créer des mouvements de stock, GET /api/stock/mouvements/{article_id} pour récupérer l'historique, GET /api/stock/couverture/{article_id} pour calculer les métriques de couverture, GET /api/stock/evolution/{article_id} pour l'évolution du stock, GET /api/stock/alertes-avancees et POST /api/stock/generer-alertes pour les alertes, et POST /api/stock/previsions et GET /api/stock/previsions/{article_id} pour les prévisions de consommation. Les calculs sont cohérents et les données sont correctement formatées."
-  - agent: "testing"
-    message: "TESTS COMPLETS DU SYSTÈME AVANCÉ DE REPORTING ET ANALYTICS terminés avec succès ! Toutes les nouvelles APIs testées : ✅ Export (Excel/PDF/CSV) avec génération correcte des fichiers ✅ KPIs spécifiques avec calculs précis ✅ Interface Power BI avec format de données correct ✅ Suivi des variations avec analyses détaillées ✅ Validation commandes avancée avec vérification des contraintes ✅ Tableaux de bord personnalisés avec widgets configurables. Aucun problème majeur détecté. Backend prêt pour production."
-  - agent: "testing"
-    message: "Tests complets des nouvelles APIs de reporting et d'analytics effectués. Toutes les APIs fonctionnent correctement : les APIs d'export (Excel, CSV, PDF), les APIs KPIs, les APIs Power BI, les APIs de variations, l'API de validation avancée des commandes et les APIs de dashboards personnalisés. Tous les tests ont réussi et les données retournées sont correctement formatées. Les fonctionnalités d'export génèrent des fichiers valides dans les formats demandés. Les calculs de KPIs sont cohérents et les données pour Power BI sont correctement structurées."
+    message: "PHASE 1 TERMINÉE - IMPLÉMENTATION DES 3 TABLEAUX PRINCIPAUX selon les images fournies ! ✅ Tableau de projection de la couverture de stock avec calculs CMS/CMC/QM ✅ Tableau de simulation de commande avec validation avancée ✅ Tableau de suivi des commandes en cours avec alertes temps réel ✅ Page intégrée avec navigation par onglets ✅ Extension API service avec nouvelles méthodes ✅ Route et navigation ajoutées. Tous les composants créés utilisent les APIs backend existantes et respectent le design existant. Prêt pour test backend puis test frontend avec permission utilisateur."
