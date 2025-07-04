@@ -1,5 +1,6 @@
 import React, { useState, ReactNode } from "react";
 import { useAuth } from "../../hooks/useAuth";
+import { ThemeProvider } from "../../hooks/useTheme";
 import {
   HomeIcon,
   BuildingOfficeIcon,
@@ -8,13 +9,12 @@ import {
   ExclamationTriangleIcon,
   ChartBarIcon,
   UserGroupIcon,
-  Bars3Icon,
   XMarkIcon,
-  UserIcon,
   ArrowRightOnRectangleIcon,
 } from "@heroicons/react/24/outline";
 import { classNames } from "../../common/utils";
 import { images } from "../../data/constants/images";
+import Header from "./Header";
 
 const navigation = [
   { name: "Dashboard", href: "/", icon: HomeIcon },
