@@ -92,7 +92,7 @@ const Layout: React.FC<LayoutProps> = ({ children, currentPath = "/" }) => {
             </nav>
           </div>
           {/* User section mobile */}
-          <div className="flex-shrink-0 border-t border-gray-200 p-4">
+          <div className="flex-shrink-0 border-t border-gray-200 dark:border-gray-700 p-4">
             <div className="flex items-center">
               <div className="w-8 h-8 bg-gradient-to-br from-blue-400 to-purple-500 rounded-full flex items-center justify-center mr-3">
                 <span className="text-xs font-medium text-white">
@@ -101,10 +101,10 @@ const Layout: React.FC<LayoutProps> = ({ children, currentPath = "/" }) => {
                 </span>
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-medium text-gray-900 truncate">
+                <p className="text-sm font-medium text-gray-900 dark:text-white truncate">
                   {user?.prenom} {user?.nom}
                 </p>
-                <p className="text-xs text-gray-500 truncate">{user?.role}</p>
+                <p className="text-xs text-gray-500 dark:text-gray-400 truncate">{user?.role}</p>
               </div>
               <button
                 onClick={logout}
