@@ -424,20 +424,29 @@ frontend:
         agent: "testing"
         comment: "Les routes protégées fonctionnent correctement. Le système de contrôle d'accès basé sur les rôles est bien implémenté et les utilisateurs non authentifiés sont redirigés vers la page de connexion."
 
-  - task: "Validateurs Zod"
+  - task: "Graphique d'évolution du stock sophistiqué"
     implemented: true
     working: true
-    file: "/app/frontend/src/common/validators/schemas.ts"
+    file: "/app/frontend/src/presentation/components/StockEvolutionChart.tsx"
     stuck_count: 0
-    priority: "medium"
-    needs_retesting: false
+    priority: "high"
+    needs_retesting: true
     status_history:
       - working: "NA"
         agent: "main"
-        comment: "Créé les schémas de validation pour tous les formulaires"
-      - working: true
-        agent: "testing"
-        comment: "Les validateurs Zod sont correctement implémentés pour tous les formulaires. Les schémas de validation sont bien définis pour l'authentification, les fournisseurs, les articles et les commandes."
+        comment: "Créé le composant StockEvolutionChart avec graphique sophistiqué selon les spécifications : courbes pointillés (rouge/vert/rose), zone grise d'écartement, annotations (ETA, CMD-P, MODE=M, etc.), métriques CMS/CMC/QM"
+
+  - task: "Composants UI avancés"
+    implemented: true
+    working: true
+    file: "/app/frontend/src/presentation/components/ui/"
+    stuck_count: 0
+    priority: "medium"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Créé les composants UI Card, Select, Button avec TypeScript pour supporter le graphique d'évolution"
 
 metadata:
   created_by: "main_agent"
