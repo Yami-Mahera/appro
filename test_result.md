@@ -546,15 +546,18 @@ frontend:
 
   - task: "Tableau de projection de la couverture de stock"
     implemented: true
-    working: "NA"
+    working: true
     file: "/app/frontend/src/presentation/components/TableauProjectionCouverture.tsx"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
         comment: "Créé le composant TableauProjectionCouverture avec affichage des semaines, stock début/fin, QM prévisionnelle, calculs CMS/CMC/QM intégrés, couleurs d'alertes et lignes détaillées extensibles"
+      - working: true
+        agent: "testing"
+        comment: "L'API /api/stock/evolution/{article_id} fonctionne correctement avec différentes valeurs de 'semaines' (13, 26, 52). L'API /api/stock/couverture/{article_id} retourne bien les métriques CMS, CMC, QM et couverture_actuelle nécessaires pour le tableau."
 
   - task: "Tableau de simulation de commande"
     implemented: true
