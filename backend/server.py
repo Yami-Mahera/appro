@@ -2210,6 +2210,405 @@ async def get_powerbi_configs(
     configs = await db.powerbi_configs.find({}).to_list(100)
     return [PowerBIConfig(**c) for c in configs]
 
+# APIs Suivi des Variations et Fiabilité des Prévisions
+
+@api_router.post("/variations/ecarts", response_model=EcartAnalyse)
+async def create_ecart_analyse(
+    ecart_data: dict,
+    current_user: User = Depends(require_roles([UserRole.ADMIN, UserRole.MANAGER]))
+):
+    """Créer une analyse d'écart"""
+    ecart = EcartAnalyse(
+        type_ecart=ecart_data["type_ecart"],
+        article_id=ecart_data.get("article_id"),
+        commande_id=ecart_data.get("commande_id"),
+        fournisseur_id=ecart_data.get("fournisseur_id"),
+        valeur_prevue=ecart_data["valeur_prevue"],
+        valeur_reelle=ecart_data["valeur_reelle"],
+        ecart_absolu=abs(ecart_data["valeur_reelle"] - ecart_data["valeur_prevue"]),
+        ecart_relatif=((ecart_data["valeur_reelle"] - ecart_data["valeur_prevue"]) / ecart_data["valeur_prevue"] * 100) if ecart_data["valeur_prevue"] != 0 else 0,
+        cause=ecart_data.get("cause"),
+        commentaire=ecart_data.get("commentaire")
+    )
+    
+    await db.ecarts_analyses.insert_one(ecart.dict())
+    return ecart
+
+@api_router.get("/variations/ecarts")
+async def get_ecarts_analyses(
+    type_ecart: Optional[str] = None,
+    article_id: Optional[str] = None,
+    seuil_alerte: Optional[float] = 20.0,  # Seuil d'alerte à 20%
+    date_debut: Optional[str] = None,
+    date_fin: Optional[str] = None,
+    current_user: User = Depends(get_current_user)
+):
+    """Récupérer les analyses d'écarts"""
+    query = {}
+    
+    if type_ecart:
+        query["type_ecart"] = type_ecart
+    if article_id:
+        query["article_id"] = article_id
+    
+    if date_debut or date_fin:
+        date_query = {}
+        if date_debut:
+            date_query["$gte"] = datetime.fromisoformat(date_debut.replace('Z', '+00:00'))
+        if date_fin:
+            date_query["$lte"] = datetime.fromisoformat(date_fin.replace('Z', '+00:00'))
+        query["date_observation"] = date_query
+    
+    ecarts = await db.ecarts_analyses.find(query).sort("date_observation", -1).to_list(1000)
+    
+    # Filtrer par seuil d'alerte si spécifié
+    if seuil_alerte:
+        ecarts = [e for e in ecarts if abs(e.get("ecart_relatif", 0)) >= seuil_alerte]
+    
+    return [EcartAnalyse(**e) for e in ecarts]
+
+@api_router.get("/variations/previsions-vs-realisations/{article_id}")
+async def get_previsions_vs_realisations(
+    article_id: str,
+    semaines: int = 12,
+    current_user: User = Depends(get_current_user)
+):
+    """Comparaison des prévisions et des réalisations pour un article"""
+    date_limite = datetime.utcnow() - timedelta(weeks=semaines)
+    
+    # Récupérer les prévisions
+    previsions = await db.previsions_consommation.find({
+        "article_id": article_id,
+        "date_debut_semaine": {"$gte": date_limite}
+    }).sort("date_debut_semaine", 1).to_list(semaines)
+    
+    # Calculer les écarts
+    comparaisons = []
+    ecarts_relatifs = []
+    
+    for prevision in previsions:
+        if prevision.get("quantite_reelle") is not None:
+            ecart_absolu = abs(prevision["quantite_reelle"] - prevision["quantite_prevue"])
+            ecart_relatif = ((prevision["quantite_reelle"] - prevision["quantite_prevue"]) / prevision["quantite_prevue"] * 100) if prevision["quantite_prevue"] != 0 else 0
+            
+            comparaisons.append({
+                "semaine": prevision["semaine"],
+                "annee": prevision["annee"],
+                "date_debut": prevision["date_debut_semaine"],
+                "quantite_prevue": prevision["quantite_prevue"],
+                "quantite_reelle": prevision["quantite_reelle"],
+                "ecart_absolu": ecart_absolu,
+                "ecart_relatif": ecart_relatif
+            })
+            
+            ecarts_relatifs.append(abs(ecart_relatif))
+    
+    # Calculer les statistiques
+    taux_erreur_moyen = sum(ecarts_relatifs) / len(ecarts_relatifs) if ecarts_relatifs else 0
+    precision_previsions = max(0, 100 - taux_erreur_moyen)
+    
+    return {
+        "article_id": article_id,
+        "periode_semaines": semaines,
+        "comparaisons": comparaisons,
+        "statistiques": {
+            "taux_erreur_moyen": taux_erreur_moyen,
+            "precision_previsions": precision_previsions,
+            "nombre_previsions": len(comparaisons)
+        }
+    }
+
+@api_router.get("/variations/delais-fournisseurs")
+async def get_ecarts_delais_fournisseurs(
+    fournisseur_id: Optional[str] = None,
+    date_debut: Optional[str] = None,
+    date_fin: Optional[str] = None,
+    current_user: User = Depends(get_current_user)
+):
+    """Analyser les écarts de délais des fournisseurs"""
+    query = {
+        "date_livraison_prevue": {"$exists": True},
+        "date_livraison_reelle": {"$exists": True}
+    }
+    
+    if fournisseur_id:
+        query["fournisseur_id"] = fournisseur_id
+    
+    if date_debut or date_fin:
+        date_query = {}
+        if date_debut:
+            date_query["$gte"] = datetime.fromisoformat(date_debut.replace('Z', '+00:00'))
+        if date_fin:
+            date_query["$lte"] = datetime.fromisoformat(date_fin.replace('Z', '+00:00'))
+        query["date_livraison_reelle"] = date_query
+    
+    commandes = await db.commandes.find(query).to_list(1000)
+    
+    analyses = []
+    for commande in commandes:
+        if commande.get("date_livraison_prevue") and commande.get("date_livraison_reelle"):
+            ecart_jours = (commande["date_livraison_reelle"] - commande["date_livraison_prevue"]).days
+            
+            # Récupérer le fournisseur
+            fournisseur = await db.fournisseurs.find_one({"id": commande["fournisseur_id"]})
+            
+            analyses.append({
+                "commande_id": commande["id"],
+                "numero_commande": commande["numero_commande"],
+                "fournisseur_nom": fournisseur["nom"] if fournisseur else "N/A",
+                "date_livraison_prevue": commande["date_livraison_prevue"],
+                "date_livraison_reelle": commande["date_livraison_reelle"],
+                "ecart_jours": ecart_jours,
+                "en_retard": ecart_jours > 0,
+                "pourcentage_retard": (ecart_jours / (commande["date_livraison_prevue"] - commande.get("date_commande", commande["date_livraison_prevue"])).days * 100) if commande.get("date_commande") else 0
+            })
+    
+    # Calculer les statistiques
+    retards = [a["ecart_jours"] for a in analyses if a["en_retard"]]
+    taux_respect_delais = ((len(analyses) - len(retards)) / len(analyses) * 100) if analyses else 100
+    retard_moyen = sum(retards) / len(retards) if retards else 0
+    
+    return {
+        "analyses": analyses,
+        "statistiques": {
+            "total_commandes": len(analyses),
+            "commandes_en_retard": len(retards),
+            "taux_respect_delais": taux_respect_delais,
+            "retard_moyen_jours": retard_moyen
+        },
+        "periode": {
+            "date_debut": date_debut,
+            "date_fin": date_fin
+        }
+    }
+
+@api_router.get("/variations/ecarts-stocks")
+async def get_ecarts_stocks(
+    article_id: Optional[str] = None,
+    date_debut: Optional[str] = None,
+    date_fin: Optional[str] = None,
+    current_user: User = Depends(get_current_user)
+):
+    """Analyser les écarts entre stock prévisionnel et réel"""
+    query = {}
+    
+    if article_id:
+        query["article_id"] = article_id
+    
+    if date_debut or date_fin:
+        date_query = {}
+        if date_debut:
+            date_query["$gte"] = datetime.fromisoformat(date_debut.replace('Z', '+00:00'))
+        if date_fin:
+            date_query["$lte"] = datetime.fromisoformat(date_fin.replace('Z', '+00:00'))
+        query["date_calcul"] = date_query
+    
+    calculs_couverture = await db.calculs_couverture.find(query).sort("date_calcul", -1).to_list(1000)
+    
+    ecarts_stocks = []
+    for calcul in calculs_couverture:
+        # Récupérer le stock réel à la date du calcul
+        article = await db.articles.find_one({"id": calcul["article_id"]})
+        if article:
+            stock_previsionnel = calcul.get("stock_prevu", calcul["stock_actuel"])  # Si pas de prévision, utiliser stock actuel
+            stock_reel = article["stock_actuel"]
+            
+            ecart_absolu = abs(stock_reel - stock_previsionnel)
+            ecart_relatif = ((stock_reel - stock_previsionnel) / stock_previsionnel * 100) if stock_previsionnel != 0 else 0
+            
+            ecarts_stocks.append({
+                "article_id": calcul["article_id"],
+                "article_nom": article["nom"],
+                "date_calcul": calcul["date_calcul"],
+                "stock_previsionnel": stock_previsionnel,
+                "stock_reel": stock_reel,
+                "ecart_absolu": ecart_absolu,
+                "ecart_relatif": ecart_relatif
+            })
+    
+    return {
+        "ecarts_stocks": ecarts_stocks,
+        "periode": {
+            "date_debut": date_debut,
+            "date_fin": date_fin
+        }
+    }
+
+@api_router.get("/variations/alertes-seuils")
+async def get_alertes_seuils(
+    seuil: float = 20.0,
+    current_user: User = Depends(get_current_user)
+):
+    """Récupérer les alertes pour écarts dépassant les seuils"""
+    # Écarts de prévisions dépassant le seuil
+    ecarts = await db.ecarts_analyses.find({
+        "$expr": {"$gte": [{"$abs": "$ecart_relatif"}, seuil]}
+    }).sort("date_observation", -1).to_list(100)
+    
+    alertes = []
+    for ecart in ecarts:
+        alertes.append({
+            "type": "ecart_prevision",
+            "gravite": "critique" if abs(ecart["ecart_relatif"]) > 50 else "important",
+            "message": f"Écart de {ecart['ecart_relatif']:.1f}% sur {ecart['type_ecart']}",
+            "ecart_data": ecart,
+            "date": ecart["date_observation"]
+        })
+    
+    return {
+        "seuil_alerte": seuil,
+        "nombre_alertes": len(alertes),
+        "alertes": alertes
+    }
+
+# APIs Validation des Commandes Avancée
+
+@api_router.post("/commandes/validation-avancee")
+async def validation_avancee_commande(
+    validation_data: dict,
+    current_user: User = Depends(require_roles([UserRole.ADMIN, UserRole.MANAGER]))
+):
+    """Validation avancée d'une commande avec toutes les contraintes"""
+    commande_id = validation_data["commande_id"]
+    
+    # Récupérer la commande
+    commande = await db.commandes.find_one({"id": commande_id})
+    if not commande:
+        raise HTTPException(status_code=404, detail="Commande non trouvée")
+    
+    validation = ValidationCommande(commande_id=commande_id)
+    recommandations = []
+    
+    # Vérifier chaque ligne de commande
+    for ligne in commande.get("lignes", []):
+        article = await db.articles.find_one({"id": ligne["article_id"]})
+        if not article:
+            continue
+        
+        # 1. Validation date limite de consommation
+        if article.get("duree_vie"):
+            date_fabrication = datetime.utcnow()  # Supposer fabrication aujourd'hui
+            date_limite = date_fabrication + timedelta(days=article["duree_vie"])
+            
+            # Calculer la consommation prévisionnelle jusqu'à la date limite
+            moyenne_consommation = await calculer_moyenne_consommation_hebdo(ligne["article_id"])
+            semaines_restantes = (date_limite - datetime.utcnow()).days / 7
+            consommation_previsionnelle = moyenne_consommation * semaines_restantes
+            
+            if ligne["quantite"] > consommation_previsionnelle:
+                validation.date_limite_consommation = date_limite
+                recommandations.append(f"Quantité commandée pour {article['nom']} dépasse la consommation prévisionnelle avant péremption")
+        
+        # 2. Validation espace de stockage
+        # (Supposer un calcul basé sur l'emplacement de stockage)
+        if article.get("emplacement_stockage"):
+            # Logique de vérification d'espace (à implémenter selon vos besoins)
+            pass
+        
+        # 3. Validation quantité minimum commande
+        fournisseur = await db.fournisseurs.find_one({"id": article["fournisseur_id"]})
+        quantite_min_fournisseur = fournisseur.get("quantite_min_commande", 1) if fournisseur else 1
+        
+        if ligne["quantite"] < quantite_min_fournisseur:
+            validation.quantite_min_respectee = False
+            recommandations.append(f"Quantité pour {article['nom']} inférieure au minimum fournisseur ({quantite_min_fournisseur})")
+        
+        # 4. Validation délai de livraison
+        delai_fournisseur = fournisseur.get("delai_livraison_moyen", 14) if fournisseur else 14
+        date_besoin = await calculer_date_besoin(ligne["article_id"])
+        
+        if date_besoin and commande.get("date_livraison_prevue"):
+            if commande["date_livraison_prevue"] > date_besoin:
+                validation.delai_livraison_acceptable = False
+                recommandations.append(f"Délai de livraison trop long pour {article['nom']} - besoin avant {date_besoin.strftime('%Y-%m-%d')}")
+        
+        # 5. Validation stock de sécurité
+        cms = await calculer_couverture_minimale_securite(ligne["article_id"])
+        couverture_actuelle = await calculer_couverture_actuelle(ligne["article_id"])
+        
+        if couverture_actuelle <= cms:
+            recommandations.append(f"Stock de sécurité non respecté pour {article['nom']} - couverture actuelle: {couverture_actuelle:.1f} semaines")
+        
+        # 6. Validation seuil surstock
+        cmc = await calculer_couverture_maximale_commande(ligne["article_id"])
+        nouvelle_couverture = couverture_actuelle + (ligne["quantite"] / moyenne_consommation if moyenne_consommation > 0 else 0)
+        
+        if nouvelle_couverture > cmc:
+            validation.seuil_surstock_respecte = False
+            recommandations.append(f"Risque de surstock pour {article['nom']} - nouvelle couverture: {nouvelle_couverture:.1f} semaines")
+    
+    # Évaluation globale
+    if all([
+        validation.espace_stockage_disponible,
+        validation.quantite_min_respectee,
+        validation.delai_livraison_acceptable,
+        validation.stock_securite_respecte,
+        validation.seuil_surstock_respecte
+    ]):
+        validation.validation_status = "validee"
+    elif recommandations:
+        validation.validation_status = "en_attente"
+    
+    validation.recommandations = recommandations
+    validation.validee_par = current_user.id
+    validation.validee_le = datetime.utcnow()
+    
+    await db.validations_commandes.insert_one(validation.dict())
+    
+    return validation
+
+@api_router.get("/commandes/{commande_id}/validation")
+async def get_validation_commande(
+    commande_id: str,
+    current_user: User = Depends(get_current_user)
+):
+    """Récupérer la validation d'une commande"""
+    validation = await db.validations_commandes.find_one({"commande_id": commande_id})
+    if not validation:
+        raise HTTPException(status_code=404, detail="Validation non trouvée")
+    
+    return ValidationCommande(**validation)
+
+@api_router.post("/commandes/optimisation-groupage")
+async def optimiser_groupage_commandes(
+    articles_ids: List[str],
+    current_user: User = Depends(require_roles([UserRole.ADMIN, UserRole.MANAGER]))
+):
+    """Optimiser le groupage des commandes"""
+    if not articles_ids:
+        raise HTTPException(status_code=400, detail="Liste d'articles requise")
+    
+    # Calculer la composition TC optimale
+    composition = await calculer_composition_tc(articles_ids)
+    
+    # Vérifier la compatibilité des produits
+    articles = await db.articles.find({"id": {"$in": articles_ids}}).to_list(len(articles_ids))
+    
+    # Logique de compatibilité (à adapter selon vos besoins)
+    produits_dangereux = [a for a in articles if "dangereux" in a.get("description", "").lower()]
+    produits_refrigeres = [a for a in articles if "réfrigéré" in a.get("description", "").lower() or "frais" in a.get("description", "").lower()]
+    
+    recommandations = []
+    compatible = True
+    
+    if produits_dangereux and len(articles) > len(produits_dangereux):
+        compatible = False
+        recommandations.append("Produits dangereux détectés - groupage déconseillé avec d'autres produits")
+    
+    if produits_refrigeres and len(articles) > len(produits_refrigeres):
+        recommandations.append("Produits réfrigérés détectés - vérifier la compatibilité de stockage")
+    
+    return {
+        "articles_analyses": len(articles),
+        "composition_optimale": composition,
+        "compatibilite": {
+            "compatible": compatible,
+            "produits_dangereux": len(produits_dangereux),
+            "produits_refrigeres": len(produits_refrigeres),
+            "recommandations": recommandations
+        }
+    }
+
 # Fonctions utilitaires pour les exports et reporting avancé
 
 async def create_excel_export(data: List[Dict], filename: str, sheet_name: str = "Données") -> str:
