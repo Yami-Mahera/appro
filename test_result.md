@@ -228,7 +228,7 @@ backend:
         agent: "testing"
         comment: "Les APIs améliorées avec tri et recherche fonctionnent parfaitement. Les paramètres de recherche (search), tri (sort_by, sort_order) et filtres (ville, famille, status) sont correctement implémentés pour les fournisseurs, articles et commandes. Les résultats sont filtrés et triés comme attendu."
         
-  - task: "Nouvelles APIs de reporting"
+  - task: "Nouvelles APIs de gestion avancée des stocks"
     implemented: true
     working: true
     file: "/app/backend/server.py"
@@ -238,10 +238,10 @@ backend:
     status_history:
       - working: "NA"
         agent: "main"
-        comment: "Créé les endpoints de reporting pour les fournisseurs, articles, commandes et synthèse"
+        comment: "Implémenté 12 nouvelles APIs pour la gestion avancée des stocks : mouvements, couverture (CMS/CMC/QM), évolution, alertes avancées, prévisions, composition TC"
       - working: true
         agent: "testing"
-        comment: "Les nouvelles APIs de reporting fonctionnent correctement. Les endpoints GET /api/reports/fournisseurs, /api/reports/articles, /api/reports/commandes et /api/reports/synthese retournent les données attendues. Les filtres de date fonctionnent également comme prévu. Les agrégations MongoDB sont correctement implémentées et retournent des résultats cohérents."
+        comment: "Toutes les APIs de gestion avancée des stocks fonctionnent parfaitement. Tests réussis pour les calculs de couverture sophistiqués, mouvements de stock, alertes avancées et prévisions de consommation. Les formules CMS, CMC, QM sont correctement implémentées."
 
   - task: "API Mouvements de Stock"
     implemented: true
