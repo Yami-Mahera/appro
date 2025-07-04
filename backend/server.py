@@ -1769,6 +1769,447 @@ async def calculer_composition_tc_endpoint(
         "calculs": composition
     }
 
+# ============================================================================
+# NOUVELLES APIS POUR LE REPORTING AVANCÉ ET L'EXPORT
+# ============================================================================
+
+# APIs d'Export de Données
+
+@api_router.get("/export/fournisseurs/{format}")
+async def export_fournisseurs(
+    format: str,  # "excel", "pdf", "csv"
+    ville: Optional[str] = None,
+    pays: Optional[str] = None,
+    active: Optional[bool] = True,
+    current_user: User = Depends(get_current_user)
+):
+    """Exporter les données des fournisseurs"""
+    query = {}
+    if active is not None:
+        query["active"] = active
+    if ville:
+        query["ville"] = {"$regex": ville, "$options": "i"}
+    if pays:
+        query["pays"] = {"$regex": pays, "$options": "i"}
+    
+    fournisseurs = await db.fournisseurs.find(query).to_list(10000)
+    
+    # Préparer les données pour l'export
+    data = []
+    for f in fournisseurs:
+        data.append({
+            "ID": f["id"],
+            "Nom": f["nom"],
+            "Code Fournisseur": f["code_fournisseur"],
+            "Adresse": f["adresse"],
+            "Ville": f["ville"],
+            "Code Postal": f["code_postal"],
+            "Pays": f["pays"],
+            "Téléphone": f.get("telephone", ""),
+            "Email": f.get("email", ""),
+            "Site Web": f.get("site_web", ""),
+            "Délai Livraison Moyen": f.get("delai_livraison_moyen", 0),
+            "Date Création": f["created_at"].strftime("%Y-%m-%d %H:%M:%S")
+        })
+    
+    filename = f"fournisseurs_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
+    
+    if format.lower() == "excel":
+        file_path = await create_excel_export(data, filename, "Fournisseurs")
+        return FileResponse(
+            path=file_path,
+            filename=f"{filename}.xlsx",
+            media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        )
+    elif format.lower() == "pdf":
+        file_path = await create_pdf_export(data, filename, "Rapport Fournisseurs")
+        return FileResponse(
+            path=file_path,
+            filename=f"{filename}.pdf",
+            media_type="application/pdf"
+        )
+    elif format.lower() == "csv":
+        file_path = await create_csv_export(data, filename)
+        return FileResponse(
+            path=file_path,
+            filename=f"{filename}.csv",
+            media_type="text/csv"
+        )
+    else:
+        raise HTTPException(status_code=400, detail="Format non supporté. Utilisez: excel, pdf, csv")
+
+@api_router.get("/export/articles/{format}")
+async def export_articles(
+    format: str,
+    famille: Optional[str] = None,
+    fournisseur_id: Optional[str] = None,
+    stock_bas: Optional[bool] = None,
+    active: Optional[bool] = True,
+    current_user: User = Depends(get_current_user)
+):
+    """Exporter les données des articles"""
+    query = {}
+    if active is not None:
+        query["active"] = active
+    if famille:
+        query["famille"] = {"$regex": famille, "$options": "i"}
+    if fournisseur_id:
+        query["fournisseur_id"] = fournisseur_id
+    if stock_bas:
+        query["$expr"] = {"$lte": ["$stock_actuel", "$seuil_min"]}
+    
+    articles = await db.articles.find(query).to_list(10000)
+    
+    # Enrichir avec les noms des fournisseurs
+    data = []
+    for a in articles:
+        fournisseur = await db.fournisseurs.find_one({"id": a["fournisseur_id"]})
+        data.append({
+            "ID": a["id"],
+            "Référence": a["reference"],
+            "Nom": a["nom"],
+            "Description": a.get("description", ""),
+            "Famille": a.get("famille", ""),
+            "Fournisseur": fournisseur["nom"] if fournisseur else "N/A",
+            "Prix Unitaire": a["prix_unitaire"],
+            "Unité": a["unite"],
+            "Seuil Min": a["seuil_min"],
+            "Seuil Max": a["seuil_max"],
+            "Stock Actuel": a["stock_actuel"],
+            "Valeur Stock": a["stock_actuel"] * a["prix_unitaire"],
+            "Durée de Vie": a.get("duree_vie", ""),
+            "Emplacement": a.get("emplacement_stockage", ""),
+            "Date Création": a["created_at"].strftime("%Y-%m-%d %H:%M:%S")
+        })
+    
+    filename = f"articles_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
+    
+    if format.lower() == "excel":
+        file_path = await create_excel_export(data, filename, "Articles")
+        return FileResponse(
+            path=file_path,
+            filename=f"{filename}.xlsx",
+            media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        )
+    elif format.lower() == "pdf":
+        file_path = await create_pdf_export(data, filename, "Rapport Articles")
+        return FileResponse(
+            path=file_path,
+            filename=f"{filename}.pdf",
+            media_type="application/pdf"
+        )
+    elif format.lower() == "csv":
+        file_path = await create_csv_export(data, filename)
+        return FileResponse(
+            path=file_path,
+            filename=f"{filename}.csv",
+            media_type="text/csv"
+        )
+    else:
+        raise HTTPException(status_code=400, detail="Format non supporté. Utilisez: excel, pdf, csv")
+
+@api_router.get("/export/commandes/{format}")
+async def export_commandes(
+    format: str,
+    status: Optional[CommandeStatus] = None,
+    fournisseur_id: Optional[str] = None,
+    date_from: Optional[str] = None,
+    date_to: Optional[str] = None,
+    current_user: User = Depends(get_current_user)
+):
+    """Exporter les données des commandes"""
+    query = {}
+    if status:
+        query["status"] = status
+    if fournisseur_id:
+        query["fournisseur_id"] = fournisseur_id
+    
+    if date_from or date_to:
+        date_query = {}
+        if date_from:
+            date_query["$gte"] = datetime.fromisoformat(date_from.replace('Z', '+00:00'))
+        if date_to:
+            date_query["$lte"] = datetime.fromisoformat(date_to.replace('Z', '+00:00'))
+        query["created_at"] = date_query
+    
+    commandes = await db.commandes.find(query).to_list(10000)
+    
+    # Enrichir avec les noms des fournisseurs et utilisateurs
+    data = []
+    for c in commandes:
+        fournisseur = await db.fournisseurs.find_one({"id": c["fournisseur_id"]})
+        user = await db.users.find_one({"id": c["created_by"]})
+        
+        delai_livraison = None
+        if c.get("date_commande") and c.get("date_livraison_reelle"):
+            delai_livraison = (c["date_livraison_reelle"] - c["date_commande"]).days
+        
+        data.append({
+            "ID": c["id"],
+            "Numéro Commande": c["numero_commande"],
+            "Fournisseur": fournisseur["nom"] if fournisseur else "N/A",
+            "Status": c["status"],
+            "Total HT": c["total_ht"],
+            "Total TTC": c["total_ttc"],
+            "Nombre Articles": len(c.get("lignes", [])),
+            "Date Commande": c.get("date_commande").strftime("%Y-%m-%d") if c.get("date_commande") else "",
+            "Date Livraison Prévue": c.get("date_livraison_prevue").strftime("%Y-%m-%d") if c.get("date_livraison_prevue") else "",
+            "Date Livraison Réelle": c.get("date_livraison_reelle").strftime("%Y-%m-%d") if c.get("date_livraison_reelle") else "",
+            "Délai Livraison (jours)": delai_livraison if delai_livraison else "",
+            "Créé par": f"{user['prenom']} {user['nom']}" if user else "N/A",
+            "Notes": c.get("notes", ""),
+            "Date Création": c["created_at"].strftime("%Y-%m-%d %H:%M:%S")
+        })
+    
+    filename = f"commandes_{datetime.now().strftime('%Y%m%d_%H%M%S')}"
+    
+    if format.lower() == "excel":
+        file_path = await create_excel_export(data, filename, "Commandes")
+        return FileResponse(
+            path=file_path,
+            filename=f"{filename}.xlsx",
+            media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+        )
+    elif format.lower() == "pdf":
+        file_path = await create_pdf_export(data, filename, "Rapport Commandes")
+        return FileResponse(
+            path=file_path,
+            filename=f"{filename}.pdf",
+            media_type="application/pdf"
+        )
+    elif format.lower() == "csv":
+        file_path = await create_csv_export(data, filename)
+        return FileResponse(
+            path=file_path,
+            filename=f"{filename}.csv",
+            media_type="text/csv"
+        )
+    else:
+        raise HTTPException(status_code=400, detail="Format non supporté. Utilisez: excel, pdf, csv")
+
+# APIs KPIs Spécifiques
+
+@api_router.get("/kpis/taux-service-client")
+async def get_taux_service_client(
+    date_debut: Optional[str] = None,
+    date_fin: Optional[str] = None,
+    current_user: User = Depends(get_current_user)
+):
+    """Calculer le taux de service client"""
+    debut = datetime.fromisoformat(date_debut.replace('Z', '+00:00')) if date_debut else None
+    fin = datetime.fromisoformat(date_fin.replace('Z', '+00:00')) if date_fin else None
+    
+    taux = await calculer_taux_service_client(debut, fin)
+    
+    return {
+        "taux_service_client": taux,
+        "periode": {
+            "date_debut": date_debut,
+            "date_fin": date_fin
+        },
+        "unite": "pourcentage"
+    }
+
+@api_router.get("/kpis/delai-moyen-livraison")
+async def get_delai_moyen_livraison(
+    date_debut: Optional[str] = None,
+    date_fin: Optional[str] = None,
+    current_user: User = Depends(get_current_user)
+):
+    """Calculer le délai moyen de livraison"""
+    debut = datetime.fromisoformat(date_debut.replace('Z', '+00:00')) if date_debut else None
+    fin = datetime.fromisoformat(date_fin.replace('Z', '+00:00')) if date_fin else None
+    
+    delai = await calculer_delai_moyen_livraison(debut, fin)
+    
+    return {
+        "delai_moyen_livraison": delai,
+        "periode": {
+            "date_debut": date_debut,
+            "date_fin": date_fin
+        },
+        "unite": "jours"
+    }
+
+@api_router.get("/kpis/commandes-traitees")
+async def get_commandes_traitees(
+    date_debut: Optional[str] = None,
+    date_fin: Optional[str] = None,
+    current_user: User = Depends(get_current_user)
+):
+    """Calculer le nombre de commandes traitées"""
+    debut = datetime.fromisoformat(date_debut.replace('Z', '+00:00')) if date_debut else None
+    fin = datetime.fromisoformat(date_fin.replace('Z', '+00:00')) if date_fin else None
+    
+    nombre = await calculer_nombre_commandes_traitees(debut, fin)
+    
+    return {
+        "nombre_commandes_traitees": nombre,
+        "periode": {
+            "date_debut": date_debut,
+            "date_fin": date_fin
+        },
+        "unite": "commandes"
+    }
+
+@api_router.get("/kpis/commandes-aeriennes")
+async def get_commandes_aeriennes(
+    date_debut: Optional[str] = None,
+    date_fin: Optional[str] = None,
+    current_user: User = Depends(get_current_user)
+):
+    """Calculer le nombre de commandes en mode aérien"""
+    debut = datetime.fromisoformat(date_debut.replace('Z', '+00:00')) if date_debut else None
+    fin = datetime.fromisoformat(date_fin.replace('Z', '+00:00')) if date_fin else None
+    
+    nombre = await calculer_nombre_commandes_aeriennes(debut, fin)
+    
+    return {
+        "nombre_commandes_aeriennes": nombre,
+        "periode": {
+            "date_debut": date_debut,
+            "date_fin": date_fin
+        },
+        "unite": "commandes"
+    }
+
+@api_router.get("/kpis/taux-rupture-stock")
+async def get_taux_rupture_stock(
+    date_debut: Optional[str] = None,
+    date_fin: Optional[str] = None,
+    current_user: User = Depends(get_current_user)
+):
+    """Calculer le taux de rupture de stock"""
+    debut = datetime.fromisoformat(date_debut.replace('Z', '+00:00')) if date_debut else None
+    fin = datetime.fromisoformat(date_fin.replace('Z', '+00:00')) if date_fin else None
+    
+    data = await calculer_taux_rupture_stock(debut, fin)
+    
+    return {
+        **data,
+        "periode": {
+            "date_debut": date_debut,
+            "date_fin": date_fin
+        }
+    }
+
+@api_router.get("/kpis/taux-commandes-tension")
+async def get_taux_commandes_tension(
+    current_user: User = Depends(get_current_user)
+):
+    """Calculer le taux de commandes en tension"""
+    data = await calculer_taux_commandes_tension()
+    
+    return {
+        **data,
+        "date_calcul": datetime.utcnow().isoformat()
+    }
+
+@api_router.get("/kpis/synthese")
+async def get_kpis_synthese(
+    date_debut: Optional[str] = None,
+    date_fin: Optional[str] = None,
+    current_user: User = Depends(get_current_user)
+):
+    """Récupérer une synthèse de tous les KPIs"""
+    debut = datetime.fromisoformat(date_debut.replace('Z', '+00:00')) if date_debut else None
+    fin = datetime.fromisoformat(date_fin.replace('Z', '+00:00')) if date_fin else None
+    
+    taux_service = await calculer_taux_service_client(debut, fin)
+    delai_moyen = await calculer_delai_moyen_livraison(debut, fin)
+    commandes_traitees = await calculer_nombre_commandes_traitees(debut, fin)
+    commandes_aeriennes = await calculer_nombre_commandes_aeriennes(debut, fin)
+    rupture_data = await calculer_taux_rupture_stock(debut, fin)
+    tension_data = await calculer_taux_commandes_tension()
+    
+    return {
+        "taux_service_client": taux_service,
+        "delai_moyen_livraison": delai_moyen,
+        "nombre_commandes_traitees": commandes_traitees,
+        "nombre_commandes_aeriennes": commandes_aeriennes,
+        "taux_rupture_stock": rupture_data,
+        "taux_commandes_tension": tension_data,
+        "periode": {
+            "date_debut": date_debut,
+            "date_fin": date_fin
+        },
+        "date_calcul": datetime.utcnow().isoformat()
+    }
+
+# APIs Power BI Interface
+
+@api_router.get("/powerbi/datasets")
+async def get_powerbi_datasets(
+    current_user: User = Depends(require_roles([UserRole.ADMIN, UserRole.MANAGER]))
+):
+    """Lister les datasets disponibles pour Power BI"""
+    return {
+        "datasets": [
+            {
+                "nom": "fournisseurs",
+                "description": "Données des fournisseurs",
+                "tables": ["fournisseurs"]
+            },
+            {
+                "nom": "articles",
+                "description": "Données des articles et stocks",
+                "tables": ["articles"]
+            },
+            {
+                "nom": "commandes",
+                "description": "Données des commandes",
+                "tables": ["commandes"]
+            },
+            {
+                "nom": "kpis",
+                "description": "Indicateurs clés de performance",
+                "tables": ["kpis"]
+            }
+        ]
+    }
+
+@api_router.get("/powerbi/data/{table}")
+async def get_powerbi_data(
+    table: str,
+    current_user: User = Depends(require_roles([UserRole.ADMIN, UserRole.MANAGER]))
+):
+    """Récupérer les données formatées pour Power BI"""
+    try:
+        data = await generer_donnees_powerbi(table)
+        return {
+            "table": table,
+            "count": len(data),
+            "data": data,
+            "last_updated": datetime.utcnow().isoformat()
+        }
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=f"Erreur lors de la génération des données: {str(e)}")
+
+@api_router.post("/powerbi/config")
+async def create_powerbi_config(
+    config_data: dict,
+    current_user: User = Depends(require_roles([UserRole.ADMIN]))
+):
+    """Créer une configuration Power BI"""
+    config = PowerBIConfig(
+        nom_dataset=config_data["nom_dataset"],
+        workspace_id=config_data["workspace_id"],
+        dataset_id=config_data["dataset_id"],
+        frequence_sync=config_data.get("frequence_sync", "quotidienne"),
+        tables_synchronisees=config_data.get("tables_synchronisees", [])
+    )
+    
+    await db.powerbi_configs.insert_one(config.dict())
+    return config
+
+@api_router.get("/powerbi/configs")
+async def get_powerbi_configs(
+    current_user: User = Depends(require_roles([UserRole.ADMIN]))
+):
+    """Récupérer les configurations Power BI"""
+    configs = await db.powerbi_configs.find({}).to_list(100)
+    return [PowerBIConfig(**c) for c in configs]
+
 # Fonctions utilitaires pour les exports et reporting avancé
 
 async def create_excel_export(data: List[Dict], filename: str, sheet_name: str = "Données") -> str:
