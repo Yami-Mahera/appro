@@ -5,7 +5,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { loginSchema, LoginData } from "../../common/validators/schemas";
 import { EyeIcon, EyeSlashIcon } from "@heroicons/react/24/outline";
 import { images } from "../../data/constants/images";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Navigate } from "react-router-dom";
 
 const Login: React.FC = () => {
   const { login, isAuthenticated } = useAuth();
@@ -22,11 +22,10 @@ const Login: React.FC = () => {
     resolver: zodResolver(loginSchema),
   });
 
-  useEffect(() => {
-    if (isAuthenticated) {
-      navigate("/dashboard", { replace: true });
-    }
-  }, [isAuthenticated, navigate]);
+  // Redirection si déjà authentifié
+  if (isAuthenticated) {
+    return <Navigate to="/" replace />;
+  }
 
   const onSubmit = async (data: LoginData) => {
     setLoading(true);
@@ -34,7 +33,8 @@ const Login: React.FC = () => {
 
     try {
       await login(data.email, data.password);
-      // Redirect will be handled by the auth context
+      // Navigation programmatique vers la page d'accueil
+      navigate("/", { replace: true });
     } catch (err: any) {
       setError(err.response?.data?.detail || "Erreur de connexion");
     } finally {
