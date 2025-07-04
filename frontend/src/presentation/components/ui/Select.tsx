@@ -8,6 +8,33 @@ interface SelectProps {
   className?: string;
 }
 
+interface SelectTriggerProps {
+  children: React.ReactNode;
+  onClick?: () => void;
+  isOpen?: boolean;
+  className?: string;
+}
+
+interface SelectValueProps {
+  placeholder?: string;
+  className?: string;
+}
+
+interface SelectContentProps {
+  children: React.ReactNode;
+  onSelect?: (value: string) => void;
+  value?: string;
+  className?: string;
+}
+
+interface SelectItemProps {
+  value: string;
+  children: React.ReactNode;
+  onSelect?: (value: string) => void;
+  isSelected?: boolean;
+  className?: string;
+}
+
 export const Select: React.FC<SelectProps> = ({ value, onValueChange, children, className = '' }) => {
   const [isOpen, setIsOpen] = useState(false);
   const selectRef = useRef<HTMLDivElement>(null);
@@ -30,13 +57,13 @@ export const Select: React.FC<SelectProps> = ({ value, onValueChange, children, 
       {React.Children.map(children, (child) => {
         if (React.isValidElement(child)) {
           if (child.type === SelectTrigger) {
-            return React.cloneElement(child, { 
+            return React.cloneElement(child as React.ReactElement<SelectTriggerProps>, { 
               onClick: () => setIsOpen(!isOpen),
               isOpen 
             });
           }
           if (child.type === SelectContent) {
-            return isOpen ? React.cloneElement(child, { 
+            return isOpen ? React.cloneElement(child as React.ReactElement<SelectContentProps>, { 
               onSelect: (val: string) => {
                 onValueChange(val);
                 setIsOpen(false);
@@ -50,13 +77,6 @@ export const Select: React.FC<SelectProps> = ({ value, onValueChange, children, 
     </div>
   );
 };
-
-interface SelectTriggerProps {
-  children: React.ReactNode;
-  onClick?: () => void;
-  isOpen?: boolean;
-  className?: string;
-}
 
 export const SelectTrigger: React.FC<SelectTriggerProps> = ({ 
   children, 
@@ -83,11 +103,6 @@ export const SelectTrigger: React.FC<SelectTriggerProps> = ({
   );
 };
 
-interface SelectValueProps {
-  placeholder?: string;
-  className?: string;
-}
-
 export const SelectValue: React.FC<SelectValueProps> = ({ placeholder, className = '' }) => {
   return (
     <span className={`text-gray-900 ${className}`}>
@@ -95,13 +110,6 @@ export const SelectValue: React.FC<SelectValueProps> = ({ placeholder, className
     </span>
   );
 };
-
-interface SelectContentProps {
-  children: React.ReactNode;
-  onSelect?: (value: string) => void;
-  value?: string;
-  className?: string;
-}
 
 export const SelectContent: React.FC<SelectContentProps> = ({ 
   children, 
@@ -116,9 +124,9 @@ export const SelectContent: React.FC<SelectContentProps> = ({
     `}>
       {React.Children.map(children, (child) => {
         if (React.isValidElement(child) && child.type === SelectItem) {
-          return React.cloneElement(child, { 
+          return React.cloneElement(child as React.ReactElement<SelectItemProps>, { 
             onSelect,
-            isSelected: child.props.value === value 
+            isSelected: (child.props as SelectItemProps).value === value 
           });
         }
         return child;
@@ -126,14 +134,6 @@ export const SelectContent: React.FC<SelectContentProps> = ({
     </div>
   );
 };
-
-interface SelectItemProps {
-  value: string;
-  children: React.ReactNode;
-  onSelect?: (value: string) => void;
-  isSelected?: boolean;
-  className?: string;
-}
 
 export const SelectItem: React.FC<SelectItemProps> = ({ 
   value, 
