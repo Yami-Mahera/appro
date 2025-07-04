@@ -1403,6 +1403,288 @@ async def get_dashboard_stats(
 async def root():
     return {"message": "API Gestion des Approvisionnements"}
 
+# Routes pour la gestion avancée des stocks
+
+@api_router.post("/stock/mouvements", response_model=MouvementStock)
+async def create_mouvement_stock(
+    mouvement_data: dict,
+    current_user: User = Depends(require_roles([UserRole.ADMIN, UserRole.MANAGER]))
+):
+    """Créer un mouvement de stock"""
+    mouvement = MouvementStock(
+        article_id=mouvement_data["article_id"],
+        type_mouvement=mouvement_data["type_mouvement"],
+        quantite=mouvement_data["quantite"],
+        stock_avant=mouvement_data["stock_avant"],
+        stock_apres=mouvement_data["stock_apres"],
+        commande_id=mouvement_data.get("commande_id"),
+        reference_document=mouvement_data.get("reference_document"),
+        commentaire=mouvement_data.get("commentaire"),
+        created_by=current_user.id
+    )
+    await db.mouvements_stock.insert_one(mouvement.dict())
+    return mouvement
+
+@api_router.get("/stock/mouvements/{article_id}")
+async def get_mouvements_stock(
+    article_id: str,
+    limit: int = 100,
+    current_user: User = Depends(get_current_user)
+):
+    """Récupérer l'historique des mouvements d'un article"""
+    mouvements = await db.mouvements_stock.find(
+        {"article_id": article_id}
+    ).sort("date_mouvement", -1).limit(limit).to_list(limit)
+    return [MouvementStock(**m) for m in mouvements]
+
+@api_router.get("/stock/couverture/{article_id}")
+async def get_calcul_couverture(
+    article_id: str,
+    current_user: User = Depends(get_current_user)
+):
+    """Calculer et retourner les métriques de couverture pour un article"""
+    
+    # Effectuer tous les calculs
+    vl = await calculer_variation_logistique(article_id)
+    vp = await calculer_variation_prevision(article_id)
+    cms = await calculer_couverture_minimale_securite(article_id)
+    cmc = await calculer_couverture_maximale_commande(article_id)
+    qm = await calculer_quantite_maximale_commande(article_id)
+    cr = await calculer_couverture_actuelle(article_id)
+    date_besoin = await calculer_date_besoin(article_id)
+    moyenne_consommation = await calculer_moyenne_consommation_hebdo(article_id)
+    
+    # Récupérer l'article pour les données de base
+    article = await db.articles.find_one({"id": article_id})
+    if not article:
+        raise HTTPException(status_code=404, detail="Article non trouvé")
+    
+    fournisseur = await db.fournisseurs.find_one({"id": article["fournisseur_id"]})
+    horizon = (fournisseur.get("delai_livraison_moyen", 14) / 7) if fournisseur else 2
+    
+    # Créer l'objet de calcul
+    calcul = CalculCouverture(
+        article_id=article_id,
+        variation_logistique=vl,
+        variation_prevision=vp,
+        horizon=int(horizon),
+        couverture_minimale_securite=cms,
+        couverture_maximale_commande=cmc,
+        quantite_maximale_commande=qm,
+        couverture_actuelle=cr,
+        date_besoin=date_besoin,
+        stock_actuel=article.get("stock_actuel", 0),
+        moyenne_consommation_hebdo=moyenne_consommation,
+        duree_vie_produit=article.get("duree_vie", 365),
+        delai_acheminement=fournisseur.get("delai_livraison_moyen", 14) if fournisseur else 14
+    )
+    
+    # Sauvegarder le calcul
+    await db.calculs_couverture.insert_one(calcul.dict())
+    
+    return calcul
+
+@api_router.get("/stock/evolution/{article_id}")
+async def get_evolution_stock(
+    article_id: str,
+    semaines: int = 26,
+    current_user: User = Depends(get_current_user)
+):
+    """
+    Récupérer les données d'évolution du stock sur X semaines
+    pour le graphique sophisticated
+    """
+    # Calculer la date de début
+    date_debut = datetime.utcnow() - timedelta(weeks=semaines)
+    
+    # Récupérer les prévisions de consommation
+    previsions = await db.previsions_consommation.find({
+        "article_id": article_id,
+        "date_debut_semaine": {"$gte": date_debut}
+    }).sort("date_debut_semaine", 1).to_list(semaines)
+    
+    # Récupérer les mouvements de stock
+    mouvements = await db.mouvements_stock.find({
+        "article_id": article_id,
+        "date_mouvement": {"$gte": date_debut}
+    }).sort("date_mouvement", 1).to_list(1000)
+    
+    # Calculer l'évolution du stock semaine par semaine
+    evolution_data = []
+    current_date = date_debut
+    
+    for i in range(semaines):
+        semaine_debut = current_date
+        semaine_fin = current_date + timedelta(weeks=1)
+        
+        # Mouvements de la semaine
+        mouvements_semaine = [
+            m for m in mouvements
+            if semaine_debut <= m["date_mouvement"] < semaine_fin
+        ]
+        
+        # Prévision de la semaine
+        prevision_semaine = next(
+            (p for p in previsions if p["date_debut_semaine"] == semaine_debut),
+            None
+        )
+        
+        # Calculer les métriques de la semaine
+        stock_debut = 0  # À calculer selon les mouvements précédents
+        stock_fin = stock_debut + sum(
+            m["quantite"] if m["type_mouvement"] == "entree" else -m["quantite"]
+            for m in mouvements_semaine
+        )
+        
+        evolution_data.append({
+            "semaine": i + 1,
+            "date_debut": semaine_debut,
+            "date_fin": semaine_fin,
+            "stock_debut": stock_debut,
+            "stock_fin": stock_fin,
+            "prevision_consommation": prevision_semaine["quantite_prevue"] if prevision_semaine else 0,
+            "consommation_reelle": prevision_semaine["quantite_reelle"] if prevision_semaine else 0,
+            "mouvements": len(mouvements_semaine)
+        })
+        
+        current_date = semaine_fin
+    
+    return {
+        "article_id": article_id,
+        "periode": f"{semaines} semaines",
+        "evolution": evolution_data
+    }
+
+@api_router.get("/stock/alertes-avancees")
+async def get_alertes_avancees(
+    current_user: User = Depends(get_current_user)
+):
+    """Récupérer toutes les alertes avancées"""
+    alertes = await db.alertes_avancees.find({}).sort("created_at", -1).to_list(100)
+    return [AlerteAvancee(**a) for a in alertes]
+
+@api_router.post("/stock/generer-alertes")
+async def generer_alertes_avancees(
+    current_user: User = Depends(require_roles([UserRole.ADMIN, UserRole.MANAGER]))
+):
+    """Générer les alertes avancées pour tous les articles"""
+    # Récupérer tous les articles actifs
+    articles = await db.articles.find({"active": True}).to_list(1000)
+    
+    alertes_generees = []
+    
+    for article in articles:
+        article_id = article["id"]
+        
+        # Alerte pour nouvelle commande
+        niveau_alerte = await calculer_niveau_alerte_nouvelle_commande(article_id)
+        date_besoin = await calculer_date_besoin(article_id)
+        
+        if niveau_alerte in [NiveauAlerte.URGENT, NiveauAlerte.CRITIQUE]:
+            alerte = AlerteAvancee(
+                article_id=article_id,
+                niveau_alerte=niveau_alerte,
+                type_alerte="nouvelle_commande",
+                date_besoin=date_besoin,
+                delai_passation=3,
+                ecart_jours=(date_besoin - datetime.utcnow()).days if date_besoin else 0,
+                message=f"Commande {niveau_alerte.value} pour {article['nom']}",
+                recommandation=f"Passer commande immédiatement" if niveau_alerte == NiveauAlerte.CRITIQUE else "Passer commande rapidement"
+            )
+            
+            await db.alertes_avancees.insert_one(alerte.dict())
+            alertes_generees.append(alerte)
+        
+        # Alertes pour commandes en cours
+        commandes_en_cours = await db.commandes.find({
+            "lignes.article_id": article_id,
+            "status": {"$in": [CommandeStatus.PENDING, CommandeStatus.APPROVED, CommandeStatus.ORDERED]}
+        }).to_list(100)
+        
+        for commande in commandes_en_cours:
+            niveau_alerte = await calculer_niveau_alerte_commande_en_cours(article_id, commande["id"])
+            
+            if niveau_alerte in [NiveauAlerte.URGENT, NiveauAlerte.A_SUIVRE]:
+                alerte = AlerteAvancee(
+                    article_id=article_id,
+                    commande_id=commande["id"],
+                    niveau_alerte=niveau_alerte,
+                    type_alerte="commande_en_cours",
+                    message=f"Commande {niveau_alerte.value} pour {article['nom']}",
+                    recommandation=f"Suivre la commande {commande['numero_commande']}"
+                )
+                
+                await db.alertes_avancees.insert_one(alerte.dict())
+                alertes_generees.append(alerte)
+    
+    return {
+        "message": f"{len(alertes_generees)} alertes générées",
+        "alertes": alertes_generees
+    }
+
+@api_router.post("/stock/previsions", response_model=PrevisionConsommation)
+async def create_prevision_consommation(
+    prevision_data: dict,
+    current_user: User = Depends(require_roles([UserRole.ADMIN, UserRole.MANAGER]))
+):
+    """Créer une prévision de consommation"""
+    prevision = PrevisionConsommation(
+        article_id=prevision_data["article_id"],
+        semaine=prevision_data["semaine"],
+        annee=prevision_data["annee"],
+        date_debut_semaine=datetime.fromisoformat(prevision_data["date_debut_semaine"]),
+        date_fin_semaine=datetime.fromisoformat(prevision_data["date_fin_semaine"]),
+        quantite_prevue=prevision_data["quantite_prevue"],
+        quantite_reelle=prevision_data.get("quantite_reelle"),
+        ecart_absolu=prevision_data.get("ecart_absolu"),
+        ecart_relatif=prevision_data.get("ecart_relatif")
+    )
+    await db.previsions_consommation.insert_one(prevision.dict())
+    return prevision
+
+@api_router.get("/stock/previsions/{article_id}")
+async def get_previsions_consommation(
+    article_id: str,
+    semaines: int = 26,
+    current_user: User = Depends(get_current_user)
+):
+    """Récupérer les prévisions de consommation d'un article"""
+    date_limite = datetime.utcnow() - timedelta(weeks=semaines)
+    
+    previsions = await db.previsions_consommation.find({
+        "article_id": article_id,
+        "date_debut_semaine": {"$gte": date_limite}
+    }).sort("date_debut_semaine", 1).to_list(semaines)
+    
+    return [PrevisionConsommation(**p) for p in previsions]
+
+@api_router.post("/stock/composition-tc")
+async def calculer_composition_tc_endpoint(
+    data: dict,
+    current_user: User = Depends(require_roles([UserRole.ADMIN, UserRole.MANAGER]))
+):
+    """Calculer la composition optimale des TCs"""
+    articles_ids = data.get("articles_ids", [])
+    
+    if not articles_ids:
+        raise HTTPException(status_code=400, detail="Liste d'articles requise")
+    
+    composition = await calculer_composition_tc(articles_ids)
+    
+    # Sauvegarder la composition
+    composition_tc = CompositionTC(
+        reference_tc=f"TC-{datetime.now().strftime('%Y%m%d')}-{str(uuid.uuid4())[:8]}",
+        articles=articles_ids,
+        date_besoin_groupe=composition.get("date_besoin_groupe")
+    )
+    
+    await db.compositions_tc.insert_one(composition_tc.dict())
+    
+    return {
+        "composition_tc": composition_tc,
+        "calculs": composition
+    }
+
 # Include the router in the main app
 app.include_router(api_router)
 
