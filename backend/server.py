@@ -212,6 +212,109 @@ class Alerte(BaseModel):
     lue: bool = False
     created_at: datetime = Field(default_factory=datetime.utcnow)
 
+# Nouveaux modèles pour la gestion avancée des stocks
+
+class TypeMouvement(str, Enum):
+    ENTREE = "entree"
+    SORTIE = "sortie"
+    AJUSTEMENT = "ajustement"
+    TRANSFERT = "transfert"
+
+class MouvementStock(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    article_id: str
+    type_mouvement: TypeMouvement
+    quantite: int
+    stock_avant: int
+    stock_apres: int
+    date_mouvement: datetime = Field(default_factory=datetime.utcnow)
+    commande_id: Optional[str] = None
+    reference_document: Optional[str] = None
+    commentaire: Optional[str] = None
+    created_by: str
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+
+class PrevisionConsommation(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    article_id: str
+    semaine: int  # Numéro de semaine (1-52)
+    annee: int
+    date_debut_semaine: datetime
+    date_fin_semaine: datetime
+    quantite_prevue: float
+    quantite_reelle: Optional[float] = None
+    ecart_absolu: Optional[float] = None
+    ecart_relatif: Optional[float] = None
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+    updated_at: datetime = Field(default_factory=datetime.utcnow)
+
+class CalculCouverture(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    article_id: str
+    date_calcul: datetime = Field(default_factory=datetime.utcnow)
+    
+    # Paramètres de calcul
+    variation_logistique: float = 0.0  # VL
+    variation_prevision: float = 0.0   # Vp
+    horizon: int = 0                   # H en semaines
+    
+    # Résultats de calcul
+    couverture_minimale_securite: float = 0.0  # CMS
+    couverture_maximale_commande: float = 0.0  # CMC
+    quantite_maximale_commande: float = 0.0    # QM
+    couverture_actuelle: float = 0.0           # Cr
+    
+    # Dates importantes
+    date_besoin: Optional[datetime] = None
+    date_arrivee_prevue: Optional[datetime] = None
+    
+    # Données pour le calcul
+    stock_actuel: int = 0
+    moyenne_consommation_hebdo: float = 0.0
+    duree_vie_produit: int = 0
+    delai_acheminement: int = 0
+    
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+
+class NiveauAlerte(str, Enum):
+    NORMAL = "normal"
+    URGENT = "urgent"
+    CRITIQUE = "critique"
+    A_SUIVRE = "a_suivre"
+
+class AlerteAvancee(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    article_id: str
+    commande_id: Optional[str] = None
+    niveau_alerte: NiveauAlerte
+    type_alerte: str  # "nouvelle_commande" ou "commande_en_cours"
+    
+    # Calculs d'alerte
+    date_besoin: Optional[datetime] = None
+    date_observation: datetime = Field(default_factory=datetime.utcnow)
+    delai_passation: int = 0
+    ecart_jours: Optional[int] = None
+    
+    # Pour commandes en cours
+    couverture_prevue: Optional[float] = None
+    couverture_minimale: Optional[float] = None
+    pourcentage_variation: Optional[float] = None
+    
+    message: str
+    recommandation: str
+    lue: bool = False
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+
+class CompositionTC(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    reference_tc: str
+    articles: List[Dict[str, Any]]  # [{article_id, quantite_par_tc, taux_remplissage}]
+    nombre_conteneurs: int = 0
+    quantite_complement: Dict[str, int] = {}  # {article_id: quantite}
+    quantite_alignement: Dict[str, int] = {}  # {article_id: quantite}
+    date_besoin_groupe: Optional[datetime] = None
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+
 # Utility functions
 def verify_password(plain_password, hashed_password):
     return pwd_context.verify(plain_password, hashed_password)
