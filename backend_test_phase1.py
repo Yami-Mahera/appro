@@ -6,7 +6,7 @@ from datetime import datetime, timedelta
 from typing import Dict, List, Optional, Any
 
 # Configuration
-BASE_URL = "http://localhost:8001/api"
+BASE_URL = "http://localhost:8000/api"
 ADMIN_USER = {
     "email": "admin@test.com",
     "password": "admin123"
