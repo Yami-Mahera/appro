@@ -120,7 +120,7 @@ const Layout: React.FC<LayoutProps> = ({ children, currentPath = "/" }) => {
 
       {/* Static sidebar for desktop */}
       <div className="hidden md:flex md:w-72 md:flex-col md:fixed md:inset-y-0">
-        <div className="flex-1 flex flex-col min-h-0 bg-white shadow-xl border-r border-gray-100">
+        <div className="flex-1 flex flex-col min-h-0 bg-white dark:bg-gray-800 shadow-xl border-r border-gray-100 dark:border-gray-700 transition-colors duration-200">
           <div className="flex-1 flex flex-col pt-8 pb-4 overflow-y-auto custom-scrollbar">
             <div className="flex items-center flex-shrink-0 px-6 mb-10">
               <div className="w-20 h-20 flex items-center justify-center">
