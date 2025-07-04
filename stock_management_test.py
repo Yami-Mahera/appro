@@ -9,7 +9,7 @@ from typing import Dict, List, Optional, Any
 BASE_URL = "http://localhost:8001/api"
 ADMIN_USER = {
     "email": "admin@test.com",
-    "password": "testpassword123",
+    "password": "admin123",
     "nom": "Admin",
     "prenom": "Test",
     "role": "administrateur"
