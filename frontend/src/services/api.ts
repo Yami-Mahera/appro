@@ -355,6 +355,92 @@ class ApiService {
       previsions
     };
   }
+
+  // Nouvelles méthodes pour les tableaux de gestion des stocks
+
+  async validateCommandeAvancee(data: any) {
+    const response = await this.api.post('/commandes/validation-avancee', data);
+    return response.data;
+  }
+
+  async getKPIsTauxServiceClient() {
+    const response = await this.api.get('/kpis/taux-service-client');
+    return response.data;
+  }
+
+  async getKPIsDelaiMoyenLivraison() {
+    const response = await this.api.get('/kpis/delai-moyen-livraison');
+    return response.data;
+  }
+
+  async getKPIsNombreCommandes() {
+    const response = await this.api.get('/kpis/nombre-commandes');
+    return response.data;
+  }
+
+  async getKPIsCommandesAeriennes() {
+    const response = await this.api.get('/kpis/commandes-aeriennes');
+    return response.data;
+  }
+
+  async getKPIsSynthese() {
+    const response = await this.api.get('/kpis/synthese');
+    return response.data;
+  }
+
+  async getEcartsAnalyse(params?: { type_ecart?: string }) {
+    const queryParams = new URLSearchParams();
+    if (params?.type_ecart) queryParams.append('type_ecart', params.type_ecart);
+    
+    const url = queryParams.toString() ? `/variations/ecarts?${queryParams.toString()}` : '/variations/ecarts';
+    const response = await this.api.get(url);
+    return response.data;
+  }
+
+  async getPrevisionsVsRealisations(articleId: string) {
+    const response = await this.api.get(`/variations/previsions-vs-realisations/${articleId}`);
+    return response.data;
+  }
+
+  async createDashboardPersonnalise(data: any) {
+    const response = await this.api.post('/dashboards/personnalises', data);
+    return response.data;
+  }
+
+  async getDashboardsPersonnalises() {
+    const response = await this.api.get('/dashboards/personnalises');
+    return response.data;
+  }
+
+  async getWidgetsDisponibles() {
+    const response = await this.api.get('/dashboards/widgets-disponibles');
+    return response.data;
+  }
+
+  async exportData(type: string, format: string, params?: any) {
+    const queryParams = new URLSearchParams();
+    if (params) {
+      Object.keys(params).forEach(key => {
+        if (params[key] !== undefined && params[key] !== null) {
+          queryParams.append(key, params[key].toString());
+        }
+      });
+    }
+    
+    const url = queryParams.toString() ? `/export/${type}/${format}?${queryParams.toString()}` : `/export/${type}/${format}`;
+    const response = await this.api.get(url, { responseType: 'blob' });
+    return response.data;
+  }
+
+  async getPowerBIDatasets() {
+    const response = await this.api.get('/powerbi/datasets');
+    return response.data;
+  }
+
+  async getPowerBIData(dataType: string) {
+    const response = await this.api.get(`/powerbi/data/${dataType}`);
+    return response.data;
+  }
 }
 
 export default new ApiService();
