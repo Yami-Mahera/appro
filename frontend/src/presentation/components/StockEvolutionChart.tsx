@@ -244,7 +244,7 @@ const StockEvolutionChart: React.FC<StockEvolutionChartProps> = ({ className = '
             </Select>
           </div>
           <div className="w-32">
-            <Select value={periode.toString()} onValueChange={(value) => setPeriode(parseInt(value))}>
+            <Select value={periode.toString()} onValueChange={(value: string) => setPeriode(parseInt(value))}>
               <SelectTrigger>
                 <SelectValue />
               </SelectTrigger>
