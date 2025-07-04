@@ -456,11 +456,8 @@ metadata:
 
 test_plan:
   current_focus:
-    - "API Mouvements de Stock"
-    - "API Calcul de Couverture"
-    - "API Évolution du Stock"
-    - "API Alertes Avancées"
-    - "API Prévisions de Consommation"
+    - "Graphique d'évolution du stock sophistiqué"
+    - "Composants UI avancés"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
