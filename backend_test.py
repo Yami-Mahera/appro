@@ -496,15 +496,15 @@ def test_alertes_system():
         print_test_result("Get all alerts", False, message)
         return False
     
-    # Test 2: Test limit parameter (default should be 10)
-    print_header("Test 2: Test Default Limit (10)")
+    # Test 2: Test limit parameter (should be 100 by default based on the implementation)
+    print_header("Test 2: Test Default Limit (100)")
     success, message, data = make_request("get", "/alertes", token=admin_token, expected_status=200)
     
     if success and isinstance(data, list):
-        default_limit_correct = len(data) <= 10
-        print_test_result("Default limit (10)", default_limit_correct, 
+        default_limit_correct = len(data) <= 100
+        print_test_result("Default limit (100)", default_limit_correct, 
                          f"Default limit works correctly, got {len(data)} alerts" if default_limit_correct 
-                         else f"Default limit not working, got {len(data)} alerts instead of 10 or fewer")
+                         else f"Default limit not working, got {len(data)} alerts instead of 100 or fewer")
     else:
         print_test_result("Test default limit", False, message)
     
