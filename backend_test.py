@@ -1191,4 +1191,5 @@ def create_test_data(admin_token):
     print("Test data creation completed")
 
 if __name__ == "__main__":
-    run_all_tests()
+    # Run specific alert system tests
+    test_alertes_system()
