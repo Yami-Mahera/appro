@@ -1769,6 +1769,349 @@ async def calculer_composition_tc_endpoint(
         "calculs": composition
     }
 
+# Fonctions utilitaires pour les exports et reporting avancé
+
+async def create_excel_export(data: List[Dict], filename: str, sheet_name: str = "Données") -> str:
+    """Créer un fichier Excel à partir des données"""
+    df = pd.DataFrame(data)
+    
+    # Créer un fichier temporaire
+    temp_file = tempfile.NamedTemporaryFile(delete=False, suffix='.xlsx')
+    
+    with pd.ExcelWriter(temp_file.name, engine='openpyxl') as writer:
+        df.to_excel(writer, sheet_name=sheet_name, index=False)
+        
+        # Styling
+        workbook = writer.book
+        worksheet = writer.sheets[sheet_name]
+        
+        # Style des headers
+        header_font = Font(bold=True, color='FFFFFF')
+        header_fill = PatternFill(start_color='366092', end_color='366092', fill_type='solid')
+        
+        for cell in worksheet[1]:
+            cell.font = header_font
+            cell.fill = header_fill
+            cell.alignment = Alignment(horizontal='center')
+        
+        # Auto-width pour les colonnes
+        for column in worksheet.columns:
+            max_length = 0
+            column_letter = column[0].column_letter
+            for cell in column:
+                try:
+                    if len(str(cell.value)) > max_length:
+                        max_length = len(str(cell.value))
+                except:
+                    pass
+            adjusted_width = min(max_length + 2, 50)
+            worksheet.column_dimensions[column_letter].width = adjusted_width
+    
+    return temp_file.name
+
+async def create_pdf_export(data: List[Dict], filename: str, title: str = "Rapport") -> str:
+    """Créer un fichier PDF à partir des données"""
+    temp_file = tempfile.NamedTemporaryFile(delete=False, suffix='.pdf')
+    
+    doc = SimpleDocTemplate(temp_file.name, pagesize=A4)
+    elements = []
+    styles = getSampleStyleSheet()
+    
+    # Titre
+    title_style = ParagraphStyle(
+        'CustomTitle',
+        parent=styles['Heading1'],
+        fontSize=16,
+        spaceAfter=30,
+        alignment=1  # Center
+    )
+    elements.append(Paragraph(title, title_style))
+    elements.append(Spacer(1, 12))
+    
+    if data:
+        # Créer le tableau
+        df = pd.DataFrame(data)
+        
+        # Préparer les données pour le tableau
+        table_data = [list(df.columns)]
+        for _, row in df.iterrows():
+            table_data.append(list(row.astype(str)))
+        
+        # Créer le tableau
+        table = Table(table_data)
+        table.setStyle(TableStyle([
+            ('BACKGROUND', (0, 0), (-1, 0), colors.grey),
+            ('TEXTCOLOR', (0, 0), (-1, 0), colors.whitesmoke),
+            ('ALIGN', (0, 0), (-1, -1), 'CENTER'),
+            ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
+            ('FONTSIZE', (0, 0), (-1, 0), 12),
+            ('BOTTOMPADDING', (0, 0), (-1, 0), 12),
+            ('BACKGROUND', (0, 1), (-1, -1), colors.beige),
+            ('GRID', (0, 0), (-1, -1), 1, colors.black),
+            ('FONTSIZE', (0, 1), (-1, -1), 10),
+        ]))
+        
+        elements.append(table)
+    
+    doc.build(elements)
+    return temp_file.name
+
+async def create_csv_export(data: List[Dict], filename: str) -> str:
+    """Créer un fichier CSV à partir des données"""
+    temp_file = tempfile.NamedTemporaryFile(delete=False, suffix='.csv', mode='w', newline='', encoding='utf-8')
+    
+    if data:
+        df = pd.DataFrame(data)
+        df.to_csv(temp_file.name, index=False, encoding='utf-8')
+    
+    temp_file.close()
+    return temp_file.name
+
+async def calculer_taux_service_client(date_debut: Optional[datetime] = None, date_fin: Optional[datetime] = None) -> float:
+    """
+    Calculer le taux de service client
+    Taux = (Commandes livrées à temps / Total commandes livrées) * 100
+    """
+    query = {"status": CommandeStatus.DELIVERED}
+    
+    if date_debut or date_fin:
+        date_filter = {}
+        if date_debut:
+            date_filter["$gte"] = date_debut
+        if date_fin:
+            date_filter["$lte"] = date_fin
+        query["date_livraison_reelle"] = date_filter
+    
+    commandes_livrees = await db.commandes.find(query).to_list(10000)
+    
+    if not commandes_livrees:
+        return 0.0
+    
+    commandes_a_temps = 0
+    for commande in commandes_livrees:
+        if (commande.get("date_livraison_reelle") and 
+            commande.get("date_livraison_prevue") and
+            commande["date_livraison_reelle"] <= commande["date_livraison_prevue"]):
+            commandes_a_temps += 1
+    
+    return (commandes_a_temps / len(commandes_livrees)) * 100
+
+async def calculer_delai_moyen_livraison(date_debut: Optional[datetime] = None, date_fin: Optional[datetime] = None) -> float:
+    """
+    Calculer le délai moyen de livraison en jours
+    """
+    query = {
+        "status": CommandeStatus.DELIVERED,
+        "date_commande": {"$exists": True},
+        "date_livraison_reelle": {"$exists": True}
+    }
+    
+    if date_debut or date_fin:
+        date_filter = {}
+        if date_debut:
+            date_filter["$gte"] = date_debut
+        if date_fin:
+            date_filter["$lte"] = date_fin
+        query["date_livraison_reelle"].update(date_filter)
+    
+    commandes = await db.commandes.find(query).to_list(10000)
+    
+    if not commandes:
+        return 0.0
+    
+    total_delais = 0
+    for commande in commandes:
+        if commande.get("date_commande") and commande.get("date_livraison_reelle"):
+            delai = (commande["date_livraison_reelle"] - commande["date_commande"]).days
+            total_delais += delai
+    
+    return total_delais / len(commandes)
+
+async def calculer_nombre_commandes_traitees(date_debut: Optional[datetime] = None, date_fin: Optional[datetime] = None) -> int:
+    """
+    Calculer le nombre de commandes traitées (approuvées ou plus)
+    """
+    query = {
+        "status": {"$in": [CommandeStatus.APPROVED, CommandeStatus.ORDERED, CommandeStatus.DELIVERED]}
+    }
+    
+    if date_debut or date_fin:
+        date_filter = {}
+        if date_debut:
+            date_filter["$gte"] = date_debut
+        if date_fin:
+            date_filter["$lte"] = date_fin
+        query["created_at"] = date_filter
+    
+    return await db.commandes.count_documents(query)
+
+async def calculer_nombre_commandes_aeriennes(date_debut: Optional[datetime] = None, date_fin: Optional[datetime] = None) -> int:
+    """
+    Calculer le nombre de commandes en mode aérien (urgentes)
+    """
+    query = {
+        "status": {"$ne": CommandeStatus.CANCELLED},
+        "notes": {"$regex": "aérien|aerien|urgent|express", "$options": "i"}
+    }
+    
+    if date_debut or date_fin:
+        date_filter = {}
+        if date_debut:
+            date_filter["$gte"] = date_debut
+        if date_fin:
+            date_filter["$lte"] = date_fin
+        query["created_at"] = date_filter
+    
+    return await db.commandes.count_documents(query)
+
+async def calculer_taux_rupture_stock(date_debut: Optional[datetime] = None, date_fin: Optional[datetime] = None) -> Dict[str, float]:
+    """
+    Calculer le taux de rupture de stock
+    """
+    # Nombre total d'articles actifs
+    total_articles = await db.articles.count_documents({"active": True})
+    
+    # Nombre d'articles en rupture (stock = 0)
+    articles_rupture = await db.articles.count_documents({
+        "active": True,
+        "stock_actuel": 0
+    })
+    
+    taux_rupture = (articles_rupture / total_articles * 100) if total_articles > 0 else 0
+    
+    # Calculer le nombre de jours de rupture si period fournie
+    jours_rupture = 0
+    if date_debut and date_fin:
+        # Rechercher dans l'historique des mouvements
+        mouvements = await db.mouvements_stock.find({
+            "date_mouvement": {"$gte": date_debut, "$lte": date_fin},
+            "stock_apres": 0
+        }).to_list(10000)
+        
+        # Calculer les jours uniques de rupture
+        dates_rupture = set()
+        for mouvement in mouvements:
+            dates_rupture.add(mouvement["date_mouvement"].date())
+        
+        jours_rupture = len(dates_rupture)
+    
+    return {
+        "taux_rupture_pourcentage": taux_rupture,
+        "articles_en_rupture": articles_rupture,
+        "total_articles": total_articles,
+        "jours_rupture": jours_rupture
+    }
+
+async def calculer_taux_commandes_tension() -> Dict[str, Any]:
+    """
+    Calculer le taux de commandes en tension
+    """
+    # Commandes en tension (urgentes ou critiques)
+    commandes_tension = await db.alertes_avancees.count_documents({
+        "type_alerte": "nouvelle_commande",
+        "niveau_alerte": {"$in": [NiveauAlerte.URGENT, NiveauAlerte.CRITIQUE]}
+    })
+    
+    # Total des commandes actives
+    total_commandes = await db.commandes.count_documents({
+        "status": {"$in": [CommandeStatus.PENDING, CommandeStatus.APPROVED, CommandeStatus.ORDERED]}
+    })
+    
+    taux_tension = (commandes_tension / total_commandes * 100) if total_commandes > 0 else 0
+    
+    # Calculer les ruptures liées aux commandes en tension
+    ruptures_tension = await db.articles.count_documents({
+        "active": True,
+        "stock_actuel": {"$lte": "$seuil_min"}
+    })
+    
+    return {
+        "commandes_en_tension": commandes_tension,
+        "total_commandes": total_commandes,
+        "taux_tension_pourcentage": taux_tension,
+        "ruptures_liees_tension": ruptures_tension,
+        "ratio_rupture_tension": (ruptures_tension / commandes_tension) if commandes_tension > 0 else 0
+    }
+
+async def generer_donnees_powerbi(table: str) -> List[Dict[str, Any]]:
+    """
+    Générer les données formatées pour Power BI
+    """
+    data = []
+    
+    if table == "fournisseurs":
+        fournisseurs = await db.fournisseurs.find({"active": True}).to_list(10000)
+        data = [
+            {
+                "FournisseurID": f["id"],
+                "Nom": f["nom"],
+                "CodeFournisseur": f["code_fournisseur"],
+                "Ville": f["ville"],
+                "Pays": f["pays"],
+                "DelaiLivraisonMoyen": f.get("delai_livraison_moyen", 0),
+                "DateCreation": f["created_at"].isoformat()
+            }
+            for f in fournisseurs
+        ]
+    
+    elif table == "articles":
+        articles = await db.articles.find({"active": True}).to_list(10000)
+        data = [
+            {
+                "ArticleID": a["id"],
+                "Reference": a["reference"],
+                "Nom": a["nom"],
+                "Famille": a.get("famille", ""),
+                "FournisseurID": a["fournisseur_id"],
+                "PrixUnitaire": a["prix_unitaire"],
+                "StockActuel": a["stock_actuel"],
+                "SeuilMin": a["seuil_min"],
+                "SeuilMax": a["seuil_max"],
+                "DateCreation": a["created_at"].isoformat()
+            }
+            for a in articles
+        ]
+    
+    elif table == "commandes":
+        commandes = await db.commandes.find({}).to_list(10000)
+        data = [
+            {
+                "CommandeID": c["id"],
+                "NumeroCommande": c["numero_commande"],
+                "FournisseurID": c["fournisseur_id"],
+                "Status": c["status"],
+                "TotalHT": c["total_ht"],
+                "TotalTTC": c["total_ttc"],
+                "DateCommande": c.get("date_commande").isoformat() if c.get("date_commande") else None,
+                "DateLivraisonPrevue": c.get("date_livraison_prevue").isoformat() if c.get("date_livraison_prevue") else None,
+                "DateLivraisonReelle": c.get("date_livraison_reelle").isoformat() if c.get("date_livraison_reelle") else None,
+                "DateCreation": c["created_at"].isoformat()
+            }
+            for c in commandes
+        ]
+    
+    elif table == "kpis":
+        taux_service = await calculer_taux_service_client()
+        delai_moyen = await calculer_delai_moyen_livraison()
+        commandes_traitees = await calculer_nombre_commandes_traitees()
+        commandes_aeriennes = await calculer_nombre_commandes_aeriennes()
+        rupture_data = await calculer_taux_rupture_stock()
+        tension_data = await calculer_taux_commandes_tension()
+        
+        data = [{
+            "Date": datetime.utcnow().isoformat(),
+            "TauxServiceClient": taux_service,
+            "DelaiMoyenLivraison": delai_moyen,
+            "NombreCommandesTraitees": commandes_traitees,
+            "NombreCommandesAeriennes": commandes_aeriennes,
+            "TauxRuptureStock": rupture_data["taux_rupture_pourcentage"],
+            "ArticlesEnRupture": rupture_data["articles_en_rupture"],
+            "TauxCommandesTension": tension_data["taux_tension_pourcentage"],
+            "CommandesEnTension": tension_data["commandes_en_tension"]
+        }]
+    
+    return data
+
 # Include the router in the main app
 app.include_router(api_router)
 
