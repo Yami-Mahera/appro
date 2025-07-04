@@ -285,7 +285,7 @@ def test_export_articles_csv(token):
         content_type = response.headers.get('Content-Type')
         content_disposition = response.headers.get('Content-Disposition')
         
-        if content_type == 'text/csv' and content_disposition:
+        if content_type.startswith('text/csv') and content_disposition:
             print_test_result("Export articles csv", True, "Successfully exported articles to CSV")
             test_results["export"]["articles_csv"]["success"] = True
             test_results["export"]["articles_csv"]["message"] = "Successfully exported articles to CSV"
