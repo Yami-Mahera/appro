@@ -24,8 +24,9 @@ const Header: React.FC<HeaderProps> = ({ onMenuClick }) => {
           {/* This space can be used for breadcrumbs or page titles */}
         </div>
 
-        {/* User menu */}
-        <div className="flex items-center">
+        {/* User menu and alerts */}
+        <div className="flex items-center space-x-2">
+          <AlertsMenu />
           <UserMenu />
         </div>
       </div>
