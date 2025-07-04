@@ -2318,6 +2318,233 @@ async def get_previsions_vs_realisations(
         }
     }
 
+# APIs Tableaux de Bord Personnalisés
+
+@api_router.post("/dashboards/personnalises", response_model=DashboardPersonnalise)
+async def create_dashboard_personnalise(
+    dashboard_data: dict,
+    current_user: User = Depends(get_current_user)
+):
+    """Créer un tableau de bord personnalisé"""
+    dashboard = DashboardPersonnalise(
+        nom=dashboard_data["nom"],
+        description=dashboard_data.get("description"),
+        user_id=current_user.id,
+        widgets=dashboard_data.get("widgets", []),
+        layout=dashboard_data.get("layout", {}),
+        partage=dashboard_data.get("partage", False)
+    )
+    
+    await db.dashboards_personnalises.insert_one(dashboard.dict())
+    return dashboard
+
+@api_router.get("/dashboards/personnalises")
+async def get_dashboards_personnalises(
+    partage: Optional[bool] = None,
+    current_user: User = Depends(get_current_user)
+):
+    """Récupérer les tableaux de bord personnalisés"""
+    query = {"$or": [{"user_id": current_user.id}]}
+    
+    # Inclure les dashboards partagés si demandé
+    if partage or partage is None:
+        query["$or"].append({"partage": True})
+    
+    dashboards = await db.dashboards_personnalises.find(query).sort("created_at", -1).to_list(100)
+    return [DashboardPersonnalise(**d) for d in dashboards]
+
+@api_router.put("/dashboards/personnalises/{dashboard_id}")
+async def update_dashboard_personnalise(
+    dashboard_id: str,
+    dashboard_data: dict,
+    current_user: User = Depends(get_current_user)
+):
+    """Mettre à jour un tableau de bord personnalisé"""
+    # Vérifier que l'utilisateur peut modifier ce dashboard
+    dashboard = await db.dashboards_personnalises.find_one({"id": dashboard_id})
+    if not dashboard:
+        raise HTTPException(status_code=404, detail="Dashboard non trouvé")
+    
+    if dashboard["user_id"] != current_user.id and current_user.role != UserRole.ADMIN:
+        raise HTTPException(status_code=403, detail="Non autorisé à modifier ce dashboard")
+    
+    update_data = {}
+    for field in ["nom", "description", "widgets", "layout", "partage"]:
+        if field in dashboard_data:
+            update_data[field] = dashboard_data[field]
+    
+    update_data["updated_at"] = datetime.utcnow()
+    
+    await db.dashboards_personnalises.update_one(
+        {"id": dashboard_id},
+        {"$set": update_data}
+    )
+    
+    updated_dashboard = await db.dashboards_personnalises.find_one({"id": dashboard_id})
+    return DashboardPersonnalise(**updated_dashboard)
+
+@api_router.delete("/dashboards/personnalises/{dashboard_id}")
+async def delete_dashboard_personnalise(
+    dashboard_id: str,
+    current_user: User = Depends(get_current_user)
+):
+    """Supprimer un tableau de bord personnalisé"""
+    dashboard = await db.dashboards_personnalises.find_one({"id": dashboard_id})
+    if not dashboard:
+        raise HTTPException(status_code=404, detail="Dashboard non trouvé")
+    
+    if dashboard["user_id"] != current_user.id and current_user.role != UserRole.ADMIN:
+        raise HTTPException(status_code=403, detail="Non autorisé à supprimer ce dashboard")
+    
+    await db.dashboards_personnalises.delete_one({"id": dashboard_id})
+    return {"message": "Dashboard supprimé avec succès"}
+
+@api_router.get("/dashboards/widgets-disponibles")
+async def get_widgets_disponibles(
+    current_user: User = Depends(get_current_user)
+):
+    """Récupérer la liste des widgets disponibles pour les dashboards"""
+    return {
+        "widgets": [
+            {
+                "type": "kpi_card",
+                "nom": "Carte KPI",
+                "description": "Affiche une valeur KPI avec indicateur",
+                "options": ["taux_service_client", "delai_livraison", "commandes_traitees", "rupture_stock"]
+            },
+            {
+                "type": "chart_line",
+                "nom": "Graphique Linéaire",
+                "description": "Évolution d'un indicateur dans le temps",
+                "options": ["evolution_stock", "evolution_commandes", "evolution_kpis"]
+            },
+            {
+                "type": "chart_bar",
+                "nom": "Graphique Barres",
+                "description": "Comparaison de valeurs",
+                "options": ["commandes_par_fournisseur", "articles_par_famille", "alertes_par_type"]
+            },
+            {
+                "type": "chart_pie",
+                "nom": "Graphique Camembert",
+                "description": "Répartition en pourcentages",
+                "options": ["repartition_commandes", "repartition_stock", "repartition_alertes"]
+            },
+            {
+                "type": "table",
+                "nom": "Tableau",
+                "description": "Affichage tabulaire des données",
+                "options": ["alertes_recentes", "commandes_urgentes", "stock_bas"]
+            },
+            {
+                "type": "gauge",
+                "nom": "Jauge",
+                "description": "Indicateur de performance avec seuils",
+                "options": ["performance_fournisseur", "taux_service", "niveau_stock"]
+            }
+        ]
+    }
+
+@api_router.get("/dashboards/donnees-widget/{widget_type}")
+async def get_donnees_widget(
+    widget_type: str,
+    option: Optional[str] = None,
+    periode: Optional[str] = "30d",
+    current_user: User = Depends(get_current_user)
+):
+    """Récupérer les données pour un widget spécifique"""
+    
+    # Calculer les dates selon la période
+    if periode == "7d":
+        date_debut = datetime.utcnow() - timedelta(days=7)
+    elif periode == "30d":
+        date_debut = datetime.utcnow() - timedelta(days=30)
+    elif periode == "90d":
+        date_debut = datetime.utcnow() - timedelta(days=90)
+    else:
+        date_debut = datetime.utcnow() - timedelta(days=30)
+    
+    date_fin = datetime.utcnow()
+    
+    if widget_type == "kpi_card":
+        if option == "taux_service_client":
+            taux = await calculer_taux_service_client(date_debut, date_fin)
+            return {"valeur": taux, "unite": "%", "tendance": "stable"}
+        elif option == "delai_livraison":
+            delai = await calculer_delai_moyen_livraison(date_debut, date_fin)
+            return {"valeur": delai, "unite": "jours", "tendance": "amelioration"}
+        elif option == "commandes_traitees":
+            nombre = await calculer_nombre_commandes_traitees(date_debut, date_fin)
+            return {"valeur": nombre, "unite": "commandes", "tendance": "hausse"}
+        elif option == "rupture_stock":
+            data = await calculer_taux_rupture_stock(date_debut, date_fin)
+            return {"valeur": data["taux_rupture_pourcentage"], "unite": "%", "tendance": "baisse"}
+    
+    elif widget_type == "chart_line":
+        if option == "evolution_stock":
+            # Données d'évolution du stock sur la période
+            return {
+                "labels": ["Sem 1", "Sem 2", "Sem 3", "Sem 4"],
+                "datasets": [{
+                    "label": "Valeur Stock",
+                    "data": [1500000, 1450000, 1600000, 1580000]
+                }]
+            }
+        elif option == "evolution_commandes":
+            return {
+                "labels": ["Sem 1", "Sem 2", "Sem 3", "Sem 4"],
+                "datasets": [{
+                    "label": "Nombre Commandes",
+                    "data": [45, 52, 48, 61]
+                }]
+            }
+    
+    elif widget_type == "chart_bar":
+        if option == "commandes_par_fournisseur":
+            # Top 5 fournisseurs par nombre de commandes
+            pipeline = [
+                {"$group": {"_id": "$fournisseur_id", "count": {"$sum": 1}}},
+                {"$sort": {"count": -1}},
+                {"$limit": 5}
+            ]
+            results = await db.commandes.aggregate(pipeline).to_list(5)
+            
+            labels = []
+            data = []
+            for result in results:
+                fournisseur = await db.fournisseurs.find_one({"id": result["_id"]})
+                labels.append(fournisseur["nom"] if fournisseur else "N/A")
+                data.append(result["count"])
+            
+            return {"labels": labels, "data": data}
+    
+    elif widget_type == "table":
+        if option == "alertes_recentes":
+            alertes = await db.alertes.find({"lue": False}).sort("created_at", -1).limit(10).to_list(10)
+            return [
+                {
+                    "titre": a["titre"],
+                    "priorite": a["priorite"],
+                    "date": a["created_at"].strftime("%d/%m/%Y %H:%M")
+                }
+                for a in alertes
+            ]
+        elif option == "stock_bas":
+            articles = await db.articles.find({
+                "active": True,
+                "$expr": {"$lte": ["$stock_actuel", "$seuil_min"]}
+            }).limit(10).to_list(10)
+            return [
+                {
+                    "nom": a["nom"],
+                    "stock": a["stock_actuel"],
+                    "seuil": a["seuil_min"]
+                }
+                for a in articles
+            ]
+    
+    return {"message": "Type de widget non supporté ou données non disponibles"}
+
 @api_router.get("/variations/delais-fournisseurs")
 async def get_ecarts_delais_fournisseurs(
     fournisseur_id: Optional[str] = None,
