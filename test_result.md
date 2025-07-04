@@ -535,11 +535,14 @@ frontend:
     file: "/app/frontend/src/presentation/components/ui/"
     stuck_count: 0
     priority: "medium"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
         comment: "Créé les composants UI Card, Select, Button avec TypeScript pour supporter le graphique d'évolution"
+      - working: true
+        agent: "testing"
+        comment: "Les composants UI avancés fonctionnent correctement. Les composants Card, Select et Button sont bien implémentés et supportent correctement le graphique d'évolution du stock."
 
 metadata:
   created_by: "main_agent"
