@@ -67,7 +67,7 @@ const Layout: React.FC<LayoutProps> = ({ children, currentPath = "/" }) => {
               <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center mr-3">
                 <HomeIcon className="w-6 h-6 text-white" />
               </div>
-              <h1 className="text-xl font-bold text-gray-800">
+              <h1 className="text-xl font-bold text-gray-800 dark:text-gray-200">
                 Gestion Approovisionnements
               </h1>
             </div>
