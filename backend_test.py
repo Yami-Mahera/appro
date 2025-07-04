@@ -2,28 +2,29 @@ import requests
 import json
 import time
 import uuid
+import re
 from datetime import datetime, timedelta
 from typing import Dict, List, Optional, Any
 
 # Configuration
-BASE_URL = "https://3fc8b13e-1e2f-4d6c-b557-68c0aa1d3221.preview.emergentagent.com/api"
+BASE_URL = "https://8e9cb52f-5d8f-42e5-bc26-d323127231c4.preview.emergentagent.com/api"
 ADMIN_USER = {
     "email": "admin@test.com",
-    "password": "admin123",
+    "password": "password123",
     "nom": "Admin",
     "prenom": "Test",
     "role": "administrateur"
 }
 MANAGER_USER = {
     "email": "manager@test.com",
-    "password": "manager123",
+    "password": "password123",
     "nom": "Manager",
     "prenom": "Test",
     "role": "manager"
 }
 NORMAL_USER = {
     "email": "user@test.com",
-    "password": "user123",
+    "password": "password123",
     "nom": "User",
     "prenom": "Test",
     "role": "utilisateur"
@@ -60,6 +61,14 @@ test_results = {
         "login": {"success": False, "message": "Not tested"},
         "me": {"success": False, "message": "Not tested"}
     },
+    "users": {
+        "list": {"success": False, "message": "Not tested"},
+        "create": {"success": False, "message": "Not tested"},
+        "get": {"success": False, "message": "Not tested"},
+        "update": {"success": False, "message": "Not tested"},
+        "reset_password": {"success": False, "message": "Not tested"},
+        "delete": {"success": False, "message": "Not tested"}
+    },
     "fournisseurs": {
         "create": {"success": False, "message": "Not tested"},
         "list": {"success": False, "message": "Not tested"},
@@ -84,7 +93,13 @@ test_results = {
     },
     "access_control": {
         "unauthorized": {"success": False, "message": "Not tested"},
-        "role_based": {"success": False, "message": "Not tested"}
+        "role_based": {"success": False, "message": "Not tested"},
+        "admin_self_delete": {"success": False, "message": "Not tested"}
+    },
+    "validations": {
+        "email_uniqueness": {"success": False, "message": "Not tested"},
+        "invalid_email": {"success": False, "message": "Not tested"},
+        "password_validation": {"success": False, "message": "Not tested"}
     }
 }
 
@@ -97,6 +112,10 @@ tokens = {
 
 # IDs for created resources
 created_ids = {
+    "user": None,
+    "user_admin": None,
+    "user_manager": None,
+    "user_normal": None,
     "fournisseur": None,
     "article": None,
     "commande": None,
@@ -129,6 +148,8 @@ def make_request(method, endpoint, data=None, token=None, expected_status=200):
             response = requests.post(url, json=data, headers=headers)
         elif method.lower() == "put":
             response = requests.put(url, json=data, headers=headers)
+        elif method.lower() == "delete":
+            response = requests.delete(url, headers=headers)
         else:
             return False, f"Unsupported method: {method}", None
         
@@ -471,6 +492,254 @@ def test_unauthorized_access():
         return True
     else:
         print_test_result("Unauthorized access", False, "Request without token was not rejected properly")
+# User Management Test Functions
+def test_list_users(token):
+    print_header("Testing List Users")
+    success, message, data = make_request("get", "/users", token=token, expected_status=200)
+    
+    if success and isinstance(data, list):
+        print_test_result("List users", True, f"Retrieved {len(data)} users")
+        test_results["users"]["list"]["success"] = True
+        test_results["users"]["list"]["message"] = f"Successfully retrieved {len(data)} users"
+        return True
+    else:
+        print_test_result("List users", False, message)
+        test_results["users"]["list"]["message"] = message
+        return False
+
+def test_create_user(token, role="utilisateur"):
+    print_header(f"Testing Create User with role: {role}")
+    
+    # Generate a unique email to avoid conflicts
+    unique_id = uuid.uuid4().hex[:6]
+    user_data = {
+        "email": f"test.{role}.{unique_id}@example.com",
+        "password": "Password123!",
+        "nom": f"Test {role.capitalize()}",
+        "prenom": f"User {unique_id}",
+        "role": role
+    }
+    
+    success, message, data = make_request("post", "/users", user_data, token=token, expected_status=200)
+    
+    if success and data and "id" in data:
+        print_test_result("Create user", True, f"Created user: {data['email']} with role {data['role']}")
+        test_results["users"]["create"]["success"] = True
+        test_results["users"]["create"]["message"] = f"Successfully created user with role {role}"
+        
+        # Store the user ID based on role
+        if role == "administrateur":
+            created_ids["user_admin"] = data["id"]
+        elif role == "manager":
+            created_ids["user_manager"] = data["id"]
+        elif role == "utilisateur":
+            created_ids["user_normal"] = data["id"]
+        
+        # Store the latest user ID regardless of role
+        created_ids["user"] = data["id"]
+        
+        return data["id"]
+    else:
+        print_test_result("Create user", False, message)
+        test_results["users"]["create"]["message"] = message
+        return None
+
+def test_get_user(token, user_id):
+    print_header("Testing Get User")
+    success, message, data = make_request("get", f"/users/{user_id}", token=token, expected_status=200)
+    
+    if success and data and data["id"] == user_id:
+        print_test_result("Get user", True, f"Retrieved user: {data['email']}")
+        test_results["users"]["get"]["success"] = True
+        test_results["users"]["get"]["message"] = f"Successfully retrieved user: {data['email']}"
+        return True
+    else:
+        print_test_result("Get user", False, message)
+        test_results["users"]["get"]["message"] = message
+        return False
+
+def test_update_user(token, user_id):
+    print_header("Testing Update User")
+    update_data = {
+        "nom": f"Updated Name {uuid.uuid4().hex[:6]}",
+        "prenom": f"Updated Firstname {uuid.uuid4().hex[:6]}"
+    }
+    
+    success, message, data = make_request("put", f"/users/{user_id}", update_data, token=token, expected_status=200)
+    
+    if success and data and data["nom"] == update_data["nom"]:
+        print_test_result("Update user", True, f"Updated user: {data['email']}")
+        test_results["users"]["update"]["success"] = True
+        test_results["users"]["update"]["message"] = f"Successfully updated user: {data['email']}"
+        return True
+    else:
+        print_test_result("Update user", False, message)
+        test_results["users"]["update"]["message"] = message
+        return False
+
+def test_reset_user_password(token, user_id):
+    print_header("Testing Reset User Password")
+    password_data = {
+        "new_password": "NewPassword123!"
+    }
+    
+    success, message, data = make_request("put", f"/users/{user_id}/reset-password", password_data, token=token, expected_status=200)
+    
+    if success:
+        print_test_result("Reset user password", True, "Password reset successful")
+        test_results["users"]["reset_password"]["success"] = True
+        test_results["users"]["reset_password"]["message"] = "Successfully reset user password"
+        return True
+    else:
+        print_test_result("Reset user password", False, message)
+        test_results["users"]["reset_password"]["message"] = message
+        return False
+
+def test_delete_user(token, user_id):
+    print_header("Testing Delete User")
+    success, message, data = make_request("delete", f"/users/{user_id}", token=token, expected_status=200)
+    
+    if success:
+        print_test_result("Delete user", True, "User deleted successfully")
+        test_results["users"]["delete"]["success"] = True
+        test_results["users"]["delete"]["message"] = "Successfully deleted user"
+        return True
+    else:
+        print_test_result("Delete user", False, message)
+        test_results["users"]["delete"]["message"] = message
+        return False
+
+def test_admin_self_delete(token, admin_id):
+    print_header("Testing Admin Self-Delete Prevention")
+    # For this test, we expect a 400 error when an admin tries to delete their own account
+    success, message, data = make_request("delete", f"/users/{admin_id}", token=token, expected_status=400)
+    
+    if success:
+        print_test_result("Admin self-delete prevention", True, "Correctly prevented admin from deleting own account")
+        test_results["access_control"]["admin_self_delete"]["success"] = True
+        test_results["access_control"]["admin_self_delete"]["message"] = "Correctly prevented admin from deleting own account"
+        return True
+    else:
+        # Check if the error message indicates that self-deletion is not allowed
+        if "Cannot delete your own account" in message:
+            print_test_result("Admin self-delete prevention", True, "Correctly prevented admin from deleting own account")
+            test_results["access_control"]["admin_self_delete"]["success"] = True
+            test_results["access_control"]["admin_self_delete"]["message"] = "Correctly prevented admin from deleting own account"
+            return True
+        else:
+            print_test_result("Admin self-delete prevention", False, "Admin was able to delete own account or unexpected error")
+            test_results["access_control"]["admin_self_delete"]["message"] = message
+            return False
+
+def test_email_uniqueness(token):
+    print_header("Testing Email Uniqueness Validation")
+    
+    # First create a user
+    user_data = {
+        "email": f"unique.test.{uuid.uuid4().hex[:6]}@example.com",
+        "password": "Password123!",
+        "nom": "Unique",
+        "prenom": "Test",
+        "role": "utilisateur"
+    }
+    
+    success, message, data = make_request("post", "/users", user_data, token=token, expected_status=200)
+    
+    if not success:
+        print_test_result("Email uniqueness", False, "Failed to create initial test user")
+        test_results["validations"]["email_uniqueness"]["message"] = "Failed to create initial test user"
+        return False
+    
+    # Now try to create another user with the same email
+    duplicate_data = user_data.copy()
+    duplicate_data["nom"] = "Duplicate"
+    
+    success, message, data = make_request("post", "/users", duplicate_data, token=token, expected_status=400)
+    
+    # For this test, success means we got the expected 400 error
+    if success:
+        print_test_result("Email uniqueness", True, "Correctly rejected duplicate email")
+        test_results["validations"]["email_uniqueness"]["success"] = True
+        test_results["validations"]["email_uniqueness"]["message"] = "Correctly rejected duplicate email"
+        return True
+    else:
+        print_test_result("Email uniqueness", False, "Duplicate email was not rejected properly")
+        test_results["validations"]["email_uniqueness"]["message"] = "Duplicate email was not rejected properly"
+        return False
+
+def test_invalid_email(token):
+    print_header("Testing Invalid Email Validation")
+    
+    invalid_emails = [
+        "not-an-email",
+        "missing@domain",
+        "@missing-local.com",
+        "spaces in@email.com",
+        "missing.domain@",
+        "two@symbols@email.com"
+    ]
+    
+    all_rejected = True
+    for invalid_email in invalid_emails:
+        user_data = {
+            "email": invalid_email,
+            "password": "Password123!",
+            "nom": "Invalid",
+            "prenom": "Email",
+            "role": "utilisateur"
+        }
+        
+        success, message, data = make_request("post", "/users", user_data, token=token, expected_status=422)
+        
+        if not success:
+            all_rejected = False
+            print_test_result(f"Invalid email: {invalid_email}", False, "Was not rejected properly")
+    
+    if all_rejected:
+        print_test_result("Invalid email validation", True, "All invalid emails were correctly rejected")
+        test_results["validations"]["invalid_email"]["success"] = True
+        test_results["validations"]["invalid_email"]["message"] = "All invalid emails were correctly rejected"
+        return True
+    else:
+        print_test_result("Invalid email validation", False, "Some invalid emails were not rejected")
+        test_results["validations"]["invalid_email"]["message"] = "Some invalid emails were not rejected"
+        return False
+
+def test_password_validation(token):
+    print_header("Testing Password Validation")
+    
+    # This test is a bit tricky since the backend might not have strict password validation
+    # We'll test with an empty password which should definitely be rejected
+    
+    user_data = {
+        "email": f"password.test.{uuid.uuid4().hex[:6]}@example.com",
+        "password": "",  # Empty password
+        "nom": "Password",
+        "prenom": "Test",
+        "role": "utilisateur"
+    }
+    
+    success, message, data = make_request("post", "/users", user_data, token=token, expected_status=422)
+    
+    # For this test, success means we got the expected 422 error for validation
+    # But the API might return 400 for bad request instead
+    if success:
+        print_test_result("Password validation", True, "Correctly rejected empty password")
+        test_results["validations"]["password_validation"]["success"] = True
+        test_results["validations"]["password_validation"]["message"] = "Correctly rejected empty password"
+        return True
+    else:
+        # Check if we got a 400 error instead of 422
+        success, message, data = make_request("post", "/users", user_data, token=token, expected_status=400)
+        if success:
+            print_test_result("Password validation", True, "Correctly rejected empty password (400 status)")
+            test_results["validations"]["password_validation"]["success"] = True
+            test_results["validations"]["password_validation"]["message"] = "Correctly rejected empty password"
+            return True
+        else:
+            print_test_result("Password validation", False, "Empty password was not rejected properly")
+            test_results["validations"]["password_validation"]["message"] = "Empty password was not rejected properly"
+            return False
         test_results["access_control"]["unauthorized"]["message"] = "Request without token was not rejected properly"
         return False
 
@@ -518,36 +787,107 @@ def run_all_tests():
     # Test unauthorized access first
     test_unauthorized_access()
     
-    # Test authentication
-    admin_registered = test_auth_register(ADMIN_USER)
-    if admin_registered:
-        admin_token = test_auth_login(ADMIN_USER)
-        if admin_token:
-            test_auth_me(admin_token, ADMIN_USER["email"])
+    # Try to login with existing users first
+    print_header("Testing Authentication with Existing Users")
+    admin_token = test_auth_login(ADMIN_USER)
+    manager_token = test_auth_login(MANAGER_USER)
+    user_token = test_auth_login(NORMAL_USER)
     
-    # Register manager user
-    manager_registered = test_auth_register(MANAGER_USER)
-    if manager_registered:
-        manager_token = test_auth_login(MANAGER_USER)
-        if manager_token:
-            test_auth_me(manager_token, MANAGER_USER["email"])
+    # Register users only if login failed
+    if not admin_token:
+        print_header("Registering Admin User")
+        admin_registered = test_auth_register(ADMIN_USER)
+        if admin_registered:
+            admin_token = test_auth_login(ADMIN_USER)
     
-    # Register a normal user
-    user_registered = test_auth_register(NORMAL_USER)
-    if user_registered:
-        user_token = test_auth_login(NORMAL_USER)
-        if user_token:
-            test_auth_me(user_token, NORMAL_USER["email"])
+    if not manager_token:
+        print_header("Registering Manager User")
+        manager_registered = test_auth_register(MANAGER_USER)
+        if manager_registered:
+            manager_token = test_auth_login(MANAGER_USER)
+    
+    if not user_token:
+        print_header("Registering Normal User")
+        user_registered = test_auth_register(NORMAL_USER)
+        if user_registered:
+            user_token = test_auth_login(NORMAL_USER)
+    
+    # Store tokens
+    if admin_token:
+        tokens["admin"] = admin_token
+        test_auth_me(admin_token, ADMIN_USER["email"])
+    else:
+        print("Admin authentication failed, cannot proceed with further tests")
+        print_summary()
+        return
+    
+    if manager_token:
+        tokens["manager"] = manager_token
+        test_auth_me(manager_token, MANAGER_USER["email"])
+    
+    if user_token:
+        tokens["user"] = user_token
+        test_auth_me(user_token, NORMAL_USER["email"])
     
     # Test role-based access control
     if tokens["user"]:
         test_role_based_access()
     
-    # If admin authentication failed, we can't test the rest
-    if not tokens["admin"]:
-        print("Admin authentication failed, cannot proceed with further tests")
-        print_summary()
-        return
+    # Test user management APIs
+    print_header("Testing User Management APIs")
+    
+    # Test listing users (admin only)
+    test_list_users(tokens["admin"])
+    
+    # Test creating users with different roles
+    admin_user_id = test_create_user(tokens["admin"], "administrateur")
+    manager_user_id = test_create_user(tokens["admin"], "manager")
+    normal_user_id = test_create_user(tokens["admin"], "utilisateur")
+    
+    # Test getting a specific user
+    if normal_user_id:
+        test_get_user(tokens["admin"], normal_user_id)
+    
+    # Test updating a user
+    if manager_user_id:
+        test_update_user(tokens["admin"], manager_user_id)
+    
+    # Test resetting a user's password
+    if normal_user_id:
+        test_reset_user_password(tokens["admin"], normal_user_id)
+    
+    # Test admin self-delete prevention
+    if tokens["admin"]:
+        # Get the current admin's ID from /auth/me
+        success, message, admin_data = make_request("get", "/auth/me", token=tokens["admin"], expected_status=200)
+        if success and admin_data and "id" in admin_data:
+            test_admin_self_delete(tokens["admin"], admin_data["id"])
+    
+    # Test deleting a user
+    if normal_user_id:
+        test_delete_user(tokens["admin"], normal_user_id)
+    
+    # Test validations
+    test_email_uniqueness(tokens["admin"])
+    test_invalid_email(tokens["admin"])
+    test_password_validation(tokens["admin"])
+    
+    # Test access control with non-admin users
+    if tokens["manager"]:
+        print_header("Testing Access Control with Manager User")
+        success, message, data = make_request("get", "/users", token=tokens["manager"], expected_status=403)
+        if success:
+            print_test_result("Manager access to users API", True, "Correctly rejected manager access to users API")
+        else:
+            print_test_result("Manager access to users API", False, "Manager was able to access users API or unexpected error")
+    
+    if tokens["user"]:
+        print_header("Testing Access Control with Normal User")
+        success, message, data = make_request("get", "/users", token=tokens["user"], expected_status=403)
+        if success:
+            print_test_result("Normal user access to users API", True, "Correctly rejected normal user access to users API")
+        else:
+            print_test_result("Normal user access to users API", False, "Normal user was able to access users API or unexpected error")
     
     # Test fournisseurs
     fournisseur_id = test_create_fournisseur(tokens["admin"])
@@ -575,9 +915,6 @@ def run_all_tests():
     
     # Test dashboard
     test_dashboard_stats(tokens["admin"])
-    
-    # Create additional test data
-    create_test_data(tokens["admin"])
     
     # Print summary
     print_summary()
