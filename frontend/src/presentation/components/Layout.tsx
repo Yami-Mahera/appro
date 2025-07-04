@@ -127,7 +127,7 @@ const Layout: React.FC<LayoutProps> = ({ children, currentPath = "/" }) => {
                 <img src={images.logo} alt="logo star" loading="lazy" />
               </div>
               <div className="flex items-center">
-                <h1 className="ml-3 text-lg font-semibold text-gray-900">
+                <h1 className="ml-3 text-lg font-semibold text-gray-900 dark:text-white">
                   Gestion des approvisionnements
                 </h1>
               </div>
