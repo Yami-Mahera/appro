@@ -243,8 +243,33 @@ def test_stock_couverture(token, article_id):
 def test_commandes_validation(token, article_id, fournisseur_id):
     print_header("Testing Commandes Validation API")
     
+    # First, create a test commande to get a commande_id
+    commande_data = {
+        "fournisseur_id": fournisseur_id,
+        "lignes": [
+            {
+                "article_id": article_id,
+                "quantite": 10,
+                "prix_unitaire": 19.99,
+                "total": 199.90
+            }
+        ],
+        "date_livraison_prevue": (datetime.now() + timedelta(days=7)).isoformat(),
+        "notes": "Commande test pour validation"
+    }
+    
+    success, message, commande = make_request("post", "/commandes", commande_data, token=token, expected_status=200)
+    
+    if not success or not commande or "id" not in commande:
+        print_test_result("Create test commande", False, message)
+        return
+    
+    commande_id = commande["id"]
+    print_test_result("Create test commande", True, f"Created commande with ID: {commande_id}")
+    
     # Create a basic validation request
     validation_data = {
+        "commande_id": commande_id,
         "article_id": article_id,
         "fournisseur_id": fournisseur_id,
         "quantite": 20,
@@ -265,6 +290,7 @@ def test_commandes_validation(token, article_id, fournisseur_id):
     # Test with constraints
     # Create a validation request with constraints
     validation_data_constraints = {
+        "commande_id": commande_id,
         "article_id": article_id,
         "fournisseur_id": fournisseur_id,
         "quantite": 5,  # Small quantity to potentially trigger minimum quantity constraint
