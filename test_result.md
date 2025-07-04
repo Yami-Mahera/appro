@@ -102,7 +102,7 @@
 # Testing Data - Main Agent and testing sub agent both should log testing data below this section
 #====================================================================================================
 
-user_problem_statement: "Créer un outil de gestion des approvisionnements et des commandes avec dashboard analytics, fournisseurs, articles, commandes, alertes. Interface moderne avec Tailwind CSS basée sur l'architecture du projet GitHub https://github.com/Yami-Mahera/appro/tree/based"
+user_problem_statement: "Créer un outil de gestion des approvisionnements et des commandes avec dashboard analytics, fournisseurs, articles, commandes, alertes. Interface moderne avec Tailwind CSS basée sur l'architecture du projet GitHub https://github.com/Yami-Mahera/appro/tree/based. NOUVEAU: Implémentation d'un système avancé de gestion des stocks avec graphique d'évolution sophistiqué selon les modalités de calcul CMS, CMC, QM et seuils d'alerte avancés."
 
 backend:
   - task: "Modèles de données MongoDB"
