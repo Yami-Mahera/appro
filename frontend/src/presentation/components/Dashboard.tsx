@@ -11,6 +11,7 @@ import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContaine
 import { DashboardStats } from '../../data/types';
 import apiService from '../../services/api';
 import { formatNumber } from '../../common/utils';
+import StockEvolutionChart from './StockEvolutionChart';
 
 const Dashboard: React.FC = () => {
   const [stats, setStats] = useState<DashboardStats | null>(null);
@@ -207,6 +208,9 @@ const Dashboard: React.FC = () => {
           </ResponsiveContainer>
         </div>
       </div>
+
+      {/* Graphique d'évolution du stock avancé */}
+      <StockEvolutionChart className="mt-6" />
 
       {/* Recent Activity */}
       <div className="bg-white shadow rounded-lg">

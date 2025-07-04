@@ -54,6 +54,55 @@ class ApiService {
     return response.data;
   }
 
+  // Users management methods
+  async getUsers(params?: {
+    search?: string;
+    sort_by?: string;
+    sort_order?: string;
+    role?: string;
+    active?: boolean;
+    limit?: number;
+    skip?: number;
+  }) {
+    const queryParams = new URLSearchParams();
+    if (params?.search) queryParams.append('search', params.search);
+    if (params?.sort_by) queryParams.append('sort_by', params.sort_by);
+    if (params?.sort_order) queryParams.append('sort_order', params.sort_order);
+    if (params?.role) queryParams.append('role', params.role);
+    if (params?.active !== undefined) queryParams.append('active', params.active.toString());
+    if (params?.limit) queryParams.append('limit', params.limit.toString());
+    if (params?.skip) queryParams.append('skip', params.skip.toString());
+    
+    const url = queryParams.toString() ? `/users?${queryParams.toString()}` : '/users';
+    const response = await this.api.get(url);
+    return response.data;
+  }
+
+  async getUser(id: string) {
+    const response = await this.api.get(`/users/${id}`);
+    return response.data;
+  }
+
+  async createUser(data: any) {
+    const response = await this.api.post('/users', data);
+    return response.data;
+  }
+
+  async updateUser(id: string, data: any) {
+    const response = await this.api.put(`/users/${id}`, data);
+    return response.data;
+  }
+
+  async deleteUser(id: string) {
+    const response = await this.api.delete(`/users/${id}`);
+    return response.data;
+  }
+
+  async resetUserPassword(id: string, newPassword: string) {
+    const response = await this.api.put(`/users/${id}/reset-password`, { new_password: newPassword });
+    return response.data;
+  }
+
   // Fournisseurs methods
   async getFournisseurs(params?: {
     search?: string;
@@ -242,6 +291,154 @@ class ApiService {
     
     const url = queryParams.toString() ? `/reports/synthese?${queryParams.toString()}` : '/reports/synthese';
     const response = await this.api.get(url);
+    return response.data;
+  }
+
+  // Méthodes pour la gestion avancée des stocks
+
+  async createMouvementStock(data: any) {
+    const response = await this.api.post('/stock/mouvements', data);
+    return response.data;
+  }
+
+  async getMouvementsStock(articleId: string, limit: number = 100) {
+    const response = await this.api.get(`/stock/mouvements/${articleId}?limit=${limit}`);
+    return response.data;
+  }
+
+  async getCalculCouverture(articleId: string) {
+    const response = await this.api.get(`/stock/couverture/${articleId}`);
+    return response.data;
+  }
+
+  async getEvolutionStock(articleId: string, semaines: number = 26) {
+    const response = await this.api.get(`/stock/evolution/${articleId}?semaines=${semaines}`);
+    return response.data;
+  }
+
+  async getAlertesAvancees() {
+    const response = await this.api.get('/stock/alertes-avancees');
+    return response.data;
+  }
+
+  async genererAlertesAvancees() {
+    const response = await this.api.post('/stock/generer-alertes');
+    return response.data;
+  }
+
+  async createPrevisionConsommation(data: any) {
+    const response = await this.api.post('/stock/previsions', data);
+    return response.data;
+  }
+
+  async getPrevisionsConsommation(articleId: string, semaines: number = 26) {
+    const response = await this.api.get(`/stock/previsions/${articleId}?semaines=${semaines}`);
+    return response.data;
+  }
+
+  async calculerCompositionTC(articlesIds: string[]) {
+    const response = await this.api.post('/stock/composition-tc', { articles_ids: articlesIds });
+    return response.data;
+  }
+
+  async getStockCoverageData(articleId: string, semaines: number = 26) {
+    // Cette méthode combine plusieurs appels pour récupérer toutes les données nécessaires au graphique
+    const [evolution, couverture, previsions] = await Promise.all([
+      this.getEvolutionStock(articleId, semaines),
+      this.getCalculCouverture(articleId),
+      this.getPrevisionsConsommation(articleId, semaines)
+    ]);
+
+    return {
+      evolution,
+      couverture,
+      previsions
+    };
+  }
+
+  // Nouvelles méthodes pour les tableaux de gestion des stocks
+
+  async validateCommandeAvancee(data: any) {
+    const response = await this.api.post('/commandes/validation-avancee', data);
+    return response.data;
+  }
+
+  async getKPIsTauxServiceClient() {
+    const response = await this.api.get('/kpis/taux-service-client');
+    return response.data;
+  }
+
+  async getKPIsDelaiMoyenLivraison() {
+    const response = await this.api.get('/kpis/delai-moyen-livraison');
+    return response.data;
+  }
+
+  async getKPIsNombreCommandes() {
+    const response = await this.api.get('/kpis/nombre-commandes');
+    return response.data;
+  }
+
+  async getKPIsCommandesAeriennes() {
+    const response = await this.api.get('/kpis/commandes-aeriennes');
+    return response.data;
+  }
+
+  async getKPIsSynthese() {
+    const response = await this.api.get('/kpis/synthese');
+    return response.data;
+  }
+
+  async getEcartsAnalyse(params?: { type_ecart?: string }) {
+    const queryParams = new URLSearchParams();
+    if (params?.type_ecart) queryParams.append('type_ecart', params.type_ecart);
+    
+    const url = queryParams.toString() ? `/variations/ecarts?${queryParams.toString()}` : '/variations/ecarts';
+    const response = await this.api.get(url);
+    return response.data;
+  }
+
+  async getPrevisionsVsRealisations(articleId: string) {
+    const response = await this.api.get(`/variations/previsions-vs-realisations/${articleId}`);
+    return response.data;
+  }
+
+  async createDashboardPersonnalise(data: any) {
+    const response = await this.api.post('/dashboards/personnalises', data);
+    return response.data;
+  }
+
+  async getDashboardsPersonnalises() {
+    const response = await this.api.get('/dashboards/personnalises');
+    return response.data;
+  }
+
+  async getWidgetsDisponibles() {
+    const response = await this.api.get('/dashboards/widgets-disponibles');
+    return response.data;
+  }
+
+  async exportData(type: string, format: string, params?: any) {
+    const queryParams = new URLSearchParams();
+    if (params) {
+      Object.keys(params).forEach(key => {
+        if (params[key] !== undefined && params[key] !== null) {
+          queryParams.append(key, params[key].toString());
+        }
+      });
+    }
+    
+    const url = queryParams.toString() ? `/export/${type}/${format}?${queryParams.toString()}` : `/export/${type}/${format}`;
+    const response = await this.api.get(url, { responseType: 'blob' });
+    return response.data;
+  }
+
+  async getPowerBIDatasets() {
+    const response = await this.api.get('/powerbi/datasets');
+    return response.data;
+  }
+
+  async getPowerBIData(dataType: string) {
+    const response = await this.api.get(`/powerbi/data/${dataType}`);
     return response.data;
   }
 }

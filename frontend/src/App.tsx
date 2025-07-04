@@ -9,6 +9,8 @@ import FournisseursAdvanced from './presentation/screens/FournisseursAdvanced';
 import ArticlesAdvanced from './presentation/screens/ArticlesAdvanced';
 import CommandesAdvanced from './presentation/screens/CommandesAdvanced';
 import Reporting from './presentation/screens/Reporting';
+import GestionStocksAvancee from './presentation/screens/GestionStocksAvancee';
+import UsersAdvanced from './presentation/screens/UsersAdvanced';
 import "./App.css";
 
 // Placeholder component for alertes (can be enhanced later)
@@ -67,6 +69,16 @@ function App() {
               }
             />
             <Route
+              path="/stocks-avances"
+              element={
+                <ProtectedRoute>
+                  <Layout currentPath="/stocks-avances">
+                    <GestionStocksAvancee />
+                  </Layout>
+                </ProtectedRoute>
+              }
+            />
+            <Route
               path="/reporting"
               element={
                 <ProtectedRoute>
@@ -82,6 +94,16 @@ function App() {
                 <ProtectedRoute>
                   <Layout currentPath="/alertes">
                     <Alertes />
+                  </Layout>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/users"
+              element={
+                <ProtectedRoute requiredRole="administrateur">
+                  <Layout currentPath="/users">
+                    <UsersAdvanced />
                   </Layout>
                 </ProtectedRoute>
               }

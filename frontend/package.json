@@ -8,6 +8,7 @@
     "axios": "^1.8.4",
     "axios-auth-refresh": "^3.3.6",
     "cra-template": "1.2.0",
+    "lucide-react": "^0.525.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-hook-form": "^7.59.0",
