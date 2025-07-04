@@ -75,17 +75,6 @@ const UserMenu: React.FC = () => {
         )}
       </button>
 
-      {/* Notifications */}
-      <button
-        className="p-2 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-all duration-200 relative"
-        title="Notifications"
-      >
-        <BellIcon className="h-5 w-5" />
-        <span className="absolute -top-1 -right-1 h-3 w-3 bg-red-500 rounded-full flex items-center justify-center">
-          <span className="text-xs text-white font-medium">2</span>
-        </span>
-      </button>
-
       {/* User Menu */}
       <div className="relative" ref={menuRef}>
         <button
