@@ -59,6 +59,17 @@ body {
   background-color: #f8fafc;
 }
 
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  body {
+    background-color: #1f2937;
+  }
+}
+
+.dark body {
+  background-color: #1f2937;
+}
+
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
     monospace;
