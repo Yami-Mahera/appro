@@ -184,15 +184,8 @@ const Layout: React.FC<LayoutProps> = ({ children, currentPath = "/" }) => {
 
       {/* Main content */}
       <div className="md:pl-72 flex flex-col flex-1 min-h-0">
-        {/* Top bar */}
-        <div className="sticky top-0 z-30 md:hidden pl-1 pt-1 sm:pl-3 sm:pt-3 bg-white shadow-sm border-b border-gray-200">
-          <button
-            className="-ml-0.5 -mt-0.5 h-12 w-12 inline-flex items-center justify-center rounded-lg text-gray-500 hover:text-gray-900 hover:bg-gray-100 transition-colors duration-200"
-            onClick={() => setSidebarOpen(true)}
-          >
-            <Bars3Icon className="h-6 w-6" />
-          </button>
-        </div>
+        {/* Header */}
+        <Header onMenuClick={() => setSidebarOpen(true)} />
 
         {/* Page content */}
         <main className="flex-1 relative overflow-y-auto focus:outline-none custom-scrollbar">
@@ -202,6 +195,7 @@ const Layout: React.FC<LayoutProps> = ({ children, currentPath = "/" }) => {
         </main>
       </div>
     </div>
+    </ThemeProvider>
   );
 };
 
