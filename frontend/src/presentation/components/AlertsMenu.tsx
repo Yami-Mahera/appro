@@ -39,8 +39,12 @@ const AlertsMenu: React.FC = () => {
   const fetchAlerts = async () => {
     setLoading(true);
     try {
-      const response = await apiService.get('/api/alertes?limit=10');
-      setAlerts(response.data);
+      const response = await apiService.getAlertes();
+      // Limiter à 10 alertes et trier par date (plus récentes en premier)
+      const sortedAlerts = response.sort((a: Alert, b: Alert) => 
+        new Date(b.created_at).getTime() - new Date(a.created_at).getTime()
+      ).slice(0, 10);
+      setAlerts(sortedAlerts);
     } catch (error) {
       console.error('Error fetching alerts:', error);
     } finally {
@@ -50,7 +54,7 @@ const AlertsMenu: React.FC = () => {
 
   const markAsRead = async (alertId: string) => {
     try {
-      await apiService.put(`/api/alertes/${alertId}/mark-read`);
+      await apiService.marquerAlerteLue(alertId);
       setAlerts(alerts.map(alert => 
         alert.id === alertId ? { ...alert, lu: true } : alert
       ));
@@ -63,7 +67,7 @@ const AlertsMenu: React.FC = () => {
     try {
       const unreadAlerts = alerts.filter(alert => !alert.lu);
       await Promise.all(
-        unreadAlerts.map(alert => apiService.put(`/api/alertes/${alert.id}/mark-read`))
+        unreadAlerts.map(alert => apiService.marquerAlerteLue(alert.id))
       );
       setAlerts(alerts.map(alert => ({ ...alert, lu: true })));
     } catch (error) {
