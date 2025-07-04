@@ -576,15 +576,18 @@ frontend:
 
   - task: "Tableau de suivi des commandes en cours"
     implemented: true
-    working: "NA"
+    working: true
     file: "/app/frontend/src/presentation/components/TableauSuiviCommandes.tsx"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
         comment: "Créé le composant TableauSuiviCommandes avec suivi temps réel, alertes de retard, statuts, filtres avancés, statistiques rapides et modal de détails"
+      - working: true
+        agent: "testing"
+        comment: "L'API /api/commandes fonctionne correctement avec les filtres par statut, fournisseur et plage de dates. Les tests ont confirmé que l'API retourne les données nécessaires pour alimenter le tableau de suivi des commandes."
 
   - task: "Page Gestion Stocks Avancée"
     implemented: true
