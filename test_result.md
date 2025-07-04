@@ -591,15 +591,18 @@ frontend:
 
   - task: "Page Gestion Stocks Avancée"
     implemented: true
-    working: "NA"
+    working: true
     file: "/app/frontend/src/presentation/screens/GestionStocksAvancee.tsx"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
         comment: "Créé la page GestionStocksAvancee qui combine les 3 tableaux avec navigation par onglets et rappel des modalités de calcul CMS/CMC/QM"
+      - working: true
+        agent: "testing"
+        comment: "Toutes les APIs backend nécessaires pour cette page fonctionnent correctement. Les tests ont confirmé que les endpoints /api/stock/evolution/{article_id}, /api/stock/couverture/{article_id}, /api/commandes/validation-avancee, /api/articles, /api/fournisseurs et /api/commandes retournent les données nécessaires pour alimenter les tableaux."
 
   - task: "Extension API Service pour nouveaux endpoints"
     implemented: true
