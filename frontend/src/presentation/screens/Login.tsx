@@ -1,13 +1,15 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useAuth } from "../../hooks/useAuth";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { loginSchema, LoginData } from "../../common/validators/schemas";
 import { EyeIcon, EyeSlashIcon } from "@heroicons/react/24/outline";
 import { images } from "../../data/constants/images";
+import { useNavigate } from "react-router-dom";
 
 const Login: React.FC = () => {
-  const { login } = useAuth();
+  const { login, isAuthenticated } = useAuth();
+  const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -19,6 +21,12 @@ const Login: React.FC = () => {
   } = useForm<LoginData>({
     resolver: zodResolver(loginSchema),
   });
+
+  useEffect(() => {
+    if (isAuthenticated) {
+      navigate("/dashboard", { replace: true });
+    }
+  }, [isAuthenticated, navigate]);
 
   const onSubmit = async (data: LoginData) => {
     setLoading(true);
