@@ -9,6 +9,7 @@ import FournisseursAdvanced from './presentation/screens/FournisseursAdvanced';
 import ArticlesAdvanced from './presentation/screens/ArticlesAdvanced';
 import CommandesAdvanced from './presentation/screens/CommandesAdvanced';
 import Reporting from './presentation/screens/Reporting';
+import GestionStocksAvancee from './presentation/screens/GestionStocksAvancee';
 import UsersAdvanced from './presentation/screens/UsersAdvanced';
 import "./App.css";
 
@@ -63,6 +64,16 @@ function App() {
                 <ProtectedRoute>
                   <Layout currentPath="/commandes">
                     <CommandesAdvanced />
+                  </Layout>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/stocks-avances"
+              element={
+                <ProtectedRoute>
+                  <Layout currentPath="/stocks-avances">
+                    <GestionStocksAvancee />
                   </Layout>
                 </ProtectedRoute>
               }

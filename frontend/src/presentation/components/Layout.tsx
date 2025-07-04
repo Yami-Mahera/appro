@@ -11,6 +11,7 @@ import {
   UserGroupIcon,
   XMarkIcon,
   ArrowRightOnRectangleIcon,
+  Squares2X2Icon,
 } from "@heroicons/react/24/outline";
 import { classNames } from "../../common/utils";
 import { images } from "../../data/constants/images";
@@ -21,6 +22,7 @@ const navigation = [
   { name: "Fournisseurs", href: "/fournisseurs", icon: BuildingOfficeIcon },
   { name: "Articles", href: "/articles", icon: CubeIcon },
   { name: "Commandes", href: "/commandes", icon: DocumentTextIcon },
+  { name: "Stocks Avancés", href: "/stocks-avances", icon: Squares2X2Icon },
   { name: "Reporting", href: "/reporting", icon: ChartBarIcon },
   { name: "Alertes", href: "/alertes", icon: ExclamationTriangleIcon },
   {
