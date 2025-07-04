@@ -212,6 +212,109 @@ class Alerte(BaseModel):
     lue: bool = False
     created_at: datetime = Field(default_factory=datetime.utcnow)
 
+# Nouveaux modèles pour la gestion avancée des stocks
+
+class TypeMouvement(str, Enum):
+    ENTREE = "entree"
+    SORTIE = "sortie"
+    AJUSTEMENT = "ajustement"
+    TRANSFERT = "transfert"
+
+class MouvementStock(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    article_id: str
+    type_mouvement: TypeMouvement
+    quantite: int
+    stock_avant: int
+    stock_apres: int
+    date_mouvement: datetime = Field(default_factory=datetime.utcnow)
+    commande_id: Optional[str] = None
+    reference_document: Optional[str] = None
+    commentaire: Optional[str] = None
+    created_by: str
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+
+class PrevisionConsommation(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    article_id: str
+    semaine: int  # Numéro de semaine (1-52)
+    annee: int
+    date_debut_semaine: datetime
+    date_fin_semaine: datetime
+    quantite_prevue: float
+    quantite_reelle: Optional[float] = None
+    ecart_absolu: Optional[float] = None
+    ecart_relatif: Optional[float] = None
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+    updated_at: datetime = Field(default_factory=datetime.utcnow)
+
+class CalculCouverture(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    article_id: str
+    date_calcul: datetime = Field(default_factory=datetime.utcnow)
+    
+    # Paramètres de calcul
+    variation_logistique: float = 0.0  # VL
+    variation_prevision: float = 0.0   # Vp
+    horizon: int = 0                   # H en semaines
+    
+    # Résultats de calcul
+    couverture_minimale_securite: float = 0.0  # CMS
+    couverture_maximale_commande: float = 0.0  # CMC
+    quantite_maximale_commande: float = 0.0    # QM
+    couverture_actuelle: float = 0.0           # Cr
+    
+    # Dates importantes
+    date_besoin: Optional[datetime] = None
+    date_arrivee_prevue: Optional[datetime] = None
+    
+    # Données pour le calcul
+    stock_actuel: int = 0
+    moyenne_consommation_hebdo: float = 0.0
+    duree_vie_produit: int = 0
+    delai_acheminement: int = 0
+    
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+
+class NiveauAlerte(str, Enum):
+    NORMAL = "normal"
+    URGENT = "urgent"
+    CRITIQUE = "critique"
+    A_SUIVRE = "a_suivre"
+
+class AlerteAvancee(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    article_id: str
+    commande_id: Optional[str] = None
+    niveau_alerte: NiveauAlerte
+    type_alerte: str  # "nouvelle_commande" ou "commande_en_cours"
+    
+    # Calculs d'alerte
+    date_besoin: Optional[datetime] = None
+    date_observation: datetime = Field(default_factory=datetime.utcnow)
+    delai_passation: int = 0
+    ecart_jours: Optional[int] = None
+    
+    # Pour commandes en cours
+    couverture_prevue: Optional[float] = None
+    couverture_minimale: Optional[float] = None
+    pourcentage_variation: Optional[float] = None
+    
+    message: str
+    recommandation: str
+    lue: bool = False
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+
+class CompositionTC(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    reference_tc: str
+    articles: List[Dict[str, Any]]  # [{article_id, quantite_par_tc, taux_remplissage}]
+    nombre_conteneurs: int = 0
+    quantite_complement: Dict[str, int] = {}  # {article_id: quantite}
+    quantite_alignement: Dict[str, int] = {}  # {article_id: quantite}
+    date_besoin_groupe: Optional[datetime] = None
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+
 # Utility functions
 def verify_password(plain_password, hashed_password):
     return pwd_context.verify(plain_password, hashed_password)
@@ -228,6 +331,270 @@ def create_access_token(data: dict, expires_delta: Optional[timedelta] = None):
     to_encode.update({"exp": expire})
     encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
     return encoded_jwt
+
+# Fonctions de calcul avancées pour la gestion des stocks
+
+async def calculer_variation_logistique(article_id: str, nb_commandes: int = 5) -> float:
+    """
+    Calcule la variation logistique (VL)
+    VL = Moyenne (Valeur Absolue (Date demandée – Date d'arrivée réelle))
+    """
+    commandes = await db.commandes.find({
+        "lignes.article_id": article_id,
+        "date_livraison_prevue": {"$exists": True},
+        "date_livraison_reelle": {"$exists": True}
+    }).sort("created_at", -1).limit(nb_commandes).to_list(nb_commandes)
+    
+    if not commandes:
+        return 0.0
+    
+    ecarts = []
+    for commande in commandes:
+        if commande.get("date_livraison_prevue") and commande.get("date_livraison_reelle"):
+            ecart = abs((commande["date_livraison_reelle"] - commande["date_livraison_prevue"]).days)
+            ecarts.append(ecart)
+    
+    return sum(ecarts) / len(ecarts) if ecarts else 0.0
+
+async def calculer_variation_prevision(article_id: str, nb_commandes: int = 5) -> float:
+    """
+    Calcule la variation de prévision (Vp)
+    Vp = Moyenne ((Cp-Cr)/(Cr+da))
+    """
+    # Récupérer les 5 dernières commandes avec leurs couvertures
+    commandes = await db.commandes.find({
+        "lignes.article_id": article_id,
+        "date_livraison_reelle": {"$exists": True}
+    }).sort("created_at", -1).limit(nb_commandes).to_list(nb_commandes)
+    
+    if not commandes:
+        return 0.0
+    
+    variations = []
+    for commande in commandes:
+        # Récupérer les calculs de couverture pour cette commande
+        calcul = await db.calculs_couverture.find_one({
+            "article_id": article_id,
+            "date_calcul": {"$lte": commande["date_livraison_reelle"]}
+        })
+        
+        if calcul:
+            cp = calcul.get("couverture_prevue", 0)
+            cr = calcul.get("couverture_reelle", 0)
+            da = calcul.get("delai_acheminement", 1)
+            
+            if (cr + da) > 0:
+                variation = (cp - cr) / (cr + da)
+                variations.append(variation)
+    
+    return sum(variations) / len(variations) if variations else 0.0
+
+async def calculer_couverture_minimale_securite(article_id: str) -> float:
+    """
+    Calcule la Couverture Minimale de Sécurité (CMS)
+    CMS = VL . (1+Vp) + H . Vp, avec un minimum de 6 semaines
+    """
+    vl = await calculer_variation_logistique(article_id)
+    vp = await calculer_variation_prevision(article_id)
+    
+    # Horizon = estimation basée sur le délai d'acheminement moyen
+    article = await db.articles.find_one({"id": article_id})
+    if not article:
+        return 6.0  # Minimum par défaut
+    
+    fournisseur = await db.fournisseurs.find_one({"id": article["fournisseur_id"]})
+    horizon = (fournisseur.get("delai_livraison_moyen", 14) / 7) if fournisseur else 2  # Convertir en semaines
+    
+    cms = vl * (1 + vp) + horizon * vp
+    return max(cms, 6.0)  # Minimum de 6 semaines
+
+async def calculer_couverture_maximale_commande(article_id: str) -> float:
+    """
+    Calcule la Couverture Maximale pour la commande (CMC)
+    CMC = (Dv-10-Da).(1-Vp)-H.Vp
+    """
+    article = await db.articles.find_one({"id": article_id})
+    if not article:
+        return 0.0
+    
+    dv = article.get("duree_vie", 365)  # Durée de vie en jours
+    fournisseur = await db.fournisseurs.find_one({"id": article["fournisseur_id"]})
+    da = fournisseur.get("delai_livraison_moyen", 14) if fournisseur else 14  # Délai d'acheminement
+    
+    vp = await calculer_variation_prevision(article_id)
+    horizon = da / 7  # Convertir en semaines
+    
+    # Convertir en semaines pour le calcul
+    dv_semaines = dv / 7
+    da_semaines = da / 7
+    
+    cmc = (dv_semaines - 10/7 - da_semaines) * (1 - vp) - horizon * vp
+    return max(cmc, 0.0)
+
+async def calculer_quantite_maximale_commande(article_id: str) -> float:
+    """
+    Calcule la Quantité Maximale d'une commande (QM)
+    QM = CMC - Cr
+    """
+    cmc = await calculer_couverture_maximale_commande(article_id)
+    cr = await calculer_couverture_actuelle(article_id)
+    
+    return max(cmc - cr, 0.0)
+
+async def calculer_couverture_actuelle(article_id: str) -> float:
+    """
+    Calcule la couverture actuelle (Cr)
+    Cr = Stock à la date indiquée / prévision de consommation à la date indiquée
+    """
+    article = await db.articles.find_one({"id": article_id})
+    if not article:
+        return 0.0
+    
+    stock_actuel = article.get("stock_actuel", 0)
+    
+    # Calculer la moyenne de consommation hebdomadaire
+    moyenne_consommation = await calculer_moyenne_consommation_hebdo(article_id)
+    
+    if moyenne_consommation > 0:
+        return stock_actuel / moyenne_consommation
+    return 0.0
+
+async def calculer_moyenne_consommation_hebdo(article_id: str) -> float:
+    """
+    Calcule la moyenne de consommation hebdomadaire
+    """
+    # Récupérer les mouvements de sortie des 12 dernières semaines
+    date_limite = datetime.utcnow() - timedelta(weeks=12)
+    mouvements = await db.mouvements_stock.find({
+        "article_id": article_id,
+        "type_mouvement": "sortie",
+        "date_mouvement": {"$gte": date_limite}
+    }).to_list(1000)
+    
+    if not mouvements:
+        return 0.0
+    
+    total_consommation = sum(abs(m["quantite"]) for m in mouvements)
+    return total_consommation / 12
+
+async def calculer_date_besoin(article_id: str) -> Optional[datetime]:
+    """
+    Calcule la date de besoin
+    Date de besoin = Recherche Date (couverture projective = Seuil de sécurité)
+    """
+    cms = await calculer_couverture_minimale_securite(article_id)
+    moyenne_consommation = await calculer_moyenne_consommation_hebdo(article_id)
+    
+    article = await db.articles.find_one({"id": article_id})
+    if not article or moyenne_consommation == 0:
+        return None
+    
+    stock_actuel = article.get("stock_actuel", 0)
+    
+    # Calculer combien de semaines le stock actuel peut couvrir
+    couverture_actuelle = stock_actuel / moyenne_consommation
+    
+    # Si la couverture actuelle est déjà en dessous du seuil
+    if couverture_actuelle <= cms:
+        return datetime.utcnow()
+    
+    # Calculer quand le stock atteindra le seuil de sécurité
+    semaines_avant_seuil = couverture_actuelle - cms
+    date_besoin = datetime.utcnow() + timedelta(weeks=semaines_avant_seuil)
+    
+    return date_besoin
+
+async def calculer_niveau_alerte_nouvelle_commande(article_id: str) -> NiveauAlerte:
+    """
+    Calcule le niveau d'alerte pour une nouvelle commande
+    """
+    date_besoin = await calculer_date_besoin(article_id)
+    if not date_besoin:
+        return NiveauAlerte.NORMAL
+    
+    date_observation = datetime.utcnow()
+    
+    # Délai de passation par défaut (3 jours)
+    delai_passation = 3
+    
+    # Calculer l'écart en jours
+    ecart_jours = (date_besoin - date_observation).days - delai_passation
+    
+    if ecart_jours > 4:
+        return NiveauAlerte.NORMAL
+    elif 0 < ecart_jours <= 4:
+        return NiveauAlerte.NORMAL
+    elif -4 < ecart_jours < 0:
+        return NiveauAlerte.URGENT
+    else:  # ecart_jours <= -4
+        return NiveauAlerte.CRITIQUE
+
+async def calculer_niveau_alerte_commande_en_cours(article_id: str, commande_id: str) -> NiveauAlerte:
+    """
+    Calcule le niveau d'alerte pour une commande en cours
+    """
+    cms = await calculer_couverture_minimale_securite(article_id)
+    
+    # Récupérer la couverture prévue pour cette commande
+    calcul = await db.calculs_couverture.find_one({
+        "article_id": article_id,
+        "commande_id": commande_id
+    })
+    
+    if not calcul:
+        return NiveauAlerte.NORMAL
+    
+    cp = calcul.get("couverture_prevue", 0)
+    da = calcul.get("delai_acheminement", 1)
+    
+    if (cms + da) > 0:
+        variation_pourcent = (cp - cms) / (cms + da)
+        
+        if variation_pourcent > 0.1:  # > 10%
+            return NiveauAlerte.NORMAL
+        elif 0 < variation_pourcent <= 0.1:  # 0% à 10%
+            return NiveauAlerte.A_SUIVRE
+        else:  # < 0%
+            return NiveauAlerte.URGENT
+    
+    return NiveauAlerte.NORMAL
+
+async def calculer_composition_tc(articles_ids: List[str]) -> Dict[str, Any]:
+    """
+    Calcule la composition optimale des TCs (conteneurs)
+    """
+    if not articles_ids:
+        return {}
+    
+    # Calculer les dates de besoin pour tous les articles
+    dates_besoin = {}
+    for article_id in articles_ids:
+        date_besoin = await calculer_date_besoin(article_id)
+        if date_besoin:
+            dates_besoin[article_id] = date_besoin
+    
+    if not dates_besoin:
+        return {}
+    
+    # Date de besoin du groupe = minimum des dates de besoin
+    date_besoin_groupe = min(dates_besoin.values())
+    
+    # Calculer les couvertures et moyennes de consommation
+    resultats = {}
+    for article_id in articles_ids:
+        couverture_actuelle = await calculer_couverture_actuelle(article_id)
+        moyenne_consommation = await calculer_moyenne_consommation_hebdo(article_id)
+        
+        resultats[article_id] = {
+            "couverture_actuelle": couverture_actuelle,
+            "moyenne_consommation": moyenne_consommation,
+            "date_besoin": dates_besoin.get(article_id)
+        }
+    
+    return {
+        "date_besoin_groupe": date_besoin_groupe,
+        "articles": resultats
+    }
 
 async def get_current_user(credentials: HTTPAuthorizationCredentials = Depends(security)):
     credentials_exception = HTTPException(
@@ -1035,6 +1402,288 @@ async def get_dashboard_stats(
 @api_router.get("/")
 async def root():
     return {"message": "API Gestion des Approvisionnements"}
+
+# Routes pour la gestion avancée des stocks
+
+@api_router.post("/stock/mouvements", response_model=MouvementStock)
+async def create_mouvement_stock(
+    mouvement_data: dict,
+    current_user: User = Depends(require_roles([UserRole.ADMIN, UserRole.MANAGER]))
+):
+    """Créer un mouvement de stock"""
+    mouvement = MouvementStock(
+        article_id=mouvement_data["article_id"],
+        type_mouvement=mouvement_data["type_mouvement"],
+        quantite=mouvement_data["quantite"],
+        stock_avant=mouvement_data["stock_avant"],
+        stock_apres=mouvement_data["stock_apres"],
+        commande_id=mouvement_data.get("commande_id"),
+        reference_document=mouvement_data.get("reference_document"),
+        commentaire=mouvement_data.get("commentaire"),
+        created_by=current_user.id
+    )
+    await db.mouvements_stock.insert_one(mouvement.dict())
+    return mouvement
+
+@api_router.get("/stock/mouvements/{article_id}")
+async def get_mouvements_stock(
+    article_id: str,
+    limit: int = 100,
+    current_user: User = Depends(get_current_user)
+):
+    """Récupérer l'historique des mouvements d'un article"""
+    mouvements = await db.mouvements_stock.find(
+        {"article_id": article_id}
+    ).sort("date_mouvement", -1).limit(limit).to_list(limit)
+    return [MouvementStock(**m) for m in mouvements]
+
+@api_router.get("/stock/couverture/{article_id}")
+async def get_calcul_couverture(
+    article_id: str,
+    current_user: User = Depends(get_current_user)
+):
+    """Calculer et retourner les métriques de couverture pour un article"""
+    
+    # Effectuer tous les calculs
+    vl = await calculer_variation_logistique(article_id)
+    vp = await calculer_variation_prevision(article_id)
+    cms = await calculer_couverture_minimale_securite(article_id)
+    cmc = await calculer_couverture_maximale_commande(article_id)
+    qm = await calculer_quantite_maximale_commande(article_id)
+    cr = await calculer_couverture_actuelle(article_id)
+    date_besoin = await calculer_date_besoin(article_id)
+    moyenne_consommation = await calculer_moyenne_consommation_hebdo(article_id)
+    
+    # Récupérer l'article pour les données de base
+    article = await db.articles.find_one({"id": article_id})
+    if not article:
+        raise HTTPException(status_code=404, detail="Article non trouvé")
+    
+    fournisseur = await db.fournisseurs.find_one({"id": article["fournisseur_id"]})
+    horizon = (fournisseur.get("delai_livraison_moyen", 14) / 7) if fournisseur else 2
+    
+    # Créer l'objet de calcul
+    calcul = CalculCouverture(
+        article_id=article_id,
+        variation_logistique=vl,
+        variation_prevision=vp,
+        horizon=int(horizon),
+        couverture_minimale_securite=cms,
+        couverture_maximale_commande=cmc,
+        quantite_maximale_commande=qm,
+        couverture_actuelle=cr,
+        date_besoin=date_besoin,
+        stock_actuel=article.get("stock_actuel", 0),
+        moyenne_consommation_hebdo=moyenne_consommation,
+        duree_vie_produit=article.get("duree_vie", 365),
+        delai_acheminement=fournisseur.get("delai_livraison_moyen", 14) if fournisseur else 14
+    )
+    
+    # Sauvegarder le calcul
+    await db.calculs_couverture.insert_one(calcul.dict())
+    
+    return calcul
+
+@api_router.get("/stock/evolution/{article_id}")
+async def get_evolution_stock(
+    article_id: str,
+    semaines: int = 26,
+    current_user: User = Depends(get_current_user)
+):
+    """
+    Récupérer les données d'évolution du stock sur X semaines
+    pour le graphique sophisticated
+    """
+    # Calculer la date de début
+    date_debut = datetime.utcnow() - timedelta(weeks=semaines)
+    
+    # Récupérer les prévisions de consommation
+    previsions = await db.previsions_consommation.find({
+        "article_id": article_id,
+        "date_debut_semaine": {"$gte": date_debut}
+    }).sort("date_debut_semaine", 1).to_list(semaines)
+    
+    # Récupérer les mouvements de stock
+    mouvements = await db.mouvements_stock.find({
+        "article_id": article_id,
+        "date_mouvement": {"$gte": date_debut}
+    }).sort("date_mouvement", 1).to_list(1000)
+    
+    # Calculer l'évolution du stock semaine par semaine
+    evolution_data = []
+    current_date = date_debut
+    
+    for i in range(semaines):
+        semaine_debut = current_date
+        semaine_fin = current_date + timedelta(weeks=1)
+        
+        # Mouvements de la semaine
+        mouvements_semaine = [
+            m for m in mouvements
+            if semaine_debut <= m["date_mouvement"] < semaine_fin
+        ]
+        
+        # Prévision de la semaine
+        prevision_semaine = next(
+            (p for p in previsions if p["date_debut_semaine"] == semaine_debut),
+            None
+        )
+        
+        # Calculer les métriques de la semaine
+        stock_debut = 0  # À calculer selon les mouvements précédents
+        stock_fin = stock_debut + sum(
+            m["quantite"] if m["type_mouvement"] == "entree" else -m["quantite"]
+            for m in mouvements_semaine
+        )
+        
+        evolution_data.append({
+            "semaine": i + 1,
+            "date_debut": semaine_debut,
+            "date_fin": semaine_fin,
+            "stock_debut": stock_debut,
+            "stock_fin": stock_fin,
+            "prevision_consommation": prevision_semaine["quantite_prevue"] if prevision_semaine else 0,
+            "consommation_reelle": prevision_semaine["quantite_reelle"] if prevision_semaine else 0,
+            "mouvements": len(mouvements_semaine)
+        })
+        
+        current_date = semaine_fin
+    
+    return {
+        "article_id": article_id,
+        "periode": f"{semaines} semaines",
+        "evolution": evolution_data
+    }
+
+@api_router.get("/stock/alertes-avancees")
+async def get_alertes_avancees(
+    current_user: User = Depends(get_current_user)
+):
+    """Récupérer toutes les alertes avancées"""
+    alertes = await db.alertes_avancees.find({}).sort("created_at", -1).to_list(100)
+    return [AlerteAvancee(**a) for a in alertes]
+
+@api_router.post("/stock/generer-alertes")
+async def generer_alertes_avancees(
+    current_user: User = Depends(require_roles([UserRole.ADMIN, UserRole.MANAGER]))
+):
+    """Générer les alertes avancées pour tous les articles"""
+    # Récupérer tous les articles actifs
+    articles = await db.articles.find({"active": True}).to_list(1000)
+    
+    alertes_generees = []
+    
+    for article in articles:
+        article_id = article["id"]
+        
+        # Alerte pour nouvelle commande
+        niveau_alerte = await calculer_niveau_alerte_nouvelle_commande(article_id)
+        date_besoin = await calculer_date_besoin(article_id)
+        
+        if niveau_alerte in [NiveauAlerte.URGENT, NiveauAlerte.CRITIQUE]:
+            alerte = AlerteAvancee(
+                article_id=article_id,
+                niveau_alerte=niveau_alerte,
+                type_alerte="nouvelle_commande",
+                date_besoin=date_besoin,
+                delai_passation=3,
+                ecart_jours=(date_besoin - datetime.utcnow()).days if date_besoin else 0,
+                message=f"Commande {niveau_alerte.value} pour {article['nom']}",
+                recommandation=f"Passer commande immédiatement" if niveau_alerte == NiveauAlerte.CRITIQUE else "Passer commande rapidement"
+            )
+            
+            await db.alertes_avancees.insert_one(alerte.dict())
+            alertes_generees.append(alerte)
+        
+        # Alertes pour commandes en cours
+        commandes_en_cours = await db.commandes.find({
+            "lignes.article_id": article_id,
+            "status": {"$in": [CommandeStatus.PENDING, CommandeStatus.APPROVED, CommandeStatus.ORDERED]}
+        }).to_list(100)
+        
+        for commande in commandes_en_cours:
+            niveau_alerte = await calculer_niveau_alerte_commande_en_cours(article_id, commande["id"])
+            
+            if niveau_alerte in [NiveauAlerte.URGENT, NiveauAlerte.A_SUIVRE]:
+                alerte = AlerteAvancee(
+                    article_id=article_id,
+                    commande_id=commande["id"],
+                    niveau_alerte=niveau_alerte,
+                    type_alerte="commande_en_cours",
+                    message=f"Commande {niveau_alerte.value} pour {article['nom']}",
+                    recommandation=f"Suivre la commande {commande['numero_commande']}"
+                )
+                
+                await db.alertes_avancees.insert_one(alerte.dict())
+                alertes_generees.append(alerte)
+    
+    return {
+        "message": f"{len(alertes_generees)} alertes générées",
+        "alertes": alertes_generees
+    }
+
+@api_router.post("/stock/previsions", response_model=PrevisionConsommation)
+async def create_prevision_consommation(
+    prevision_data: dict,
+    current_user: User = Depends(require_roles([UserRole.ADMIN, UserRole.MANAGER]))
+):
+    """Créer une prévision de consommation"""
+    prevision = PrevisionConsommation(
+        article_id=prevision_data["article_id"],
+        semaine=prevision_data["semaine"],
+        annee=prevision_data["annee"],
+        date_debut_semaine=datetime.fromisoformat(prevision_data["date_debut_semaine"]),
+        date_fin_semaine=datetime.fromisoformat(prevision_data["date_fin_semaine"]),
+        quantite_prevue=prevision_data["quantite_prevue"],
+        quantite_reelle=prevision_data.get("quantite_reelle"),
+        ecart_absolu=prevision_data.get("ecart_absolu"),
+        ecart_relatif=prevision_data.get("ecart_relatif")
+    )
+    await db.previsions_consommation.insert_one(prevision.dict())
+    return prevision
+
+@api_router.get("/stock/previsions/{article_id}")
+async def get_previsions_consommation(
+    article_id: str,
+    semaines: int = 26,
+    current_user: User = Depends(get_current_user)
+):
+    """Récupérer les prévisions de consommation d'un article"""
+    date_limite = datetime.utcnow() - timedelta(weeks=semaines)
+    
+    previsions = await db.previsions_consommation.find({
+        "article_id": article_id,
+        "date_debut_semaine": {"$gte": date_limite}
+    }).sort("date_debut_semaine", 1).to_list(semaines)
+    
+    return [PrevisionConsommation(**p) for p in previsions]
+
+@api_router.post("/stock/composition-tc")
+async def calculer_composition_tc_endpoint(
+    data: dict,
+    current_user: User = Depends(require_roles([UserRole.ADMIN, UserRole.MANAGER]))
+):
+    """Calculer la composition optimale des TCs"""
+    articles_ids = data.get("articles_ids", [])
+    
+    if not articles_ids:
+        raise HTTPException(status_code=400, detail="Liste d'articles requise")
+    
+    composition = await calculer_composition_tc(articles_ids)
+    
+    # Sauvegarder la composition
+    composition_tc = CompositionTC(
+        reference_tc=f"TC-{datetime.now().strftime('%Y%m%d')}-{str(uuid.uuid4())[:8]}",
+        articles=articles_ids,
+        date_besoin_groupe=composition.get("date_besoin_groupe")
+    )
+    
+    await db.compositions_tc.insert_one(composition_tc.dict())
+    
+    return {
+        "composition_tc": composition_tc,
+        "calculs": composition
+    }
 
 # Include the router in the main app
 app.include_router(api_router)

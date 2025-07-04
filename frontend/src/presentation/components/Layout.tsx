@@ -63,13 +63,15 @@ const Layout: React.FC<LayoutProps> = ({ children, currentPath = "/" }) => {
               </button>
             </div>
             <div className="flex-1 h-0 pt-5 pb-4 overflow-y-auto custom-scrollbar">
-              <div className="flex-shrink-0 flex items-center px-6 mb-8">
-                <div className="w-10 h-10 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl flex items-center justify-center mr-3">
-                  <HomeIcon className="w-6 h-6 text-white" />
+              <div className="flex items-center flex-shrink-0 px-6 mb-10">
+                <div className="w-20 h-20 flex items-center justify-center">
+                  <img src={images.logo} alt="logo star" loading="lazy" />
                 </div>
-                <h1 className="text-xl font-bold text-gray-800 dark:text-gray-200">
-                  Gestion Approovisionnements
-                </h1>
+                <div className="flex items-center">
+                  <h1 className="ml-2 text-sm font-semibold text-gray-900 dark:text-white">
+                    APPROVISIONNEMENTS
+                  </h1>
+                </div>
               </div>
               <nav className="px-4 space-y-2">
                 {navigation
