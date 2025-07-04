@@ -53,7 +53,7 @@ const Layout: React.FC<LayoutProps> = ({ children, currentPath = "/" }) => {
           className="modal-overlay"
           onClick={() => setSidebarOpen(false)}
         ></div>
-        <div className="relative flex-1 flex flex-col max-w-xs w-full bg-white shadow-2xl">
+        <div className="relative flex-1 flex flex-col max-w-xs w-full bg-white dark:bg-gray-800 shadow-2xl transition-colors duration-200">
           <div className="absolute top-0 right-0 -mr-12 pt-2">
             <button
               className="ml-1 flex items-center justify-center h-10 w-10 rounded-full focus:outline-none focus:ring-2 focus:ring-inset focus:ring-white transition-colors duration-200 hover:bg-white hover:bg-opacity-20"
