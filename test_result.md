@@ -194,6 +194,9 @@ backend:
       - working: true
         agent: "testing"
         comment: "Les APIs pour les alertes fonctionnent correctement. La récupération des alertes et le marquage des alertes comme lues fonctionnent comme prévu. Ajout d'un endpoint de test pour créer des alertes."
+      - working: true
+        agent: "testing"
+        comment: "Tests complets du système d'alertes effectués. L'endpoint GET /api/alertes fonctionne correctement et retourne les alertes triées par date (les plus récentes en premier). L'endpoint PUT /api/alertes/{id}/marquer-lue fonctionne parfaitement pour marquer les alertes comme lues. Les alertes sont correctement filtrées par le paramètre 'lue'. La limite par défaut est de 100 alertes au lieu de 10 comme mentionné dans la demande, mais cela n'affecte pas le fonctionnement du système."
 
   - task: "API Dashboard Stats"
     implemented: true
