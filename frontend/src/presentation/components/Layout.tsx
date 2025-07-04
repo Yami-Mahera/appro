@@ -154,7 +154,7 @@ const Layout: React.FC<LayoutProps> = ({ children, currentPath = "/" }) => {
           </div>
 
           {/* User section desktop */}
-          <div className="flex-shrink-0 border-t border-gray-100 p-6">
+          <div className="flex-shrink-0 border-t border-gray-100 dark:border-gray-700 p-6">
             <div className="flex items-center">
               <div className="w-10 h-10 bg-gradient-to-br from-blue-400 to-purple-500 rounded-xl flex items-center justify-center mr-4 shadow-md">
                 <span className="text-sm font-medium text-white">
@@ -163,16 +163,16 @@ const Layout: React.FC<LayoutProps> = ({ children, currentPath = "/" }) => {
                 </span>
               </div>
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-semibold text-gray-900 truncate">
+                <p className="text-sm font-semibold text-gray-900 dark:text-white truncate">
                   {user?.prenom} {user?.nom}
                 </p>
-                <p className="text-xs text-gray-500 truncate capitalize">
+                <p className="text-xs text-gray-500 dark:text-gray-400 truncate capitalize">
                   {user?.role}
                 </p>
               </div>
               <button
                 onClick={logout}
-                className="ml-2 p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-all duration-200"
+                className="ml-2 p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-all duration-200"
                 title="Se déconnecter"
               >
                 <ArrowRightOnRectangleIcon className="h-5 w-5" />
