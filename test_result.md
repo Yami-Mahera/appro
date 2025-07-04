@@ -318,6 +318,96 @@ backend:
         agent: "testing"
         comment: "Les APIs pour les prévisions de consommation fonctionnent correctement. L'endpoint POST /api/stock/previsions permet de créer une prévision avec toutes les informations nécessaires. L'endpoint GET /api/stock/previsions/{article_id} retourne correctement les prévisions pour un article donné, avec la possibilité de filtrer par période."
 
+  - task: "APIs Export de Données (Excel, PDF, CSV)"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Implémenté les APIs d'export multi-formats pour fournisseurs, articles, commandes avec génération automatique des fichiers Excel, PDF et CSV"
+      - working: true
+        agent: "testing"
+        comment: "APIs d'export testées avec succès. /api/export/fournisseurs/excel, /api/export/articles/csv, /api/export/commandes/pdf génèrent tous des fichiers dans les formats corrects avec données bien formatées."
+
+  - task: "APIs KPIs Spécifiques" 
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Implémenté les APIs pour KPIs spécifiques : taux service client, délai moyen livraison, commandes traitées, commandes aériennes, taux rupture stock, synthèse complète"
+      - working: true
+        agent: "testing"
+        comment: "Tous les KPIs testés avec succès. /api/kpis/taux-service-client, /api/kpis/delai-moyen-livraison, /api/kpis/synthese retournent des données précises et cohérentes."
+
+  - task: "APIs Power BI Interface"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Implémenté interface Power BI avec endpoints pour datasets, récupération de données formatées, et configuration Power BI"
+      - working: true
+        agent: "testing"
+        comment: "Interface Power BI testée avec succès. /api/powerbi/datasets et /api/powerbi/data/fournisseurs retournent des données au format correct pour intégration Power BI."
+
+  - task: "APIs Suivi des Variations"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Implémenté système complet de suivi des variations avec écarts prévisions/réalisations, délais fournisseurs, écarts stocks, alertes seuils"
+      - working: true
+        agent: "testing"
+        comment: "Suivi des variations testé avec succès. /api/variations/ecarts et /api/variations/previsions-vs-realisations fournissent des analyses détaillées et insights significatifs."
+
+  - task: "APIs Validation Commandes Avancée"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Implémenté validation avancée des commandes avec vérification de toutes les contraintes (date limite, espace stockage, quantités, délais, stock sécurité, optimisation groupage)"
+      - working: true
+        agent: "testing"
+        comment: "Validation commandes avancée testée avec succès. /api/commandes/validation-avancee vérifie toutes les contraintes et fournit recommandations appropriées."
+
+  - task: "APIs Tableaux de Bord Personnalisés"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Implémenté système complet de dashboards personnalisés avec widgets configurables, données temps réel, partage entre utilisateurs"
+      - working: true
+        agent: "testing"
+        comment: "APIs tableaux de bord personnalisés testées avec succès. Création, gestion, et récupération des widgets fonctionnent parfaitement avec support configuration avancée."
+
   - task: "APIs d'Export de Données"
     implemented: true
     working: true
