@@ -11,9 +11,9 @@ import {
   Area,
   ComposedChart
 } from 'recharts';
-import { Card, CardContent, CardHeader, CardTitle } from '../ui/Card';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../ui/Select';
-import { Button } from '../ui/Button';
+import { Card, CardContent, CardHeader, CardTitle } from './ui/Card';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './ui/Select';
+import { Button } from './ui/Button';
 import { RefreshCw, TrendingUp, AlertTriangle, Info } from 'lucide-react';
 import apiService from '../../services/api';
 import { Article, StockCoverageData, CalculCouverture, EvolutionStockResponse } from '../../data/types';
