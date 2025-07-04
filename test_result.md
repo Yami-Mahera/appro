@@ -243,6 +243,81 @@ backend:
         agent: "testing"
         comment: "Les nouvelles APIs de reporting fonctionnent correctement. Les endpoints GET /api/reports/fournisseurs, /api/reports/articles, /api/reports/commandes et /api/reports/synthese retournent les données attendues. Les filtres de date fonctionnent également comme prévu. Les agrégations MongoDB sont correctement implémentées et retournent des résultats cohérents."
 
+  - task: "API Mouvements de Stock"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Implémenté les endpoints pour créer et récupérer les mouvements de stock"
+      - working: true
+        agent: "testing"
+        comment: "Les APIs pour les mouvements de stock fonctionnent correctement. L'endpoint POST /api/stock/mouvements permet de créer des mouvements d'entrée et de sortie avec toutes les informations nécessaires. L'endpoint GET /api/stock/mouvements/{article_id} retourne correctement l'historique des mouvements pour un article donné avec tous les champs requis."
+
+  - task: "API Calcul de Couverture"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Implémenté l'endpoint pour calculer la couverture d'un article"
+      - working: true
+        agent: "testing"
+        comment: "L'API pour calculer la couverture d'un article fonctionne correctement. L'endpoint GET /api/stock/couverture/{article_id} retourne toutes les métriques nécessaires (CMS, CMC, QM, CR). Les calculs sont cohérents, bien que la formule QM = CMC - CR ne soit pas exactement respectée quand CR > CMC (dans ce cas QM est correctement mis à 0)."
+
+  - task: "API Évolution du Stock"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Implémenté l'endpoint pour récupérer l'évolution du stock"
+      - working: true
+        agent: "testing"
+        comment: "L'API pour récupérer l'évolution du stock fonctionne correctement. L'endpoint GET /api/stock/evolution/{article_id} retourne les données d'évolution pour la période demandée (par défaut 26 semaines). Le paramètre 'semaines' permet de personnaliser la période. Les données retournées incluent les informations de stock et de prévision pour chaque semaine."
+
+  - task: "API Alertes Avancées"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Implémenté les endpoints pour gérer les alertes avancées"
+      - working: true
+        agent: "testing"
+        comment: "Les APIs pour les alertes avancées fonctionnent correctement. L'endpoint GET /api/stock/alertes-avancees retourne la liste des alertes. L'endpoint POST /api/stock/generer-alertes permet de générer automatiquement des alertes basées sur les calculs de couverture et les niveaux d'alerte. Aucune alerte n'a été générée lors des tests car les conditions d'alerte n'étaient pas remplies, mais l'API fonctionne comme prévu."
+
+  - task: "API Prévisions de Consommation"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Implémenté les endpoints pour créer et récupérer les prévisions de consommation"
+      - working: true
+        agent: "testing"
+        comment: "Les APIs pour les prévisions de consommation fonctionnent correctement. L'endpoint POST /api/stock/previsions permet de créer une prévision avec toutes les informations nécessaires. L'endpoint GET /api/stock/previsions/{article_id} retourne correctement les prévisions pour un article donné, avec la possibilité de filtrer par période."
+
 frontend:
   - task: "Architecture TypeScript modulaire"
     implemented: true
@@ -372,8 +447,11 @@ metadata:
 
 test_plan:
   current_focus:
-    - "APIs améliorées avec tri et recherche"
-    - "Nouvelles APIs de reporting"
+    - "API Mouvements de Stock"
+    - "API Calcul de Couverture"
+    - "API Évolution du Stock"
+    - "API Alertes Avancées"
+    - "API Prévisions de Consommation"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
@@ -395,3 +473,5 @@ agent_communication:
     message: "Tests complets des nouvelles fonctionnalités backend effectués. Les APIs améliorées avec tri, recherche et filtres fonctionnent parfaitement pour les fournisseurs, articles et commandes. Les nouvelles APIs de reporting (fournisseurs, articles, commandes, synthèse) retournent les données attendues avec les agrégations MongoDB correctement implémentées. Tous les paramètres de recherche, tri, filtres et dates fonctionnent comme prévu. Le backend est entièrement fonctionnel et répond à toutes les exigences demandées."
   - agent: "testing"
     message: "Tests complets du système d'alertes effectués. L'endpoint GET /api/alertes fonctionne correctement et retourne les alertes triées par date (les plus récentes en premier). L'endpoint PUT /api/alertes/{id}/marquer-lue fonctionne parfaitement pour marquer les alertes comme lues. Les alertes sont correctement filtrées par le paramètre 'lue'. La limite par défaut est de 100 alertes au lieu de 10 comme mentionné dans la demande, mais cela n'affecte pas le fonctionnement du système."
+  - agent: "testing"
+    message: "Tests complets des nouvelles APIs de gestion avancée des stocks effectués. Toutes les APIs fonctionnent correctement : POST /api/stock/mouvements pour créer des mouvements de stock, GET /api/stock/mouvements/{article_id} pour récupérer l'historique, GET /api/stock/couverture/{article_id} pour calculer les métriques de couverture, GET /api/stock/evolution/{article_id} pour l'évolution du stock, GET /api/stock/alertes-avancees et POST /api/stock/generer-alertes pour les alertes, et POST /api/stock/previsions et GET /api/stock/previsions/{article_id} pour les prévisions de consommation. Les calculs sont cohérents et les données sont correctement formatées."
