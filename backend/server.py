@@ -333,6 +333,72 @@ class CompositionTC(BaseModel):
     date_besoin_groupe: Optional[datetime] = None
     created_at: datetime = Field(default_factory=datetime.utcnow)
 
+# Nouveaux modèles pour le reporting avancé
+
+class DashboardPersonnalise(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    nom: str
+    description: Optional[str] = None
+    user_id: str
+    widgets: List[Dict[str, Any]] = []  # Configuration des widgets
+    layout: Dict[str, Any] = {}  # Configuration du layout
+    partage: bool = False
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+    updated_at: datetime = Field(default_factory=datetime.utcnow)
+
+class KPIConfiguration(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    nom: str
+    type_kpi: str  # "taux_service_client", "delai_livraison", etc.
+    parametres: Dict[str, Any] = {}
+    seuils: Dict[str, float] = {}  # {critique: 0.8, bon: 0.95}
+    description: Optional[str] = None
+    active: bool = True
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+
+class EcartAnalyse(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    type_ecart: str  # "prevision", "delai", "stock", "date"
+    article_id: Optional[str] = None
+    commande_id: Optional[str] = None
+    fournisseur_id: Optional[str] = None
+    valeur_prevue: float
+    valeur_reelle: float
+    ecart_absolu: float
+    ecart_relatif: float
+    cause: Optional[str] = None
+    commentaire: Optional[str] = None
+    date_observation: datetime = Field(default_factory=datetime.utcnow)
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+
+class ValidationCommande(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    commande_id: str
+    date_limite_consommation: Optional[datetime] = None
+    espace_stockage_disponible: bool = True
+    quantite_min_respectee: bool = True
+    delai_livraison_acceptable: bool = True
+    stock_securite_respecte: bool = True
+    seuil_surstock_respecte: bool = True
+    contraintes_additionnelles: Dict[str, Any] = {}
+    recommandations: List[str] = []
+    validation_status: str = "en_attente"  # "validee", "rejetee", "en_attente"
+    validee_par: Optional[str] = None
+    validee_le: Optional[datetime] = None
+    commentaires: Optional[str] = None
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+
+class PowerBIConfig(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    nom_dataset: str
+    workspace_id: str
+    dataset_id: str
+    derniere_sync: Optional[datetime] = None
+    frequence_sync: str = "quotidienne"  # "horaire", "quotidienne", "hebdomadaire"
+    tables_synchronisees: List[str] = []
+    statut: str = "active"  # "active", "inactive", "erreur"
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+
 # Utility functions
 def verify_password(plain_password, hashed_password):
     return pwd_context.verify(plain_password, hashed_password)
