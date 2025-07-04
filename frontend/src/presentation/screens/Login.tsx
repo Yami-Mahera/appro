@@ -1,13 +1,15 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useAuth } from "../../hooks/useAuth";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { loginSchema, LoginData } from "../../common/validators/schemas";
 import { EyeIcon, EyeSlashIcon } from "@heroicons/react/24/outline";
 import { images } from "../../data/constants/images";
+import { useNavigate, Navigate } from "react-router-dom";
 
 const Login: React.FC = () => {
-  const { login } = useAuth();
+  const { login, isAuthenticated } = useAuth();
+  const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -20,13 +22,19 @@ const Login: React.FC = () => {
     resolver: zodResolver(loginSchema),
   });
 
+  // Redirection si déjà authentifié
+  if (isAuthenticated) {
+    return <Navigate to="/" replace />;
+  }
+
   const onSubmit = async (data: LoginData) => {
     setLoading(true);
     setError(null);
 
     try {
       await login(data.email, data.password);
-      // Redirect will be handled by the auth context
+      // Navigation programmatique vers la page d'accueil
+      navigate("/", { replace: true });
     } catch (err: any) {
       setError(err.response?.data?.detail || "Erreur de connexion");
     } finally {

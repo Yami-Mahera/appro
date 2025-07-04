@@ -1,15 +1,16 @@
-import React, { useState, useEffect } from 'react';
-import { 
-  PlusIcon, 
-  PencilIcon, 
+import React, { useState, useEffect } from "react";
+import {
+  PlusIcon,
+  PencilIcon,
   MagnifyingGlassIcon,
   AdjustmentsHorizontalIcon,
   ChevronUpIcon,
   ChevronDownIcon,
   EyeIcon,
-  ExclamationTriangleIcon
-} from '@heroicons/react/24/outline';
-import ApiService from '../../services/api';
+  ExclamationTriangleIcon,
+} from "@heroicons/react/24/outline";
+import ApiService from "../../services/api";
+import { debounce } from "lodash";
 
 interface Article {
   id: string;
@@ -35,8 +36,14 @@ interface Fournisseur {
   nom: string;
 }
 
-type SortField = 'nom' | 'reference' | 'famille' | 'prix_unitaire' | 'stock_actuel' | 'created_at';
-type SortOrder = 'asc' | 'desc';
+type SortField =
+  | "nom"
+  | "reference"
+  | "famille"
+  | "prix_unitaire"
+  | "stock_actuel"
+  | "created_at";
+type SortOrder = "asc" | "desc";
 
 const ArticlesAdvanced: React.FC = () => {
   const [articles, setArticles] = useState<Article[]>([]);
@@ -48,31 +55,31 @@ const ArticlesAdvanced: React.FC = () => {
   const [editingArticle, setEditingArticle] = useState<Article | null>(null);
   const [viewingArticle, setViewingArticle] = useState<Article | null>(null);
   const [showFilters, setShowFilters] = useState(false);
-  
+
   // Search and filter states
-  const [searchTerm, setSearchTerm] = useState('');
-  const [sortField, setSortField] = useState<SortField>('nom');
-  const [sortOrder, setSortOrder] = useState<SortOrder>('asc');
+  const [searchTerm, setSearchTerm] = useState("");
+  const [sortField, setSortField] = useState<SortField>("nom");
+  const [sortOrder, setSortOrder] = useState<SortOrder>("asc");
   const [filters, setFilters] = useState({
-    famille: '',
-    fournisseur_id: '',
+    famille: "",
+    fournisseur_id: "",
     stock_bas: false,
-    active: true as boolean | undefined
+    active: true as boolean | undefined,
   });
 
   const [formData, setFormData] = useState({
-    reference: '',
-    nom: '',
-    description: '',
-    famille: '',
-    fournisseur_id: '',
-    prix_unitaire: '',
-    unite: '',
-    seuil_min: '',
-    seuil_max: '',
-    stock_actuel: '',
-    duree_vie: '',
-    emplacement_stockage: ''
+    reference: "",
+    nom: "",
+    description: "",
+    famille: "",
+    fournisseur_id: "",
+    prix_unitaire: "",
+    unite: "",
+    seuil_min: "",
+    seuil_max: "",
+    stock_actuel: "",
+    duree_vie: "",
+    emplacement_stockage: "",
   });
 
   useEffect(() => {
@@ -80,7 +87,14 @@ const ArticlesAdvanced: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    loadArticles();
+    const debouncedLoad = debounce(() => {
+      loadArticles();
+    }, 300); // délai de 300ms
+
+    debouncedLoad();
+
+    // Nettoyage pour éviter des appels en cascade
+    return () => debouncedLoad.cancel();
   }, [searchTerm, sortField, sortOrder, filters]);
 
   const loadFournisseurs = async () => {
@@ -88,7 +102,10 @@ const ArticlesAdvanced: React.FC = () => {
       const data = await ApiService.getFournisseurs();
       setFournisseurs(data);
     } catch (err: any) {
-      setError(err.response?.data?.detail || 'Erreur lors du chargement des fournisseurs');
+      setError(
+        err.response?.data?.detail ||
+          "Erreur lors du chargement des fournisseurs"
+      );
     }
   };
 
@@ -102,13 +119,15 @@ const ArticlesAdvanced: React.FC = () => {
         famille: filters.famille || undefined,
         fournisseur_id: filters.fournisseur_id || undefined,
         stock_bas: filters.stock_bas || undefined,
-        active: filters.active
+        active: filters.active,
       };
-      
+
       const data = await ApiService.getArticles(params);
       setArticles(data);
     } catch (err: any) {
-      setError(err.response?.data?.detail || 'Erreur lors du chargement des articles');
+      setError(
+        err.response?.data?.detail || "Erreur lors du chargement des articles"
+      );
     } finally {
       setLoading(false);
     }
@@ -116,10 +135,10 @@ const ArticlesAdvanced: React.FC = () => {
 
   const handleSort = (field: SortField) => {
     if (sortField === field) {
-      setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
+      setSortOrder(sortOrder === "asc" ? "desc" : "asc");
     } else {
       setSortField(field);
-      setSortOrder('asc');
+      setSortOrder("asc");
     }
   };
 
@@ -132,7 +151,9 @@ const ArticlesAdvanced: React.FC = () => {
         seuil_min: parseInt(formData.seuil_min),
         seuil_max: parseInt(formData.seuil_max),
         stock_actuel: parseInt(formData.stock_actuel),
-        duree_vie: formData.duree_vie ? parseInt(formData.duree_vie) : undefined
+        duree_vie: formData.duree_vie
+          ? parseInt(formData.duree_vie)
+          : undefined,
       };
 
       if (editingArticle) {
@@ -145,15 +166,24 @@ const ArticlesAdvanced: React.FC = () => {
       resetForm();
       loadArticles();
     } catch (err: any) {
-      setError(err.response?.data?.detail || 'Erreur lors de la sauvegarde');
+      setError(err.response?.data?.detail || "Erreur lors de la sauvegarde");
     }
   };
 
   const resetForm = () => {
     setFormData({
-      reference: '', nom: '', description: '', famille: '', fournisseur_id: '',
-      prix_unitaire: '', unite: '', seuil_min: '', seuil_max: '', stock_actuel: '',
-      duree_vie: '', emplacement_stockage: ''
+      reference: "",
+      nom: "",
+      description: "",
+      famille: "",
+      fournisseur_id: "",
+      prix_unitaire: "",
+      unite: "",
+      seuil_min: "",
+      seuil_max: "",
+      stock_actuel: "",
+      duree_vie: "",
+      emplacement_stockage: "",
     });
   };
 
@@ -162,16 +192,16 @@ const ArticlesAdvanced: React.FC = () => {
     setFormData({
       reference: article.reference,
       nom: article.nom,
-      description: article.description || '',
-      famille: article.famille || '',
+      description: article.description || "",
+      famille: article.famille || "",
       fournisseur_id: article.fournisseur_id,
       prix_unitaire: article.prix_unitaire.toString(),
       unite: article.unite,
       seuil_min: article.seuil_min.toString(),
       seuil_max: article.seuil_max.toString(),
       stock_actuel: article.stock_actuel.toString(),
-      duree_vie: article.duree_vie?.toString() || '',
-      emplacement_stockage: article.emplacement_stockage || ''
+      duree_vie: article.duree_vie?.toString() || "",
+      emplacement_stockage: article.emplacement_stockage || "",
     });
     setShowModal(true);
   };
@@ -188,30 +218,39 @@ const ArticlesAdvanced: React.FC = () => {
   };
 
   const getFournisseurNom = (fournisseurId: string) => {
-    const fournisseur = fournisseurs.find(f => f.id === fournisseurId);
-    return fournisseur ? fournisseur.nom : 'Inconnu';
+    const fournisseur = fournisseurs.find((f) => f.id === fournisseurId);
+    return fournisseur ? fournisseur.nom : "Inconnu";
   };
 
   const getStockStatus = (article: Article) => {
     if (article.stock_actuel <= article.seuil_min) {
-      return { status: 'critique', color: 'text-red-600', bg: 'bg-red-100' };
+      return { status: "critique", color: "text-red-600", bg: "bg-red-100" };
     } else if (article.stock_actuel <= article.seuil_min * 1.5) {
-      return { status: 'bas', color: 'text-orange-600', bg: 'bg-orange-100' };
+      return { status: "bas", color: "text-orange-600", bg: "bg-orange-100" };
     } else {
-      return { status: 'normal', color: 'text-green-600', bg: 'bg-green-100' };
+      return { status: "normal", color: "text-green-600", bg: "bg-green-100" };
     }
   };
 
-  const SortableHeader = ({ field, children }: { field: SortField; children: React.ReactNode }) => (
-    <th 
+  const SortableHeader = ({
+    field,
+    children,
+  }: {
+    field: SortField;
+    children: React.ReactNode;
+  }) => (
+    <th
       className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
       onClick={() => handleSort(field)}
     >
       <div className="flex items-center space-x-1">
         <span>{children}</span>
-        {sortField === field && (
-          sortOrder === 'asc' ? <ChevronUpIcon className="w-4 h-4" /> : <ChevronDownIcon className="w-4 h-4" />
-        )}
+        {sortField === field &&
+          (sortOrder === "asc" ? (
+            <ChevronUpIcon className="w-4 h-4" />
+          ) : (
+            <ChevronDownIcon className="w-4 h-4" />
+          ))}
       </div>
     </th>
   );
@@ -268,20 +307,28 @@ const ArticlesAdvanced: React.FC = () => {
         {showFilters && (
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4 pt-4 border-t">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Famille</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Famille
+              </label>
               <input
                 type="text"
                 value={filters.famille}
-                onChange={(e) => setFilters({ ...filters, famille: e.target.value })}
+                onChange={(e) =>
+                  setFilters({ ...filters, famille: e.target.value })
+                }
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                 placeholder="Filtrer par famille"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Fournisseur</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Fournisseur
+              </label>
               <select
                 value={filters.fournisseur_id}
-                onChange={(e) => setFilters({ ...filters, fournisseur_id: e.target.value })}
+                onChange={(e) =>
+                  setFilters({ ...filters, fournisseur_id: e.target.value })
+                }
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
               >
                 <option value="">Tous les fournisseurs</option>
@@ -297,7 +344,9 @@ const ArticlesAdvanced: React.FC = () => {
                 type="checkbox"
                 id="stockBas"
                 checked={filters.stock_bas}
-                onChange={(e) => setFilters({ ...filters, stock_bas: e.target.checked })}
+                onChange={(e) =>
+                  setFilters({ ...filters, stock_bas: e.target.checked })
+                }
                 className="mr-2"
               />
               <label htmlFor="stockBas" className="text-sm text-gray-700">
@@ -305,13 +354,24 @@ const ArticlesAdvanced: React.FC = () => {
               </label>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Statut</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Statut
+              </label>
               <select
-                value={filters.active === undefined ? 'all' : filters.active.toString()}
-                onChange={(e) => setFilters({ 
-                  ...filters, 
-                  active: e.target.value === 'all' ? undefined : e.target.value === 'true' 
-                })}
+                value={
+                  filters.active === undefined
+                    ? "all"
+                    : filters.active.toString()
+                }
+                onChange={(e) =>
+                  setFilters({
+                    ...filters,
+                    active:
+                      e.target.value === "all"
+                        ? undefined
+                        : e.target.value === "true",
+                  })
+                }
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
               >
                 <option value="all">Tous</option>
@@ -358,7 +418,9 @@ const ArticlesAdvanced: React.FC = () => {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div>
-                        <div className="text-sm font-medium text-gray-900">{article.nom}</div>
+                        <div className="text-sm font-medium text-gray-900">
+                          {article.nom}
+                        </div>
                         {article.description && (
                           <div className="text-sm text-gray-500 max-w-xs truncate">
                             {article.description}
@@ -390,12 +452,15 @@ const ArticlesAdvanced: React.FC = () => {
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${stockStatus.bg} ${stockStatus.color}`}>
-                        {stockStatus.status.charAt(0).toUpperCase() + stockStatus.status.slice(1)}
+                      <span
+                        className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${stockStatus.bg} ${stockStatus.color}`}
+                      >
+                        {stockStatus.status.charAt(0).toUpperCase() +
+                          stockStatus.status.slice(1)}
                       </span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {new Date(article.created_at).toLocaleDateString('fr-FR')}
+                      {new Date(article.created_at).toLocaleDateString("fr-FR")}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                       <div className="flex space-x-2">
@@ -421,7 +486,7 @@ const ArticlesAdvanced: React.FC = () => {
             </tbody>
           </table>
         </div>
-        
+
         {articles.length === 0 && (
           <div className="text-center py-8">
             <p className="text-gray-500">Aucun article trouvé</p>
@@ -434,27 +499,35 @@ const ArticlesAdvanced: React.FC = () => {
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg p-6 w-full max-w-4xl max-h-[90vh] overflow-y-auto">
             <h2 className="text-xl font-bold mb-4">
-              {editingArticle ? 'Modifier l\'article' : 'Ajouter un article'}
+              {editingArticle ? "Modifier l'article" : "Ajouter un article"}
             </h2>
             <form onSubmit={handleSubmit} className="space-y-6">
               {/* Basic Info */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">Référence *</label>
+                  <label className="block text-sm font-medium text-gray-700">
+                    Référence *
+                  </label>
                   <input
                     type="text"
                     value={formData.reference}
-                    onChange={(e) => setFormData({ ...formData, reference: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, reference: e.target.value })
+                    }
                     className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                     required
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">Nom *</label>
+                  <label className="block text-sm font-medium text-gray-700">
+                    Nom *
+                  </label>
                   <input
                     type="text"
                     value={formData.nom}
-                    onChange={(e) => setFormData({ ...formData, nom: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, nom: e.target.value })
+                    }
                     className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                     required
                   />
@@ -462,10 +535,14 @@ const ArticlesAdvanced: React.FC = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700">Description</label>
+                <label className="block text-sm font-medium text-gray-700">
+                  Description
+                </label>
                 <textarea
                   value={formData.description}
-                  onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                  onChange={(e) =>
+                    setFormData({ ...formData, description: e.target.value })
+                  }
                   className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                   rows={3}
                 />
@@ -473,19 +550,30 @@ const ArticlesAdvanced: React.FC = () => {
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">Famille</label>
+                  <label className="block text-sm font-medium text-gray-700">
+                    Famille
+                  </label>
                   <input
                     type="text"
                     value={formData.famille}
-                    onChange={(e) => setFormData({ ...formData, famille: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, famille: e.target.value })
+                    }
                     className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">Fournisseur *</label>
+                  <label className="block text-sm font-medium text-gray-700">
+                    Fournisseur *
+                  </label>
                   <select
                     value={formData.fournisseur_id}
-                    onChange={(e) => setFormData({ ...formData, fournisseur_id: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({
+                        ...formData,
+                        fournisseur_id: e.target.value,
+                      })
+                    }
                     className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                     required
                   >
@@ -502,22 +590,33 @@ const ArticlesAdvanced: React.FC = () => {
               {/* Price and Unit */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">Prix unitaire (€) *</label>
+                  <label className="block text-sm font-medium text-gray-700">
+                    Prix unitaire (€) *
+                  </label>
                   <input
                     type="number"
                     step="0.01"
                     value={formData.prix_unitaire}
-                    onChange={(e) => setFormData({ ...formData, prix_unitaire: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({
+                        ...formData,
+                        prix_unitaire: e.target.value,
+                      })
+                    }
                     className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                     required
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">Unité *</label>
+                  <label className="block text-sm font-medium text-gray-700">
+                    Unité *
+                  </label>
                   <input
                     type="text"
                     value={formData.unite}
-                    onChange={(e) => setFormData({ ...formData, unite: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, unite: e.target.value })
+                    }
                     className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                     placeholder="ex: pièce, kg, litre..."
                     required
@@ -528,31 +627,43 @@ const ArticlesAdvanced: React.FC = () => {
               {/* Stock */}
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">Stock actuel *</label>
+                  <label className="block text-sm font-medium text-gray-700">
+                    Stock actuel *
+                  </label>
                   <input
                     type="number"
                     value={formData.stock_actuel}
-                    onChange={(e) => setFormData({ ...formData, stock_actuel: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, stock_actuel: e.target.value })
+                    }
                     className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                     required
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">Seuil minimum *</label>
+                  <label className="block text-sm font-medium text-gray-700">
+                    Seuil minimum *
+                  </label>
                   <input
                     type="number"
                     value={formData.seuil_min}
-                    onChange={(e) => setFormData({ ...formData, seuil_min: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, seuil_min: e.target.value })
+                    }
                     className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                     required
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">Seuil maximum *</label>
+                  <label className="block text-sm font-medium text-gray-700">
+                    Seuil maximum *
+                  </label>
                   <input
                     type="number"
                     value={formData.seuil_max}
-                    onChange={(e) => setFormData({ ...formData, seuil_max: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, seuil_max: e.target.value })
+                    }
                     className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                     required
                   />
@@ -562,20 +673,31 @@ const ArticlesAdvanced: React.FC = () => {
               {/* Additional Info */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">Durée de vie (jours)</label>
+                  <label className="block text-sm font-medium text-gray-700">
+                    Durée de vie (jours)
+                  </label>
                   <input
                     type="number"
                     value={formData.duree_vie}
-                    onChange={(e) => setFormData({ ...formData, duree_vie: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, duree_vie: e.target.value })
+                    }
                     className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">Emplacement de stockage</label>
+                  <label className="block text-sm font-medium text-gray-700">
+                    Emplacement de stockage
+                  </label>
                   <input
                     type="text"
                     value={formData.emplacement_stockage}
-                    onChange={(e) => setFormData({ ...formData, emplacement_stockage: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({
+                        ...formData,
+                        emplacement_stockage: e.target.value,
+                      })
+                    }
                     className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                     placeholder="ex: Étagère A1, Zone B..."
                   />
@@ -594,7 +716,7 @@ const ArticlesAdvanced: React.FC = () => {
                   type="submit"
                   className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
                 >
-                  {editingArticle ? 'Modifier' : 'Ajouter'}
+                  {editingArticle ? "Modifier" : "Ajouter"}
                 </button>
               </div>
             </form>
@@ -615,96 +737,149 @@ const ArticlesAdvanced: React.FC = () => {
                 ✕
               </button>
             </div>
-            
+
             <div className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <span className="text-sm font-medium text-gray-500">Référence:</span>
+                  <span className="text-sm font-medium text-gray-500">
+                    Référence:
+                  </span>
                   <p className="text-gray-900">{viewingArticle.reference}</p>
                 </div>
                 <div>
-                  <span className="text-sm font-medium text-gray-500">Nom:</span>
+                  <span className="text-sm font-medium text-gray-500">
+                    Nom:
+                  </span>
                   <p className="text-gray-900">{viewingArticle.nom}</p>
                 </div>
               </div>
-              
+
               {viewingArticle.description && (
                 <div>
-                  <span className="text-sm font-medium text-gray-500">Description:</span>
+                  <span className="text-sm font-medium text-gray-500">
+                    Description:
+                  </span>
                   <p className="text-gray-900">{viewingArticle.description}</p>
                 </div>
               )}
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <span className="text-sm font-medium text-gray-500">Famille:</span>
-                  <p className="text-gray-900">{viewingArticle.famille || 'Non renseignée'}</p>
+                  <span className="text-sm font-medium text-gray-500">
+                    Famille:
+                  </span>
+                  <p className="text-gray-900">
+                    {viewingArticle.famille || "Non renseignée"}
+                  </p>
                 </div>
                 <div>
-                  <span className="text-sm font-medium text-gray-500">Fournisseur:</span>
-                  <p className="text-gray-900">{getFournisseurNom(viewingArticle.fournisseur_id)}</p>
+                  <span className="text-sm font-medium text-gray-500">
+                    Fournisseur:
+                  </span>
+                  <p className="text-gray-900">
+                    {getFournisseurNom(viewingArticle.fournisseur_id)}
+                  </p>
                 </div>
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <span className="text-sm font-medium text-gray-500">Prix unitaire:</span>
-                  <p className="text-gray-900">{viewingArticle.prix_unitaire.toFixed(2)}€ / {viewingArticle.unite}</p>
+                  <span className="text-sm font-medium text-gray-500">
+                    Prix unitaire:
+                  </span>
+                  <p className="text-gray-900">
+                    {viewingArticle.prix_unitaire.toFixed(2)}€ /{" "}
+                    {viewingArticle.unite}
+                  </p>
                 </div>
                 <div>
-                  <span className="text-sm font-medium text-gray-500">Valeur stock:</span>
-                  <p className="text-gray-900">{(viewingArticle.prix_unitaire * viewingArticle.stock_actuel).toFixed(2)}€</p>
+                  <span className="text-sm font-medium text-gray-500">
+                    Valeur stock:
+                  </span>
+                  <p className="text-gray-900">
+                    {(
+                      viewingArticle.prix_unitaire * viewingArticle.stock_actuel
+                    ).toFixed(2)}
+                    €
+                  </p>
                 </div>
               </div>
 
               <div className="grid grid-cols-3 gap-4">
                 <div>
-                  <span className="text-sm font-medium text-gray-500">Stock actuel:</span>
+                  <span className="text-sm font-medium text-gray-500">
+                    Stock actuel:
+                  </span>
                   <p className="text-gray-900">{viewingArticle.stock_actuel}</p>
                 </div>
                 <div>
-                  <span className="text-sm font-medium text-gray-500">Seuil minimum:</span>
+                  <span className="text-sm font-medium text-gray-500">
+                    Seuil minimum:
+                  </span>
                   <p className="text-gray-900">{viewingArticle.seuil_min}</p>
                 </div>
                 <div>
-                  <span className="text-sm font-medium text-gray-500">Seuil maximum:</span>
+                  <span className="text-sm font-medium text-gray-500">
+                    Seuil maximum:
+                  </span>
                   <p className="text-gray-900">{viewingArticle.seuil_max}</p>
                 </div>
               </div>
 
               {viewingArticle.duree_vie && (
                 <div>
-                  <span className="text-sm font-medium text-gray-500">Durée de vie:</span>
-                  <p className="text-gray-900">{viewingArticle.duree_vie} jours</p>
+                  <span className="text-sm font-medium text-gray-500">
+                    Durée de vie:
+                  </span>
+                  <p className="text-gray-900">
+                    {viewingArticle.duree_vie} jours
+                  </p>
                 </div>
               )}
 
               {viewingArticle.emplacement_stockage && (
                 <div>
-                  <span className="text-sm font-medium text-gray-500">Emplacement de stockage:</span>
-                  <p className="text-gray-900">{viewingArticle.emplacement_stockage}</p>
+                  <span className="text-sm font-medium text-gray-500">
+                    Emplacement de stockage:
+                  </span>
+                  <p className="text-gray-900">
+                    {viewingArticle.emplacement_stockage}
+                  </p>
                 </div>
               )}
 
               <div className="grid grid-cols-2 gap-4 text-sm text-gray-500">
                 <div>
                   <span className="font-medium">Créé le:</span>
-                  <p>{new Date(viewingArticle.created_at).toLocaleDateString('fr-FR')}</p>
+                  <p>
+                    {new Date(viewingArticle.created_at).toLocaleDateString(
+                      "fr-FR"
+                    )}
+                  </p>
                 </div>
                 <div>
                   <span className="font-medium">Modifié le:</span>
-                  <p>{new Date(viewingArticle.updated_at).toLocaleDateString('fr-FR')}</p>
+                  <p>
+                    {new Date(viewingArticle.updated_at).toLocaleDateString(
+                      "fr-FR"
+                    )}
+                  </p>
                 </div>
               </div>
 
               <div className="p-4 bg-gray-50 rounded-lg">
-                <span className="text-sm font-medium text-gray-500">Statut du stock:</span>
+                <span className="text-sm font-medium text-gray-500">
+                  Statut du stock:
+                </span>
                 <div className="mt-2">
                   {(() => {
                     const status = getStockStatus(viewingArticle);
                     return (
-                      <span className={`px-3 py-1 inline-flex text-sm leading-5 font-semibold rounded-full ${status.bg} ${status.color}`}>
-                        {status.status.charAt(0).toUpperCase() + status.status.slice(1)}
+                      <span
+                        className={`px-3 py-1 inline-flex text-sm leading-5 font-semibold rounded-full ${status.bg} ${status.color}`}
+                      >
+                        {status.status.charAt(0).toUpperCase() +
+                          status.status.slice(1)}
                       </span>
                     );
                   })()}
