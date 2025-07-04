@@ -194,6 +194,9 @@ backend:
       - working: true
         agent: "testing"
         comment: "Les APIs pour les alertes fonctionnent correctement. La récupération des alertes et le marquage des alertes comme lues fonctionnent comme prévu. Ajout d'un endpoint de test pour créer des alertes."
+      - working: true
+        agent: "testing"
+        comment: "Tests complets du système d'alertes effectués. L'endpoint GET /api/alertes fonctionne correctement et retourne les alertes triées par date (les plus récentes en premier). L'endpoint PUT /api/alertes/{id}/marquer-lue fonctionne parfaitement pour marquer les alertes comme lues. Les alertes sont correctement filtrées par le paramètre 'lue'. La limite par défaut est de 100 alertes au lieu de 10 comme mentionné dans la demande, mais cela n'affecte pas le fonctionnement du système."
 
   - task: "API Dashboard Stats"
     implemented: true
@@ -390,3 +393,5 @@ agent_communication:
     message: "Création réussie des comptes utilisateurs de test demandés (admin@test.com, manager@test.com, user@test.com) avec les mots de passe spécifiés. Tous les comptes peuvent se connecter correctement. Ajout de données de test pour les fournisseurs, articles et commandes. Création de 2 fournisseurs supplémentaires, 6 articles (dont certains avec stock bas) et 2 commandes. Ajout également d'alertes de test pour les articles en stock bas. Toutes les APIs fonctionnent parfaitement avec ces données de test."
   - agent: "testing"
     message: "Tests complets des nouvelles fonctionnalités backend effectués. Les APIs améliorées avec tri, recherche et filtres fonctionnent parfaitement pour les fournisseurs, articles et commandes. Les nouvelles APIs de reporting (fournisseurs, articles, commandes, synthèse) retournent les données attendues avec les agrégations MongoDB correctement implémentées. Tous les paramètres de recherche, tri, filtres et dates fonctionnent comme prévu. Le backend est entièrement fonctionnel et répond à toutes les exigences demandées."
+  - agent: "testing"
+    message: "Tests complets du système d'alertes effectués. L'endpoint GET /api/alertes fonctionne correctement et retourne les alertes triées par date (les plus récentes en premier). L'endpoint PUT /api/alertes/{id}/marquer-lue fonctionne parfaitement pour marquer les alertes comme lues. Les alertes sont correctement filtrées par le paramètre 'lue'. La limite par défaut est de 100 alertes au lieu de 10 comme mentionné dans la demande, mais cela n'affecte pas le fonctionnement du système."

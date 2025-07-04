@@ -7,10 +7,10 @@ from datetime import datetime, timedelta
 from typing import Dict, List, Optional, Any
 
 # Configuration
-BASE_URL = "https://8e9cb52f-5d8f-42e5-bc26-d323127231c4.preview.emergentagent.com/api"
+BASE_URL = "http://localhost:8001/api"
 ADMIN_USER = {
     "email": "admin@test.com",
-    "password": "password123",
+    "password": "admin123",
     "nom": "Admin",
     "prenom": "Test",
     "role": "administrateur"
@@ -442,6 +442,118 @@ def test_list_alertes(token):
         print_test_result("List alertes", False, message)
         test_results["alertes"]["list"]["message"] = message
         return False
+
+def test_alertes_system():
+    print_header("TESTING ALERT SYSTEM")
+    
+    # Login as admin
+    admin_token = test_auth_login(ADMIN_USER)
+    if not admin_token:
+        print("Admin authentication failed, cannot proceed with alert system tests")
+        return False
+    
+    # Create multiple test alerts with different dates to test sorting
+    print_header("Creating Test Alerts")
+    alert_ids = []
+    
+    # Create 15 alerts with different timestamps to test sorting and limit
+    for i in range(15):
+        # Create alerts with timestamps spaced 1 hour apart
+        hours_ago = 15 - i  # Newest alerts will have smaller hours_ago values
+        timestamp = datetime.utcnow() - timedelta(hours=hours_ago)
+        
+        alerte_data = {
+            "type": "stock_bas",
+            "priorite": "high",
+            "titre": f"Test Alert {i+1}",
+            "message": f"This is test alert {i+1} created for testing",
+            "lue": i < 5,  # First 5 will be marked as read, rest unread
+            "created_at": timestamp.isoformat()
+        }
+        
+        success, message, data = make_request("post", "/alertes/test-create", alerte_data, token=admin_token, expected_status=200)
+        if success and data and "id" in data:
+            print(f"Created alert: {data['titre']} (Read: {data['lue']})")
+            alert_ids.append(data["id"])
+    
+    # Test 1: Get all alerts and verify sorting by date (newest first)
+    print_header("Test 1: Get All Alerts (Sorted by Date)")
+    success, message, data = make_request("get", "/alertes", token=admin_token, expected_status=200)
+    
+    if success and isinstance(data, list):
+        print_test_result("Get all alerts", True, f"Retrieved {len(data)} alerts")
+        
+        # Check if alerts are sorted by date (newest first)
+        is_sorted = all(data[i]["created_at"] >= data[i+1]["created_at"] for i in range(len(data)-1))
+        print_test_result("Alerts sorted by date", is_sorted, 
+                         "Alerts are correctly sorted by date (newest first)" if is_sorted 
+                         else "Alerts are NOT sorted by date correctly")
+        
+        # Store the first alert ID for testing mark-read functionality
+        if data and len(data) > 0:
+            first_alert_id = data[0]["id"]
+    else:
+        print_test_result("Get all alerts", False, message)
+        return False
+    
+    # Test 2: Test limit parameter (should be 100 by default based on the implementation)
+    print_header("Test 2: Test Default Limit (100)")
+    success, message, data = make_request("get", "/alertes", token=admin_token, expected_status=200)
+    
+    if success and isinstance(data, list):
+        default_limit_correct = len(data) <= 100
+        print_test_result("Default limit (100)", default_limit_correct, 
+                         f"Default limit works correctly, got {len(data)} alerts" if default_limit_correct 
+                         else f"Default limit not working, got {len(data)} alerts instead of 100 or fewer")
+    else:
+        print_test_result("Test default limit", False, message)
+    
+    # Test 3: Get only unread alerts
+    print_header("Test 3: Get Unread Alerts")
+    success, message, data = make_request("get", "/alertes?lue=false", token=admin_token, expected_status=200)
+    
+    if success and isinstance(data, list):
+        print_test_result("Get unread alerts", True, f"Retrieved {len(data)} unread alerts")
+        
+        # Verify all retrieved alerts are unread
+        all_unread = all(not alert["lue"] for alert in data)
+        print_test_result("All alerts unread", all_unread, 
+                         "All retrieved alerts are correctly marked as unread" if all_unread 
+                         else "Some retrieved alerts are incorrectly marked as read")
+    else:
+        print_test_result("Get unread alerts", False, message)
+    
+    # Test 4: Mark an alert as read
+    print_header("Test 4: Mark Alert as Read")
+    if alert_ids:
+        # Get an unread alert
+        success, message, unread_alerts = make_request("get", "/alertes?lue=false", token=admin_token, expected_status=200)
+        if success and unread_alerts and len(unread_alerts) > 0:
+            unread_alert_id = unread_alerts[0]["id"]
+            
+            # Mark it as read
+            success, message, data = make_request("put", f"/alertes/{unread_alert_id}/marquer-lue", token=admin_token, expected_status=200)
+            
+            if success:
+                print_test_result("Mark alert as read", True, f"Successfully marked alert {unread_alert_id} as read")
+                
+                # Verify it's now marked as read
+                success, message, updated_alert = make_request("get", "/alertes", token=admin_token, expected_status=200)
+                if success:
+                    found_alert = next((a for a in updated_alert if a["id"] == unread_alert_id), None)
+                    if found_alert and found_alert["lue"]:
+                        print_test_result("Alert marked as read verification", True, "Alert is correctly marked as read in the database")
+                    else:
+                        print_test_result("Alert marked as read verification", False, "Alert was not correctly marked as read in the database")
+            else:
+                print_test_result("Mark alert as read", False, message)
+        else:
+            print_test_result("Get unread alert for marking", False, "No unread alerts available for testing")
+    else:
+        print_test_result("Mark alert as read", False, "No alert IDs available for testing")
+    
+    print_header("ALERT SYSTEM TESTS COMPLETED")
+    return True
 
 def test_marquer_alerte_lue(token, alerte_id):
     if not alerte_id:
@@ -1079,4 +1191,5 @@ def create_test_data(admin_token):
     print("Test data creation completed")
 
 if __name__ == "__main__":
-    run_all_tests()
+    # Run specific alert system tests
+    test_alertes_system()
