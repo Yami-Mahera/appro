@@ -80,6 +80,30 @@ def make_request(method, endpoint, data=None, token=None, expected_status=200):
     except Exception as e:
         return False, f"Request error: {str(e)}", None
 
+def register():
+    print_header("Registering admin user")
+    register_data = {
+        "email": ADMIN_USER["email"],
+        "password": ADMIN_USER["password"],
+        "nom": "Admin",
+        "prenom": "Test",
+        "role": "administrateur"
+    }
+    
+    success, message, data = make_request("post", "/auth/register", register_data, expected_status=200)
+    
+    if success:
+        print_test_result("Register admin", True, f"Registered admin user: {ADMIN_USER['email']}")
+        return True
+    else:
+        # If the user already exists, that's fine
+        if "Email already registered" in message:
+            print_test_result("Register admin", True, f"Admin user already exists: {ADMIN_USER['email']}")
+            return True
+        else:
+            print_test_result("Register admin", False, message)
+            return False
+
 def login():
     print_header("Logging in as admin")
     login_data = {
@@ -94,6 +118,15 @@ def login():
         return data["access_token"]
     else:
         print_test_result("Login", False, message)
+        # Try to register if login fails
+        if register():
+            # Try login again
+            success, message, data = make_request("post", "/auth/login", login_data, expected_status=200)
+            if success and data and "access_token" in data:
+                print_test_result("Login after registration", True, f"Logged in as: {ADMIN_USER['email']}")
+                return data["access_token"]
+            else:
+                print_test_result("Login after registration", False, message)
         return None
 
 # Test functions
