@@ -102,7 +102,7 @@ const DashboardBuilder: React.FC<DashboardBuilderProps> = ({
     const newWidget: Widget = {
       id: `widget_${Date.now()}`,
       type: widgetType.type,
-      title: `Nouveau ${widgetType.name}`,
+      title: `Nouveau ${widgetType.nom || widgetType.name}`,
       config: {},
       position: { x: 0, y: 0, w: 4, h: 3 }
     };
