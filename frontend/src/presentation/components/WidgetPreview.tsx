@@ -27,6 +27,175 @@ interface WidgetPreviewProps {
 }
 
 const WidgetPreview: React.FC<WidgetPreviewProps> = ({ widget }) => {
+  const [data, setData] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
+  
+  useEffect(() => {
+    fetchWidgetData();
+  }, [widget]);
+
+  const fetchWidgetData = async () => {
+    try {
+      setLoading(true);
+      
+      let widgetData = null;
+
+      switch (widget.type) {
+        case 'kpi_card':
+          widgetData = await fetchStatsData();
+          break;
+        case 'chart_line':
+        case 'chart_bar':
+          widgetData = await fetchChartData();
+          break;
+        case 'chart_pie':
+          widgetData = await fetchPieData();
+          break;
+        case 'table':
+          widgetData = await fetchTableData();
+          break;
+        case 'gauge':
+          widgetData = await fetchKPIData();
+          break;
+        default:
+          // Données par défaut pour les types non reconnus
+          widgetData = getFallbackData();
+      }
+
+      setData(widgetData);
+    } catch (err) {
+      console.warn('Widget preview data fetch error (using fallback data):', err);
+      // Au lieu d'afficher une erreur, utiliser des données de fallback
+      setData(getFallbackData());
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchStatsData = async () => {
+    const stats = await apiService.getDashboardStats();
+    const dataKey = widget.config.kpiType;
+    return stats[dataKey] || 0;
+  };
+
+  const fetchChartData = async () => {
+    // Mock data - identique à WidgetDisplay pour cohérence
+    switch (widget.config.dataSource) {
+      case 'commandes_par_mois':
+        return [
+          { name: 'Jan', value: 65 },
+          { name: 'Fév', value: 59 },
+          { name: 'Mar', value: 80 },
+          { name: 'Avr', value: 81 },
+          { name: 'Mai', value: 56 },
+          { name: 'Jun', value: 55 }
+        ];
+      case 'evolution_stock':
+        return [
+          { name: 'S1', value: 120 },
+          { name: 'S2', value: 132 },
+          { name: 'S3', value: 101 },
+          { name: 'S4', value: 134 },
+          { name: 'S5', value: 90 },
+          { name: 'S6', value: 108 }
+        ];
+      default:
+        return [
+          { name: 'Jan', value: 65 },
+          { name: 'Fév', value: 59 },
+          { name: 'Mar', value: 80 },
+          { name: 'Avr', value: 81 },
+          { name: 'Mai', value: 56 },
+          { name: 'Jun', value: 55 }
+        ];
+    }
+  };
+
+  const fetchPieData = async () => {
+    // Mock data - identique à WidgetDisplay
+    return [
+      { name: 'Électronique', value: 35, color: '#3B82F6' },
+      { name: 'Fournitures', value: 25, color: '#10B981' },
+      { name: 'Outils', value: 20, color: '#8B5CF6' },
+      { name: 'Autres', value: 20, color: '#F59E0B' }
+    ];
+  };
+
+  const fetchTableData = async () => {
+    switch (widget.config.tableType) {
+      case 'articles_stock_bas':
+        return await apiService.getArticlesStockBas();
+      case 'fournisseurs':
+        return await apiService.getFournisseurs({ limit: widget.config.rowCount || 10 });
+      case 'articles':
+        return await apiService.getArticles({ limit: widget.config.rowCount || 10 });
+      case 'commandes':
+        return await apiService.getCommandes({ limit: widget.config.rowCount || 10 });
+      default:
+        return getFallbackTableData();
+    }
+  };
+
+  const fetchKPIData = async () => {
+    switch (widget.config.kpiType) {
+      case 'taux_service_client':
+        return await apiService.getKPIsTauxServiceClient();
+      case 'delai_moyen_livraison':
+        return await apiService.getKPIsDelaiMoyenLivraison();
+      default:
+        return { value: 94.5, unit: '%', trend: 2.3 };
+    }
+  };
+
+  const getFallbackData = () => {
+    switch (widget.type) {
+      case 'kpi_card':
+        // Utiliser des valeurs cohérentes avec WidgetDisplay
+        const dataKey = widget.config.kpiType;
+        const fallbackStats: Record<string, number> = {
+          total_fournisseurs: 45,
+          total_articles: 234,
+          total_commandes: 156,
+          alertes_non_lues: 8,
+          articles_stock_bas: 12,
+          commandes_en_cours: 0  // Cohérent avec l'API réelle
+        };
+        return fallbackStats[dataKey] ?? 156;
+      case 'chart_line':
+      case 'chart_bar':
+        return [
+          { name: 'Jan', value: 65 },
+          { name: 'Fév', value: 59 },
+          { name: 'Mar', value: 80 },
+          { name: 'Avr', value: 81 },
+          { name: 'Mai', value: 56 },
+          { name: 'Jun', value: 55 }
+        ];
+      case 'chart_pie':
+        return [
+          { name: 'Électronique', value: 35, color: '#3B82F6' },
+          { name: 'Fournitures', value: 25, color: '#10B981' },
+          { name: 'Outils', value: 20, color: '#8B5CF6' },
+          { name: 'Autres', value: 20, color: '#F59E0B' }
+        ];
+      case 'gauge':
+        return { value: 94.5, unit: '%', trend: 2.3 };
+      case 'table':
+        return getFallbackTableData();
+      default:
+        return null;
+    }
+  };
+
+  const getFallbackTableData = () => {
+    return [
+      { nom: 'Article A', valeur: '150', statut: 'En stock' },
+      { nom: 'Article B', valeur: '89', statut: 'Stock bas' },
+      { nom: 'Article C', valeur: '67', statut: 'En stock' },
+      { nom: 'Article D', valeur: '234', statut: 'En stock' },
+      { nom: 'Article E', valeur: '12', statut: 'Rupture' }
+    ];
+  };
   const getColorClass = (color: string) => {
     const colors = {
       blue: 'bg-blue-500',
