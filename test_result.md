@@ -421,6 +421,20 @@ backend:
         comment: "Implémenté l'API pour récupérer la liste des widgets disponibles pour les tableaux de bord personnalisés"
       - working: true
         agent: "testing"
+  - task: "APIs de données pour widgets"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Implémenté les APIs pour alimenter les widgets des tableaux de bord personnalisés"
+      - working: true
+        agent: "testing"
+        comment: "Les APIs pour alimenter les widgets fonctionnent correctement. GET /api/dashboard/stats retourne les statistiques générales (6 métriques). GET /api/kpis/taux-service-client, GET /api/kpis/delai-moyen-livraison et GET /api/kpis/synthese retournent les données KPI correctement. GET /api/alertes?lue=false retourne les alertes non lues."
         comment: "L'API GET /api/dashboards/widgets-disponibles fonctionne correctement et retourne la liste des 6 types de widgets disponibles (kpi_card, chart_line, chart_bar, chart_pie, table, gauge) avec leurs options de configuration."
         agent: "testing"
         comment: "Tests complets des APIs de tableaux de bord personnalisés effectués. Les endpoints GET, POST, PUT et DELETE /api/dashboards/personnalises fonctionnent correctement. L'API GET /api/dashboards/widgets-disponibles retourne bien la liste des widgets disponibles avec leurs options de configuration."
