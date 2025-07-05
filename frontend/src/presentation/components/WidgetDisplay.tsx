@@ -173,12 +173,23 @@ const WidgetDisplay: React.FC<WidgetDisplayProps> = ({ widget, refreshTrigger })
 
   const getIcon = (dataSource: string) => {
     const icons = {
+      // Types de données dashboard de base
       total_fournisseurs: BuildingOfficeIcon,
       total_articles: CubeIcon,
       total_commandes: DocumentTextIcon,
       alertes_non_lues: ExclamationTriangleIcon,
       articles_stock_bas: ArrowTrendingUpIcon,
-      commandes_en_cours: ClockIcon
+      commandes_en_cours: ClockIcon,
+      // Types KPI personnalisés 
+      taux_service_client: ChartBarIcon,
+      delai_livraison: ClockIcon,
+      delai_moyen_livraison: ClockIcon,
+      commandes_traitees: DocumentTextIcon,
+      rupture_stock: ExclamationTriangleIcon,
+      rotation_stock: ArrowTrendingUpIcon,
+      performance_fournisseur: BuildingOfficeIcon,
+      // Types génériques
+      default: ChartBarIcon
     };
     return icons[dataSource as keyof typeof icons] || ChartBarIcon;
   };
