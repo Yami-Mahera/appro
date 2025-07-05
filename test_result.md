@@ -715,15 +715,18 @@ frontend:
 
   - task: "Visualiseur de Dashboard"
     implemented: true
-    working: "NA"
+    working: true
     file: "/app/frontend/src/presentation/components/DashboardViewer.tsx"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
         comment: "Créé le visualiseur de dashboard avec mode plein écran, rafraîchissement automatique, partage, impression et édition"
+      - working: true
+        agent: "testing"
+        comment: "Le visualiseur de dashboard fonctionne correctement. Les widgets s'affichent avec leurs couleurs et données appropriées, et non plus en gris comme auparavant. Les fonctionnalités de plein écran, rafraîchissement automatique, partage et impression sont opérationnelles. Le bouton d'édition permet de basculer vers le mode édition sans problème."
 
   - task: "Navigation Dashboard KPI"
     implemented: true
