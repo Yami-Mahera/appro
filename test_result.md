@@ -407,6 +407,9 @@ backend:
       - working: true
         agent: "testing"
         comment: "APIs tableaux de bord personnalisés testées avec succès. Création, gestion, et récupération des widgets fonctionnent parfaitement avec support configuration avancée."
+      - working: true
+        agent: "testing"
+        comment: "Tests complets des APIs de tableaux de bord personnalisés effectués. Les endpoints GET, POST, PUT et DELETE /api/dashboards/personnalises fonctionnent correctement. L'API GET /api/dashboards/widgets-disponibles retourne bien la liste des widgets disponibles avec leurs options de configuration."
 
 frontend:
   - task: "Architecture TypeScript modulaire"
