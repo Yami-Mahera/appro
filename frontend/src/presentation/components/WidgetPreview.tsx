@@ -161,8 +161,7 @@ const WidgetPreview: React.FC<WidgetPreviewProps> = ({ widget }) => {
             </div>
             <ResponsiveContainer width="100%" height="80%">
               <BarChart 
-                data={mockData.chartData.slice(0, widget.config.maxItems || 10)} 
-                layout={isHorizontal ? 'verseBar' : 'normal'}
+                data={mockData.chartData.slice(0, widget.config.maxItems || 10)}
               >
                 <XAxis dataKey="name" />
                 <YAxis />
