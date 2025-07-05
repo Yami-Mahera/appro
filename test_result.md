@@ -212,6 +212,9 @@ backend:
       - working: true
         agent: "testing"
         comment: "L'API pour récupérer les statistiques du dashboard fonctionne correctement. Toutes les statistiques (fournisseurs, articles, commandes, alertes, articles en stock bas, commandes en cours) sont correctement calculées et renvoyées."
+      - working: true
+        agent: "testing"
+        comment: "Tests approfondis de l'API dashboard stats. L'API fonctionne correctement et retourne toutes les statistiques attendues. Cependant, la valeur 'commandes_en_cours' est toujours à 0 car il n'existe pas d'endpoint pour mettre à jour le statut d'une commande, et le statut par défaut est 'brouillon' (DRAFT). L'API compte correctement les commandes avec statut 'en_attente', 'approuvee' ou 'commandee' comme 'commandes_en_cours', mais aucune commande n'a ces statuts."
         
   - task: "APIs améliorées avec tri et recherche"
     implemented: true
