@@ -12,6 +12,7 @@ import {
   XMarkIcon,
   ArrowRightOnRectangleIcon,
   Squares2X2Icon,
+  PresentationChartBarIcon,
 } from "@heroicons/react/24/outline";
 import { classNames } from "../../common/utils";
 import { images } from "../../data/constants/images";
