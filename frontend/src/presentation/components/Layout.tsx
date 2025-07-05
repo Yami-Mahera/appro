@@ -25,6 +25,7 @@ const navigation = [
   { name: "Articles", href: "/articles", icon: CubeIcon },
   { name: "Commandes", href: "/commandes", icon: DocumentTextIcon },
   { name: "Stocks Avancés", href: "/stocks-avances", icon: Squares2X2Icon },
+  { name: "Dashboards KPI", href: "/dashboards", icon: PresentationChartBarIcon },
   { name: "Reporting", href: "/reporting", icon: ChartBarIcon },
   { name: "Alertes", href: "/alertes", icon: ExclamationTriangleIcon },
   {
