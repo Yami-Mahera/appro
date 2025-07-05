@@ -69,19 +69,23 @@ const DashboardBuilder: React.FC<DashboardBuilderProps> = ({
   const fetchAvailableWidgets = async () => {
     try {
       const data = await apiService.getWidgetsDisponibles();
-      setAvailableWidgets(data);
+      // S'assurer que data est un tableau
+      if (Array.isArray(data)) {
+        setAvailableWidgets(data);
+      } else {
+        console.error('Les données des widgets ne sont pas un tableau:', data);
+        setAvailableWidgets([]);
+      }
     } catch (error) {
       console.error('Erreur lors du chargement des widgets:', error);
       // Fallback avec des widgets par défaut
       setAvailableWidgets([
-        { type: 'stats_card', name: 'Carte Statistique', category: 'Métriques' },
-        { type: 'bar_chart', name: 'Graphique Barres', category: 'Graphiques' },
-        { type: 'line_chart', name: 'Graphique Courbes', category: 'Graphiques' },
-        { type: 'pie_chart', name: 'Graphique Camembert', category: 'Graphiques' },
-        { type: 'data_table', name: 'Tableau de Données', category: 'Données' },
-        { type: 'kpi_metric', name: 'Métrique KPI', category: 'KPIs' },
-        { type: 'alert_list', name: 'Liste Alertes', category: 'Alertes' },
-        { type: 'trend_indicator', name: 'Indicateur Tendance', category: 'Tendances' }
+        { type: 'kpi_card', name: 'Carte KPI', category: 'Métriques' },
+        { type: 'chart_line', name: 'Graphique Courbes', category: 'Graphiques' },
+        { type: 'chart_bar', name: 'Graphique Barres', category: 'Graphiques' },
+        { type: 'chart_pie', name: 'Graphique Camembert', category: 'Graphiques' },
+        { type: 'table', name: 'Tableau de Données', category: 'Données' },
+        { type: 'gauge', name: 'Jauge', category: 'KPIs' }
       ]);
     }
   };
