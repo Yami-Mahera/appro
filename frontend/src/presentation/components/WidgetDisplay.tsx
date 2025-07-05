@@ -92,7 +92,7 @@ const WidgetDisplay: React.FC<WidgetDisplayProps> = ({ widget, refreshTrigger })
       case 'kpi_card':
         // Utiliser des valeurs cohérentes avec WidgetPreview
         const dataKey = widget.config.dataSource || widget.config.kpiType;
-        const fallbackStats: { [key: string]: number } = {
+        const fallbackStats: Record<string, number> = {
           total_fournisseurs: 45,
           total_articles: 234,
           total_commandes: 156,
@@ -100,7 +100,7 @@ const WidgetDisplay: React.FC<WidgetDisplayProps> = ({ widget, refreshTrigger })
           articles_stock_bas: 12,
           commandes_en_cours: 23
         };
-        return fallbackStats[dataKey as string] || 156;
+        return fallbackStats[dataKey] ?? 156;
       case 'bar_chart':
       case 'chart_bar':
       case 'line_chart':
