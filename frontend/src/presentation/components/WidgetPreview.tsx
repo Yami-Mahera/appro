@@ -4,7 +4,7 @@ import {
   ChartPieIcon, 
   TableCellsIcon, 
   ExclamationTriangleIcon,
-  TrendingUpIcon,
+  ArrowTrendingUpIcon,
   ClockIcon,
   CubeIcon,
   BuildingOfficeIcon,
