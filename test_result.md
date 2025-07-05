@@ -739,15 +739,18 @@ frontend:
 
   - task: "Navigation Dashboard KPI"
     implemented: true
-    working: "NA"
+    working: true
     file: "/app/frontend/src/App.tsx, /app/frontend/src/presentation/components/Layout.tsx"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
         comment: "Ajouté la route /dashboards et le lien de navigation 'Dashboards KPI' avec icône PresentationChartBarIcon"
+      - working: true
+        agent: "testing"
+        comment: "La navigation vers les Dashboards KPI fonctionne correctement. L'onglet 'Dashboards KPI' est accessible depuis le dashboard principal et permet d'accéder à la liste des tableaux de bord personnalisés."
 
 metadata:
   created_by: "main_agent"
