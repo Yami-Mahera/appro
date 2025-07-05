@@ -711,12 +711,12 @@ metadata:
 
 test_plan:
   current_focus:
-    - "Tableau de projection de la couverture de stock"
-    - "Tableau de simulation de commande"
-    - "Tableau de suivi des commandes en cours"
-    - "Page Gestion Stocks Avancée"
-    - "Extension API Service pour nouveaux endpoints"
-    - "Intégration navigation - route Stocks Avancés"
+    - "Interface Tableaux de Bord Personnalisés"
+    - "Constructeur de Dashboard"
+    - "Configuration des Widgets"
+    - "Aperçu et Affichage des Widgets"
+    - "Visualiseur de Dashboard"
+    - "Navigation Dashboard KPI"
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
