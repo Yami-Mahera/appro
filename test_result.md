@@ -694,15 +694,18 @@ frontend:
 
   - task: "Configuration des Widgets"
     implemented: true
-    working: "NA"
+    working: true
     file: "/app/frontend/src/presentation/components/WidgetConfigModal.tsx"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
         comment: "Créé le modal de configuration des widgets avec paramètres spécifiques par type (stats, graphiques, tableaux, KPIs, alertes, tendances)"
+      - working: true
+        agent: "testing"
+        comment: "Le modal de configuration des widgets fonctionne correctement. Les paramètres spécifiques à chaque type de widget sont bien présents et fonctionnels. La configuration permet de personnaliser l'apparence et les données des widgets, qui s'affichent ensuite correctement en mode visualisation."
 
   - task: "Aperçu et Affichage des Widgets"
     implemented: true
