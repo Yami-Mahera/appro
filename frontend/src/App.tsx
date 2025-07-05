@@ -80,6 +80,16 @@ function App() {
               }
             />
             <Route
+              path="/dashboards"
+              element={
+                <ProtectedRoute>
+                  <Layout currentPath="/dashboards">
+                    <DashboardsPersonnalises />
+                  </Layout>
+                </ProtectedRoute>
+              }
+            />
+            <Route
               path="/reporting"
               element={
                 <ProtectedRoute>
