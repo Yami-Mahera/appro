@@ -187,6 +187,7 @@ const Dashboard: React.FC = () => {
     return (
       <DashboardBuilder
         dashboard={selectedDashboard}
+        isEdit={editMode}
         onSave={handleSaveDashboard}
         onCancel={() => {
           setShowBuilder(false);
