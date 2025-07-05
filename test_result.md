@@ -215,6 +215,9 @@ backend:
       - working: true
         agent: "testing"
         comment: "Tests approfondis de l'API dashboard stats. L'API fonctionne correctement et retourne toutes les statistiques attendues. Cependant, la valeur 'commandes_en_cours' est toujours à 0 car il n'existe pas d'endpoint pour mettre à jour le statut d'une commande, et le statut par défaut est 'brouillon' (DRAFT). L'API compte correctement les commandes avec statut 'en_attente', 'approuvee' ou 'commandee' comme 'commandes_en_cours', mais aucune commande n'a ces statuts."
+      - working: true
+        agent: "testing"
+        comment: "Tests supplémentaires de l'API dashboard stats suite à la modification du composant WidgetPreview.tsx. L'API /api/dashboard/stats fonctionne correctement et retourne toutes les statistiques attendues. La valeur 'commandes_en_cours' est bien à 0 car il n'existe pas d'endpoint pour mettre à jour le statut d'une commande. Le composant WidgetPreview.tsx a été correctement modifié pour utiliser les vraies données de l'API comme WidgetDisplay.tsx, et les données de fallback ont été harmonisées (commandes_en_cours = 0)."
         
   - task: "APIs améliorées avec tri et recherche"
     implemented: true
