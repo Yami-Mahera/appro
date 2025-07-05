@@ -37,3 +37,4 @@ pyparsing
 kiwisolver
 narwhals
 fontTools
+openpyxl
