@@ -264,9 +264,11 @@ const WidgetPreview: React.FC<WidgetPreviewProps> = ({ widget }) => {
   const renderWidget = () => {
     switch (widget.type) {
       case 'kpi_card':
-        const kpiValue = widget.config.displayFormat === 'percentage' ? '94.5%' : 
-                         widget.config.displayFormat === 'currency' ? '€1,234' :
-                         widget.config.displayFormat === 'days' ? '7 jours' : '156';
+        // Utiliser les vraies données de l'API ou fallback
+        const displayValue = widget.config.displayFormat === 'percentage' ? `${data || 0}%` : 
+                            widget.config.displayFormat === 'currency' ? `€${(data || 0).toLocaleString('fr-FR')}` :
+                            widget.config.displayFormat === 'days' ? `${data || 0} jours` : 
+                            (data || 0).toLocaleString('fr-FR');
         const target = widget.config.target;
         const IconComponent = getIcon(widget.config.kpiType || 'default');
         return (
@@ -278,7 +280,7 @@ const WidgetPreview: React.FC<WidgetPreviewProps> = ({ widget }) => {
               <div className="flex-1">
                 <p className="text-sm font-medium text-gray-500">{widget.title}</p>
                 <div className="flex items-baseline">
-                  <p className="text-2xl font-bold text-gray-900">{kpiValue}</p>
+                  <p className="text-2xl font-bold text-gray-900">{displayValue}</p>
                   {target && (
                     <span className="ml-2 text-xs text-gray-400">
                       / {target}{widget.config.displayFormat === 'percentage' ? '%' : ''}
@@ -292,6 +294,7 @@ const WidgetPreview: React.FC<WidgetPreviewProps> = ({ widget }) => {
         );
 
       case 'chart_line':
+        const lineData = data && Array.isArray(data) ? data : mockData.chartData;
         const lineColor = widget.config.chartColor === 'gradient' ? '#8B5CF6' :
                          widget.config.chartColor === 'green' ? '#10B981' :
                          widget.config.chartColor === 'red' ? '#EF4444' :
@@ -302,12 +305,13 @@ const WidgetPreview: React.FC<WidgetPreviewProps> = ({ widget }) => {
           <div className="h-full">
             <div className="flex justify-between items-center mb-2">
               <h4 className="text-sm font-medium text-gray-900">{widget.title}</h4>
-              <span className="text-xs text-gray-500">{widget.config.periode || '3 mois'}</span>
+              <span className="text-xs text-gray-500">{widget.config.periode || '6 mois'}</span>
             </div>
             <ResponsiveContainer width="100%" height="80%">
-              <LineChart data={mockData.chartData}>
+              <LineChart data={lineData}>
                 <XAxis dataKey="name" />
                 <YAxis />
+                <Tooltip />
                 <Line 
                   type="monotone" 
                   dataKey="value" 
@@ -322,6 +326,7 @@ const WidgetPreview: React.FC<WidgetPreviewProps> = ({ widget }) => {
         );
 
       case 'chart_bar':
+        const barData = data && Array.isArray(data) ? data : mockData.chartData;
         const barColor = widget.config.colorScheme === 'green' ? '#10B981' :
                         widget.config.colorScheme === 'multicolor' ? '#8B5CF6' :
                         widget.config.colorScheme === 'gradient' ? '#F59E0B' : '#3B82F6';
@@ -335,10 +340,11 @@ const WidgetPreview: React.FC<WidgetPreviewProps> = ({ widget }) => {
             </div>
             <ResponsiveContainer width="100%" height="80%">
               <BarChart 
-                data={mockData.chartData.slice(0, widget.config.maxItems || 10)}
+                data={barData.slice(0, widget.config.maxItems || 10)}
               >
                 <XAxis dataKey="name" />
                 <YAxis />
+                <Tooltip />
                 <Bar dataKey="value" fill={barColor} radius={2} />
               </BarChart>
             </ResponsiveContainer>
@@ -346,6 +352,7 @@ const WidgetPreview: React.FC<WidgetPreviewProps> = ({ widget }) => {
         );
 
       case 'chart_pie':
+        const pieData = data && Array.isArray(data) ? data : mockData.pieData;
         const isDonut = widget.config.displayType === 'doughnut';
         const showPercentage = widget.config.showPercentage !== 'false';
         const legendPos = widget.config.legendPosition || 'right';
@@ -356,7 +363,7 @@ const WidgetPreview: React.FC<WidgetPreviewProps> = ({ widget }) => {
               <ResponsiveContainer width="70%" height="90%">
                 <PieChart>
                   <Pie
-                    data={mockData.pieData}
+                    data={pieData}
                     cx="50%"
                     cy="50%"
                     innerRadius={isDonut ? 30 : 0}
@@ -365,15 +372,16 @@ const WidgetPreview: React.FC<WidgetPreviewProps> = ({ widget }) => {
                     label={showPercentage ? ({ value }: { value?: number }) => 
                       value ? `${value.toFixed(1)}%` : '' : false}
                   >
-                    {mockData.pieData.map((entry, index) => (
+                    {pieData.map((entry, index) => (
                       <Cell key={`cell-${index}`} fill={entry.color} />
                     ))}
                   </Pie>
+                  <Tooltip />
                 </PieChart>
               </ResponsiveContainer>
               {legendPos !== 'none' && (
                 <div className="flex flex-col justify-center space-y-1 text-xs">
-                  {mockData.pieData.map((entry, index) => (
+                  {pieData.map((entry, index) => (
                     <div key={index} className="flex items-center">
                       <div 
                         className="w-3 h-3 rounded-sm mr-2" 
@@ -389,14 +397,8 @@ const WidgetPreview: React.FC<WidgetPreviewProps> = ({ widget }) => {
         );
 
       case 'table':
+        const tableData = data && Array.isArray(data) && data.length > 0 ? data : getFallbackTableData();
         const rowCount = widget.config.rowCount || 10;
-        const sampleData = [
-          { nom: 'Article A', valeur: '150', statut: 'En stock' },
-          { nom: 'Article B', valeur: '89', statut: 'Stock bas' },
-          { nom: 'Article C', valeur: '67', statut: 'En stock' },
-          { nom: 'Article D', valeur: '234', statut: 'En stock' },
-          { nom: 'Article E', valeur: '12', statut: 'Rupture' }
-        ];
         return (
           <div className="h-full">
             <div className="flex justify-between items-center mb-2">
@@ -413,17 +415,21 @@ const WidgetPreview: React.FC<WidgetPreviewProps> = ({ widget }) => {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-200">
-                  {sampleData.slice(0, Math.min(rowCount, 5)).map((item, index) => (
+                  {tableData.slice(0, Math.min(rowCount, 5)).map((item: any, index: number) => (
                     <tr key={index}>
-                      <td className="px-2 py-1 text-xs">{item.nom}</td>
-                      <td className="px-2 py-1 text-xs">{item.valeur}</td>
+                      <td className="px-2 py-1 text-xs text-gray-900 truncate">
+                        {item.nom || item.reference || item.numero_commande || `Item ${index + 1}`}
+                      </td>
+                      <td className="px-2 py-1 text-xs text-gray-900">
+                        {item.valeur || item.stock_actuel || item.quantite || 'N/A'}
+                      </td>
                       <td className="px-2 py-1 text-xs">
                         <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                          item.statut === 'En stock' ? 'bg-green-100 text-green-800' :
-                          item.statut === 'Stock bas' ? 'bg-yellow-100 text-yellow-800' :
+                          (item.statut || item.status) === 'En stock' || (item.statut || item.status) === 'en_cours' ? 'bg-green-100 text-green-800' :
+                          (item.statut || item.status) === 'Stock bas' || (item.statut || item.status) === 'en_attente' ? 'bg-yellow-100 text-yellow-800' :
                           'bg-red-100 text-red-800'
                         }`}>
-                          {item.statut}
+                          {item.statut || item.status || 'N/A'}
                         </span>
                       </td>
                     </tr>
@@ -435,7 +441,8 @@ const WidgetPreview: React.FC<WidgetPreviewProps> = ({ widget }) => {
         );
 
       case 'gauge':
-        const currentValue = 78;
+        const gaugeData = data || { value: 78 };
+        const currentValue = gaugeData.value || 78;
         const minVal = widget.config.minValue || 0;
         const maxVal = widget.config.maxValue || 100;
         const warningThreshold = widget.config.warningThreshold || 70;
