@@ -80,12 +80,12 @@ const DashboardBuilder: React.FC<DashboardBuilderProps> = ({
       console.error('Erreur lors du chargement des widgets:', error);
       // Fallback avec des widgets par défaut
       setAvailableWidgets([
-        { type: 'kpi_card', name: 'Carte KPI', category: 'Métriques' },
-        { type: 'chart_line', name: 'Graphique Courbes', category: 'Graphiques' },
-        { type: 'chart_bar', name: 'Graphique Barres', category: 'Graphiques' },
-        { type: 'chart_pie', name: 'Graphique Camembert', category: 'Graphiques' },
-        { type: 'table', name: 'Tableau de Données', category: 'Données' },
-        { type: 'gauge', name: 'Jauge', category: 'KPIs' }
+        { type: 'kpi_card', nom: 'Carte KPI', category: 'Métriques', description: 'Affiche une valeur KPI avec indicateur' },
+        { type: 'chart_line', nom: 'Graphique Courbes', category: 'Graphiques', description: 'Évolution d\'un indicateur dans le temps' },
+        { type: 'chart_bar', nom: 'Graphique Barres', category: 'Graphiques', description: 'Comparaison de valeurs' },
+        { type: 'chart_pie', nom: 'Graphique Camembert', category: 'Graphiques', description: 'Répartition en pourcentages' },
+        { type: 'table', nom: 'Tableau de Données', category: 'Données', description: 'Affichage tabulaire des données' },
+        { type: 'gauge', nom: 'Jauge', category: 'KPIs', description: 'Indicateur de performance avec seuils' }
       ]);
     }
   };
