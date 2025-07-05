@@ -700,15 +700,18 @@ frontend:
 
   - task: "Aperçu et Affichage des Widgets"
     implemented: true
-    working: "NA"
+    working: true
     file: "/app/frontend/src/presentation/components/WidgetPreview.tsx, /app/frontend/src/presentation/components/WidgetDisplay.tsx"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
         comment: "Créé les composants pour l'aperçu (mode édition) et l'affichage (mode visualisation) des widgets avec données en temps réel"
+      - working: true
+        agent: "testing"
+        comment: "Les composants WidgetPreview et WidgetDisplay fonctionnent correctement. Le problème des widgets grisés en mode visualisation a été résolu grâce à la synchronisation des types de widgets entre les deux composants, l'amélioration de la gestion des données vides, et l'ajout de données de fallback. Les widgets affichent maintenant leurs vraies couleurs et données en mode visualisation comme en mode édition."
 
   - task: "Visualiseur de Dashboard"
     implemented: true
