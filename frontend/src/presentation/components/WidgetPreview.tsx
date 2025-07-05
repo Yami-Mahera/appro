@@ -202,7 +202,7 @@ const WidgetPreview: React.FC<WidgetPreviewProps> = ({ widget }) => {
           <div className="h-full flex flex-col justify-center items-center text-center">
             <h4 className="text-sm font-medium text-gray-500 mb-2">{widget.title}</h4>
             <div className="flex items-center">
-              <TrendingUpIcon className="h-8 w-8 text-green-500 mr-2" />
+              <ArrowTrendingUpIcon className="h-8 w-8 text-green-500 mr-2" />
               <div>
                 <div className="text-xl font-bold text-gray-900">+15.3%</div>
                 <div className="text-xs text-gray-500">vs {widget.config.compareWith || 'mois précédent'}</div>
