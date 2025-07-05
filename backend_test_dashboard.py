@@ -47,6 +47,25 @@ def make_request(method, endpoint, data=None, token=None, expected_status=200):
 
 def login():
     print_header("Authenticating")
+    
+    # Try to register first
+    register_data = {
+        "email": ADMIN_USER["email"],
+        "password": ADMIN_USER["password"],
+        "nom": "Admin",
+        "prenom": "Test",
+        "role": "administrateur"
+    }
+    
+    print("Attempting to register user...")
+    register_success, register_message, register_data = make_request("post", "/auth/register", register_data, expected_status=200)
+    
+    if register_success:
+        print(f"✅ Successfully registered user: {ADMIN_USER['email']}")
+    else:
+        print(f"ℹ️ Registration failed (user may already exist): {register_message}")
+    
+    # Now try to login
     login_data = {
         "email": ADMIN_USER["email"],
         "password": ADMIN_USER["password"]
