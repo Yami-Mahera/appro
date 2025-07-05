@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   ChartBarIcon, 
   ChartPieIcon, 
@@ -8,9 +8,11 @@ import {
   ClockIcon,
   CubeIcon,
   BuildingOfficeIcon,
-  DocumentTextIcon
+  DocumentTextIcon,
+  ArrowTrendingDownIcon
 } from '@heroicons/react/24/outline';
-import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell } from 'recharts';
+import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell, Tooltip } from 'recharts';
+import apiService from '../../services/api';
 
 interface Widget {
   id: string;
