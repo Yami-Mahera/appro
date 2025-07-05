@@ -762,13 +762,7 @@ metadata:
   run_ui: false
 
 test_plan:
-  current_focus:
-    - "Interface Tableaux de Bord Personnalisés"
-    - "Constructeur de Dashboard"
-    - "Configuration des Widgets"
-    - "Aperçu et Affichage des Widgets"
-    - "Visualiseur de Dashboard"
-    - "Navigation Dashboard KPI"
+  current_focus: []
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
