@@ -378,25 +378,48 @@ const WidgetDisplay: React.FC<WidgetDisplayProps> = ({ widget, refreshTrigger })
 
       case 'data_table':
       case 'table':
+      case 'data_table':
+      case 'table':
+        const tableData = data && Array.isArray(data) && data.length > 0 ? data : [
+          { nom: 'Article A', valeur: '150', statut: 'En stock' },
+          { nom: 'Article B', valeur: '89', statut: 'Stock bas' },
+          { nom: 'Article C', valeur: '67', statut: 'En stock' },
+          { nom: 'Article D', valeur: '234', statut: 'En stock' },
+          { nom: 'Article E', valeur: '12', statut: 'Rupture' }
+        ];
+        const rowCount = widget.config.rowCount || 10;
         return (
           <div className="h-full">
-            <h4 className="text-sm font-medium text-gray-900 mb-4">{widget.title}</h4>
+            <div className="flex justify-between items-center mb-2">
+              <h4 className="text-sm font-medium text-gray-900">{widget.title}</h4>
+              <span className="text-xs text-gray-500">{rowCount} lignes</span>
+            </div>
             <div className="overflow-auto h-5/6">
               <table className="min-w-full divide-y divide-gray-200">
                 <thead className="bg-gray-50">
                   <tr>
-                    <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">Nom</th>
-                    <th className="px-3 py-2 text-left text-xs font-medium text-gray-500 uppercase">Statut</th>
+                    <th className="px-2 py-1 text-left text-xs font-medium text-gray-500 uppercase">Nom</th>
+                    <th className="px-2 py-1 text-left text-xs font-medium text-gray-500 uppercase">Qté</th>
+                    <th className="px-2 py-1 text-left text-xs font-medium text-gray-500 uppercase">Statut</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-200">
-                  {data?.slice(0, widget.config.rowCount || 10).map((item: any, index: number) => (
+                  {tableData.slice(0, Math.min(rowCount, 10)).map((item: any, index: number) => (
                     <tr key={index}>
-                      <td className="px-3 py-2 text-sm text-gray-900 truncate">
+                      <td className="px-2 py-1 text-xs text-gray-900 truncate">
                         {item.nom || item.reference || item.numero_commande || `Item ${index + 1}`}
                       </td>
-                      <td className="px-3 py-2 text-sm text-gray-500">
-                        {item.status || item.stock_actuel || 'N/A'}
+                      <td className="px-2 py-1 text-xs text-gray-900">
+                        {item.valeur || item.stock_actuel || item.quantite || 'N/A'}
+                      </td>
+                      <td className="px-2 py-1 text-xs">
+                        <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+                          (item.statut || item.status) === 'En stock' || (item.statut || item.status) === 'en_cours' ? 'bg-green-100 text-green-800' :
+                          (item.statut || item.status) === 'Stock bas' || (item.statut || item.status) === 'en_attente' ? 'bg-yellow-100 text-yellow-800' :
+                          'bg-red-100 text-red-800'
+                        }`}>
+                          {item.statut || item.status || 'N/A'}
+                        </span>
                       </td>
                     </tr>
                   ))}
@@ -407,6 +430,7 @@ const WidgetDisplay: React.FC<WidgetDisplayProps> = ({ widget, refreshTrigger })
         );
 
       case 'kpi_metric':
+      case 'gauge':
         return (
           <div className="h-full flex flex-col justify-center items-center text-center">
             <h4 className="text-sm font-medium text-gray-500 mb-4">{widget.title}</h4>
