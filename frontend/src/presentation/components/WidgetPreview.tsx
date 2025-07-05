@@ -81,131 +81,237 @@ const WidgetPreview: React.FC<WidgetPreviewProps> = ({ widget }) => {
 
   const renderWidget = () => {
     switch (widget.type) {
-      case 'stats_card':
-        const statValue = mockData.stats[widget.config.dataSource as keyof typeof mockData.stats] || 0;
-        const IconComponent = getIcon(widget.config.dataSource);
+      case 'kpi_card':
+        const kpiValue = widget.config.displayFormat === 'percentage' ? '94.5%' : 
+                         widget.config.displayFormat === 'currency' ? '€1,234' :
+                         widget.config.displayFormat === 'days' ? '7 jours' : '156';
+        const target = widget.config.target;
+        const IconComponent = getIcon(widget.config.kpiType || 'default');
         return (
           <div className="h-full flex items-center">
             <div className="flex items-center w-full">
               <div className={`${getColorClass(widget.config.color)} rounded-md p-3 mr-4`}>
                 <IconComponent className="h-6 w-6 text-white" />
               </div>
-              <div>
+              <div className="flex-1">
                 <p className="text-sm font-medium text-gray-500">{widget.title}</p>
-                <p className="text-2xl font-bold text-gray-900">{statValue}</p>
+                <div className="flex items-baseline">
+                  <p className="text-2xl font-bold text-gray-900">{kpiValue}</p>
+                  {target && (
+                    <span className="ml-2 text-xs text-gray-400">
+                      / {target}{widget.config.displayFormat === 'percentage' ? '%' : ''}
+                    </span>
+                  )}
+                </div>
+                <div className="text-xs text-green-500 mt-1">↑ +2.3% vs précédent</div>
               </div>
             </div>
           </div>
         );
 
-      case 'bar_chart':
+      case 'chart_line':
+        const lineColor = widget.config.chartColor === 'gradient' ? '#8B5CF6' :
+                         widget.config.chartColor === 'green' ? '#10B981' :
+                         widget.config.chartColor === 'red' ? '#EF4444' :
+                         widget.config.chartColor === 'orange' ? '#F59E0B' : '#3B82F6';
+        const strokeDasharray = widget.config.lineStyle === 'dashed' ? '5 5' :
+                               widget.config.lineStyle === 'dotted' ? '2 2' : '0';
         return (
           <div className="h-full">
-            <h4 className="text-sm font-medium text-gray-900 mb-2">{widget.title}</h4>
-            <ResponsiveContainer width="100%" height="80%">
-              <BarChart data={mockData.chartData}>
-                <XAxis dataKey="name" />
-                <YAxis />
-                <Bar dataKey="value" fill="#3B82F6" />
-              </BarChart>
-            </ResponsiveContainer>
-          </div>
-        );
-
-      case 'line_chart':
-        return (
-          <div className="h-full">
-            <h4 className="text-sm font-medium text-gray-900 mb-2">{widget.title}</h4>
+            <div className="flex justify-between items-center mb-2">
+              <h4 className="text-sm font-medium text-gray-900">{widget.title}</h4>
+              <span className="text-xs text-gray-500">{widget.config.periode || '3 mois'}</span>
+            </div>
             <ResponsiveContainer width="100%" height="80%">
               <LineChart data={mockData.chartData}>
                 <XAxis dataKey="name" />
                 <YAxis />
-                <Line type="monotone" dataKey="value" stroke="#3B82F6" strokeWidth={2} />
+                <Line 
+                  type="monotone" 
+                  dataKey="value" 
+                  stroke={lineColor} 
+                  strokeWidth={2}
+                  strokeDasharray={strokeDasharray}
+                  dot={{ fill: lineColor, strokeWidth: 2, r: 3 }}
+                />
               </LineChart>
             </ResponsiveContainer>
           </div>
         );
 
-      case 'pie_chart':
+      case 'chart_bar':
+        const barColor = widget.config.colorScheme === 'green' ? '#10B981' :
+                        widget.config.colorScheme === 'multicolor' ? '#8B5CF6' :
+                        widget.config.colorScheme === 'gradient' ? '#F59E0B' : '#3B82F6';
+        const isHorizontal = widget.config.orientation === 'horizontal';
         return (
           <div className="h-full">
-            <h4 className="text-sm font-medium text-gray-900 mb-2">{widget.title}</h4>
+            <div className="flex justify-between items-center mb-2">
+              <h4 className="text-sm font-medium text-gray-900">{widget.title}</h4>
+              <span className="text-xs text-gray-500">Top {widget.config.maxItems || 10}</span>
+            </div>
             <ResponsiveContainer width="100%" height="80%">
-              <PieChart>
-                <Pie
-                  data={mockData.pieData}
-                  cx="50%"
-                  cy="50%"
-                  outerRadius={60}
-                  dataKey="value"
-                >
-                  {mockData.pieData.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={entry.color} />
-                  ))}
-                </Pie>
-              </PieChart>
+              <BarChart 
+                data={mockData.chartData.slice(0, widget.config.maxItems || 10)} 
+                layout={isHorizontal ? 'verseBar' : 'normal'}
+              >
+                <XAxis dataKey="name" />
+                <YAxis />
+                <Bar dataKey="value" fill={barColor} radius={2} />
+              </BarChart>
             </ResponsiveContainer>
           </div>
         );
 
-      case 'data_table':
+      case 'chart_pie':
+        const isDonut = widget.config.displayType === 'doughnut';
+        const showPercentage = widget.config.showPercentage !== 'false';
+        const legendPos = widget.config.legendPosition || 'right';
         return (
           <div className="h-full">
             <h4 className="text-sm font-medium text-gray-900 mb-2">{widget.title}</h4>
+            <div className="flex h-full">
+              <ResponsiveContainer width="70%" height="90%">
+                <PieChart>
+                  <Pie
+                    data={mockData.pieData}
+                    cx="50%"
+                    cy="50%"
+                    innerRadius={isDonut ? 30 : 0}
+                    outerRadius={60}
+                    dataKey="value"
+                    label={showPercentage ? ({ value, total }) => 
+                      `${((value / total) * 100).toFixed(1)}%` : false}
+                  >
+                    {mockData.pieData.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={entry.color} />
+                    ))}
+                  </Pie>
+                </PieChart>
+              </ResponsiveContainer>
+              {legendPos !== 'none' && (
+                <div className="flex flex-col justify-center space-y-1 text-xs">
+                  {mockData.pieData.map((entry, index) => (
+                    <div key={index} className="flex items-center">
+                      <div 
+                        className="w-3 h-3 rounded-sm mr-2" 
+                        style={{ backgroundColor: entry.color }}
+                      ></div>
+                      <span className="truncate">{entry.name}</span>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          </div>
+        );
+
+      case 'table':
+        const rowCount = widget.config.rowCount || 10;
+        const sampleData = [
+          { nom: 'Article A', valeur: '150', statut: 'En stock' },
+          { nom: 'Article B', valeur: '89', statut: 'Stock bas' },
+          { nom: 'Article C', valeur: '67', statut: 'En stock' },
+          { nom: 'Article D', valeur: '234', statut: 'En stock' },
+          { nom: 'Article E', valeur: '12', statut: 'Rupture' }
+        ];
+        return (
+          <div className="h-full">
+            <div className="flex justify-between items-center mb-2">
+              <h4 className="text-sm font-medium text-gray-900">{widget.title}</h4>
+              <span className="text-xs text-gray-500">{rowCount} lignes</span>
+            </div>
             <div className="overflow-hidden">
               <table className="min-w-full divide-y divide-gray-200">
                 <thead className="bg-gray-50">
                   <tr>
                     <th className="px-2 py-1 text-left text-xs font-medium text-gray-500 uppercase">Nom</th>
-                    <th className="px-2 py-1 text-left text-xs font-medium text-gray-500 uppercase">Valeur</th>
+                    <th className="px-2 py-1 text-left text-xs font-medium text-gray-500 uppercase">Qté</th>
+                    <th className="px-2 py-1 text-left text-xs font-medium text-gray-500 uppercase">Statut</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-200">
-                  <tr><td className="px-2 py-1 text-xs">Article A</td><td className="px-2 py-1 text-xs">150</td></tr>
-                  <tr><td className="px-2 py-1 text-xs">Article B</td><td className="px-2 py-1 text-xs">89</td></tr>
-                  <tr><td className="px-2 py-1 text-xs">Article C</td><td className="px-2 py-1 text-xs">67</td></tr>
+                  {sampleData.slice(0, Math.min(rowCount, 5)).map((item, index) => (
+                    <tr key={index}>
+                      <td className="px-2 py-1 text-xs">{item.nom}</td>
+                      <td className="px-2 py-1 text-xs">{item.valeur}</td>
+                      <td className="px-2 py-1 text-xs">
+                        <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
+                          item.statut === 'En stock' ? 'bg-green-100 text-green-800' :
+                          item.statut === 'Stock bas' ? 'bg-yellow-100 text-yellow-800' :
+                          'bg-red-100 text-red-800'
+                        }`}>
+                          {item.statut}
+                        </span>
+                      </td>
+                    </tr>
+                  ))}
                 </tbody>
               </table>
             </div>
           </div>
         );
 
-      case 'kpi_metric':
-        return (
-          <div className="h-full flex flex-col justify-center items-center text-center">
-            <h4 className="text-sm font-medium text-gray-500 mb-2">{widget.title}</h4>
-            <div className="text-3xl font-bold text-blue-600">94.5%</div>
-            <div className="text-xs text-green-500 mt-1">↑ +2.3% vs mois dernier</div>
-          </div>
-        );
+      case 'gauge':
+        const currentValue = 78;
+        const minVal = widget.config.minValue || 0;
+        const maxVal = widget.config.maxValue || 100;
+        const warningThreshold = widget.config.warningThreshold || 70;
+        const criticalThreshold = widget.config.criticalThreshold || 90;
+        
+        const getGaugeColor = () => {
+          if (currentValue >= criticalThreshold) return 'text-red-500';
+          if (currentValue >= warningThreshold) return 'text-yellow-500';
+          return 'text-green-500';
+        };
 
-      case 'alert_list':
+        const percentage = ((currentValue - minVal) / (maxVal - minVal)) * 100;
+        
         return (
-          <div className="h-full">
-            <h4 className="text-sm font-medium text-gray-900 mb-2">{widget.title}</h4>
-            <div className="space-y-2">
-              {mockData.alerts.slice(0, widget.config.maxAlerts || 5).map((alert) => (
-                <div key={alert.id} className="flex items-center text-xs">
-                  <div className={`w-2 h-2 rounded-full mr-2 ${
-                    alert.priority === 'high' ? 'bg-red-500' :
-                    alert.priority === 'medium' ? 'bg-yellow-500' : 'bg-green-500'
-                  }`}></div>
-                  <span className="truncate">{alert.message}</span>
-                </div>
-              ))}
+          <div className="h-full flex flex-col justify-center items-center">
+            <h4 className="text-sm font-medium text-gray-900 mb-4">{widget.title}</h4>
+            <div className="relative">
+              <svg width="120" height="80" viewBox="0 0 120 80">
+                {/* Background arc */}
+                <path
+                  d="M 20 60 A 40 40 0 0 1 100 60"
+                  fill="none"
+                  stroke="#E5E7EB"
+                  strokeWidth="8"
+                  strokeLinecap="round"
+                />
+                {/* Progress arc */}
+                <path
+                  d="M 20 60 A 40 40 0 0 1 100 60"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="8"
+                  strokeLinecap="round"
+                  strokeDasharray={`${percentage * 1.26} 126`}
+                  className={getGaugeColor()}
+                />
+              </svg>
+              <div className="absolute inset-0 flex flex-col items-center justify-center mt-4">
+                <span className={`text-xl font-bold ${getGaugeColor()}`}>
+                  {currentValue}
+                </span>
+                <span className="text-xs text-gray-500">
+                  {minVal} - {maxVal}
+                </span>
+              </div>
             </div>
-          </div>
-        );
-
-      case 'trend_indicator':
-        return (
-          <div className="h-full flex flex-col justify-center items-center text-center">
-            <h4 className="text-sm font-medium text-gray-500 mb-2">{widget.title}</h4>
-            <div className="flex items-center">
-              <ArrowTrendingUpIcon className="h-8 w-8 text-green-500 mr-2" />
-              <div>
-                <div className="text-xl font-bold text-gray-900">+15.3%</div>
-                <div className="text-xs text-gray-500">vs {widget.config.compareWith || 'mois précédent'}</div>
+            <div className="flex space-x-4 mt-2 text-xs">
+              <div className="flex items-center">
+                <div className="w-2 h-2 bg-green-500 rounded-full mr-1"></div>
+                <span>&lt;{warningThreshold}</span>
+              </div>
+              <div className="flex items-center">
+                <div className="w-2 h-2 bg-yellow-500 rounded-full mr-1"></div>
+                <span>{warningThreshold}-{criticalThreshold}</span>
+              </div>
+              <div className="flex items-center">
+                <div className="w-2 h-2 bg-red-500 rounded-full mr-1"></div>
+                <span>&gt;{criticalThreshold}</span>
               </div>
             </div>
           </div>
@@ -218,6 +324,7 @@ const WidgetPreview: React.FC<WidgetPreviewProps> = ({ widget }) => {
               <ChartBarIcon className="h-8 w-8 text-gray-400 mx-auto mb-2" />
               <h4 className="text-sm font-medium text-gray-900">{widget.title}</h4>
               <p className="text-xs text-gray-500 mt-1">Type: {widget.type}</p>
+              <p className="text-xs text-blue-500 mt-1">Configuration disponible</p>
             </div>
           </div>
         );
