@@ -253,17 +253,9 @@ def create_test_data(token):
                 print(f"✅ Successfully created commande: {commande['numero_commande']} (ID: {commande['id']})")
                 commande_id = commande["id"]
                 
-                # Update the commande status to 'en_attente'
-                update_data = commande.copy()  # Copy all fields from the original commande
-                update_data["status"] = "en_attente"  # Update the status
-                
-                print("Updating commande status to 'en_attente'...")
-                success, message, updated_commande = make_request("put", f"/commandes/{commande_id}", update_data, token=token, expected_status=200)
-                
-                if success and updated_commande and updated_commande.get("status") == "en_attente":
-                    print(f"✅ Successfully updated commande status to 'en_attente'")
-                else:
-                    print(f"❌ Failed to update commande status: {message}")
+                # Note: There's no endpoint to update a commande in the API
+                print("⚠️ Cannot update commande status: No endpoint available to update commandes")
+                print("This explains why commandes_en_cours is always 0 - all commandes remain in 'brouillon' status")
             else:
                 print(f"❌ Failed to create commande: {message}")
         else:
