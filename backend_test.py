@@ -1190,6 +1190,108 @@ def create_test_data(admin_token):
     
     print("Test data creation completed")
 
+def test_specific_endpoints():
+    print_header("TESTING SPECIFIC ENDPOINTS REPORTED WITH ISSUES")
+    
+    # First, authenticate to get a token
+    print("Authenticating to get access token...")
+    admin_token = test_auth_login(ADMIN_USER)
+    
+    if not admin_token:
+        print("❌ Authentication failed. Cannot proceed with endpoint tests.")
+        print("Trying to register a new admin user...")
+        
+        # Try to register a new admin user
+        admin_registered = test_auth_register(ADMIN_USER)
+        if admin_registered:
+            admin_token = test_auth_login(ADMIN_USER)
+        else:
+            print("❌ Failed to register admin user. Cannot proceed with endpoint tests.")
+            return False
+    
+    print("✅ Authentication successful. Proceeding with endpoint tests.")
+    
+    # Test 1: /api/fournisseurs endpoint
+    print("\n--- Testing /api/fournisseurs endpoint ---")
+    success, message, data = make_request("get", "/fournisseurs", token=admin_token, expected_status=200)
+    
+    if success and isinstance(data, list):
+        print(f"✅ Successfully retrieved {len(data)} suppliers from /api/fournisseurs")
+        print(f"   Response contains {len(data)} suppliers")
+        if len(data) > 0:
+            print(f"   First supplier: {data[0]['nom']} (ID: {data[0]['id']})")
+        test_results["fournisseurs"]["list"]["success"] = True
+        test_results["fournisseurs"]["list"]["message"] = f"Successfully retrieved {len(data)} suppliers"
+    else:
+        print(f"❌ Failed to retrieve suppliers from /api/fournisseurs")
+        print(f"   Error: {message}")
+        test_results["fournisseurs"]["list"]["success"] = False
+        test_results["fournisseurs"]["list"]["message"] = message
+    
+    # Test 2: /api/articles endpoint
+    print("\n--- Testing /api/articles endpoint ---")
+    success, message, data = make_request("get", "/articles", token=admin_token, expected_status=200)
+    
+    if success and isinstance(data, list):
+        print(f"✅ Successfully retrieved {len(data)} articles from /api/articles")
+        print(f"   Response contains {len(data)} articles")
+        if len(data) > 0:
+            print(f"   First article: {data[0]['nom']} (ID: {data[0]['id']})")
+        test_results["articles"]["list"]["success"] = True
+        test_results["articles"]["list"]["message"] = f"Successfully retrieved {len(data)} articles"
+    else:
+        print(f"❌ Failed to retrieve articles from /api/articles")
+        print(f"   Error: {message}")
+        test_results["articles"]["list"]["success"] = False
+        test_results["articles"]["list"]["message"] = message
+    
+    # Create test data if no suppliers or articles were found
+    if (not test_results["fournisseurs"]["list"]["success"] or 
+        (test_results["fournisseurs"]["list"]["success"] and len(data) == 0)):
+        print("\n--- No suppliers found. Creating test data... ---")
+        fournisseur_id = test_create_fournisseur(admin_token)
+        if fournisseur_id:
+            print(f"✅ Created test supplier with ID: {fournisseur_id}")
+            # Test the endpoint again
+            success, message, data = make_request("get", "/fournisseurs", token=admin_token, expected_status=200)
+            if success and isinstance(data, list) and len(data) > 0:
+                print(f"✅ Successfully retrieved {len(data)} suppliers after creating test data")
+                test_results["fournisseurs"]["list"]["success"] = True
+                test_results["fournisseurs"]["list"]["message"] = f"Successfully retrieved {len(data)} suppliers after creating test data"
+    
+    if (not test_results["articles"]["list"]["success"] or 
+        (test_results["articles"]["list"]["success"] and len(data) == 0)):
+        print("\n--- No articles found. Creating test data... ---")
+        # First ensure we have a supplier
+        if not created_ids["fournisseur"]:
+            fournisseur_id = test_create_fournisseur(admin_token)
+            if not fournisseur_id:
+                print("❌ Failed to create test supplier. Cannot create test article.")
+                return False
+        else:
+            fournisseur_id = created_ids["fournisseur"]
+        
+        # Create a test article
+        article_id = test_create_article(admin_token, fournisseur_id)
+        if article_id:
+            print(f"✅ Created test article with ID: {article_id}")
+            # Test the endpoint again
+            success, message, data = make_request("get", "/articles", token=admin_token, expected_status=200)
+            if success and isinstance(data, list) and len(data) > 0:
+                print(f"✅ Successfully retrieved {len(data)} articles after creating test data")
+                test_results["articles"]["list"]["success"] = True
+                test_results["articles"]["list"]["message"] = f"Successfully retrieved {len(data)} articles after creating test data"
+    
+    # Summary
+    print("\n--- ENDPOINT TESTS SUMMARY ---")
+    fournisseurs_status = "✅ PASSED" if test_results["fournisseurs"]["list"]["success"] else "❌ FAILED"
+    articles_status = "✅ PASSED" if test_results["articles"]["list"]["success"] else "❌ FAILED"
+    
+    print(f"Fournisseurs endpoint: {fournisseurs_status}")
+    print(f"Articles endpoint: {articles_status}")
+    
+    return test_results["fournisseurs"]["list"]["success"] and test_results["articles"]["list"]["success"]
+
 if __name__ == "__main__":
-    # Run specific alert system tests
-    test_alertes_system()
+    # Test specific endpoints reported with issues
+    test_specific_endpoints()
