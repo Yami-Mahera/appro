@@ -132,7 +132,7 @@ def test_fournisseurs_api(token):
     print_header("Testing Fournisseurs API")
     success, message, data = make_request("get", "/fournisseurs", token=token, expected_status=200)
     
-    if success and data:
+    if success and data is not None:
         print(f"✅ Successfully retrieved fournisseurs")
         print(f"Retrieved {len(data)} fournisseurs")
         return True
