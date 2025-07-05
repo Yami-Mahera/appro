@@ -1298,6 +1298,98 @@ def test_specific_endpoints():
     
     return test_results["fournisseurs"]["list"]["success"] and test_results["articles"]["list"]["success"]
 
+def test_dashboard_stats_detailed():
+    print_header("TESTING DASHBOARD STATS API")
+    
+    # First, authenticate to get a token
+    print("Authenticating to get access token...")
+    admin_token = test_auth_login(ADMIN_USER)
+    
+    if not admin_token:
+        print("❌ Authentication failed. Cannot proceed with dashboard stats test.")
+        print("Trying to register a new admin user...")
+        
+        # Try to register a new admin user
+        admin_registered = test_auth_register(ADMIN_USER)
+        if admin_registered:
+            admin_token = test_auth_login(ADMIN_USER)
+        else:
+            print("❌ Failed to register admin user. Cannot proceed with dashboard stats test.")
+            return False
+    
+    print("✅ Authentication successful. Proceeding with dashboard stats test.")
+    
+    # Test the dashboard stats endpoint
+    print("\n--- Testing /api/dashboard/stats endpoint ---")
+    success, message, stats_data = make_request("get", "/dashboard/stats", token=admin_token, expected_status=200)
+    
+    if success and isinstance(stats_data, dict):
+        print(f"✅ Successfully retrieved dashboard stats from /api/dashboard/stats")
+        print(f"   Response: {stats_data}")
+        
+        # Check if all required fields are present
+        required_fields = [
+            "total_fournisseurs", 
+            "total_articles", 
+            "total_commandes", 
+            "alertes_non_lues", 
+            "articles_stock_bas", 
+            "commandes_en_cours"
+        ]
+        
+        missing_fields = [field for field in required_fields if field not in stats_data]
+        
+        if missing_fields:
+            print(f"❌ Missing fields in dashboard stats response: {', '.join(missing_fields)}")
+            test_results["dashboard"]["stats"]["success"] = False
+            test_results["dashboard"]["stats"]["message"] = f"Missing fields in response: {', '.join(missing_fields)}"
+            return False
+        
+        # Check if all values are non-zero
+        zero_fields = [field for field in required_fields if stats_data.get(field, 0) == 0]
+        
+        if zero_fields:
+            print(f"⚠️ The following fields have zero values: {', '.join(zero_fields)}")
+            print("Creating test data to populate these fields...")
+            
+            # Create test data
+            create_test_data(admin_token)
+            
+            # Test the endpoint again
+            print("\n--- Testing /api/dashboard/stats endpoint after creating test data ---")
+            success, message, stats_data = make_request("get", "/dashboard/stats", token=admin_token, expected_status=200)
+            
+            if success and isinstance(stats_data, dict):
+                print(f"✅ Successfully retrieved dashboard stats after creating test data")
+                print(f"   Response: {stats_data}")
+                
+                # Check if values are now non-zero
+                zero_fields_after = [field for field in required_fields if stats_data.get(field, 0) == 0]
+                
+                if zero_fields_after:
+                    print(f"⚠️ The following fields still have zero values after creating test data: {', '.join(zero_fields_after)}")
+                    print("This might indicate an issue with the dashboard stats calculation.")
+                else:
+                    print("✅ All fields now have non-zero values after creating test data.")
+            else:
+                print(f"❌ Failed to retrieve dashboard stats after creating test data")
+                print(f"   Error: {message}")
+                test_results["dashboard"]["stats"]["success"] = False
+                test_results["dashboard"]["stats"]["message"] = message
+                return False
+        else:
+            print("✅ All fields have non-zero values.")
+        
+        test_results["dashboard"]["stats"]["success"] = True
+        test_results["dashboard"]["stats"]["message"] = "Successfully retrieved dashboard stats with all required fields"
+        return True
+    else:
+        print(f"❌ Failed to retrieve dashboard stats from /api/dashboard/stats")
+        print(f"   Error: {message}")
+        test_results["dashboard"]["stats"]["success"] = False
+        test_results["dashboard"]["stats"]["message"] = message
+        return False
+
 if __name__ == "__main__":
-    # Test specific endpoints reported with issues
-    test_specific_endpoints()
+    # Test dashboard stats API
+    test_dashboard_stats_detailed()
