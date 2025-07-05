@@ -152,32 +152,22 @@ const WidgetPreview: React.FC<WidgetPreviewProps> = ({ widget }) => {
         const barColor = widget.config.colorScheme === 'green' ? '#10B981' :
                         widget.config.colorScheme === 'multicolor' ? '#8B5CF6' :
                         widget.config.colorScheme === 'gradient' ? '#F59E0B' : '#3B82F6';
-        const isHorizontal = widget.config.orientation === 'horizontal';
         return (
           <div className="h-full">
             <div className="flex justify-between items-center mb-2">
               <h4 className="text-sm font-medium text-gray-900">{widget.title}</h4>
-              <span className="text-xs text-gray-500">Top {widget.config.maxItems || 10}</span>
+              <span className="text-xs text-gray-500">
+                {widget.config.orientation === 'horizontal' ? 'Horizontal' : 'Vertical'} - Top {widget.config.maxItems || 10}
+              </span>
             </div>
             <ResponsiveContainer width="100%" height="80%">
-              {isHorizontal ? (
-                <BarChart 
-                  data={mockData.chartData.slice(0, widget.config.maxItems || 10)}
-                  layout="verseBar"
-                >
-                  <XAxis type="number" />
-                  <YAxis dataKey="name" type="category" />
-                  <Bar dataKey="value" fill={barColor} radius={2} />
-                </BarChart>
-              ) : (
-                <BarChart 
-                  data={mockData.chartData.slice(0, widget.config.maxItems || 10)}
-                >
-                  <XAxis dataKey="name" />
-                  <YAxis />
-                  <Bar dataKey="value" fill={barColor} radius={2} />
-                </BarChart>
-              )}
+              <BarChart 
+                data={mockData.chartData.slice(0, widget.config.maxItems || 10)}
+              >
+                <XAxis dataKey="name" />
+                <YAxis />
+                <Bar dataKey="value" fill={barColor} radius={2} />
+              </BarChart>
             </ResponsiveContainer>
           </div>
         );
