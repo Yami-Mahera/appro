@@ -431,24 +431,95 @@ const WidgetDisplay: React.FC<WidgetDisplayProps> = ({ widget, refreshTrigger })
 
       case 'kpi_metric':
       case 'gauge':
-        return (
-          <div className="h-full flex flex-col justify-center items-center text-center">
-            <h4 className="text-sm font-medium text-gray-500 mb-4">{widget.title}</h4>
-            <div className="text-3xl font-bold text-blue-600">
-              {formatValue(data?.value || 0, widget.config.displayFormat)}
-            </div>
-            {data?.trend && (
-              <div className={`text-sm mt-2 flex items-center ${data.trend > 0 ? 'text-green-500' : 'text-red-500'}`}>
-                {data.trend > 0 ? (
-                  <ArrowTrendingUpIcon className="h-4 w-4 mr-1" />
-                ) : (
-                  <ArrowTrendingDownIcon className="h-4 w-4 mr-1" />
-                )}
-                {Math.abs(data.trend)}% vs mois dernier
+      case 'kpi_metric':
+      case 'gauge':
+        if (widget.type === 'gauge') {
+          // Affichage en jauge
+          const currentValue = data?.value || 78;
+          const minVal = widget.config.minValue || 0;
+          const maxVal = widget.config.maxValue || 100;
+          const warningThreshold = widget.config.warningThreshold || 70;
+          const criticalThreshold = widget.config.criticalThreshold || 90;
+          
+          const getGaugeColor = () => {
+            if (currentValue >= criticalThreshold) return 'text-red-500';
+            if (currentValue >= warningThreshold) return 'text-yellow-500';
+            return 'text-green-500';
+          };
+
+          const percentage = ((currentValue - minVal) / (maxVal - minVal)) * 100;
+          
+          return (
+            <div className="h-full flex flex-col justify-center items-center">
+              <h4 className="text-sm font-medium text-gray-900 mb-4">{widget.title}</h4>
+              <div className="relative">
+                <svg width="120" height="80" viewBox="0 0 120 80">
+                  {/* Background arc */}
+                  <path
+                    d="M 20 60 A 40 40 0 0 1 100 60"
+                    fill="none"
+                    stroke="#E5E7EB"
+                    strokeWidth="8"
+                    strokeLinecap="round"
+                  />
+                  {/* Progress arc */}
+                  <path
+                    d="M 20 60 A 40 40 0 0 1 100 60"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="8"
+                    strokeLinecap="round"
+                    strokeDasharray={`${percentage * 1.26} 126`}
+                    className={getGaugeColor()}
+                  />
+                </svg>
+                <div className="absolute inset-0 flex flex-col items-center justify-center mt-4">
+                  <span className={`text-xl font-bold ${getGaugeColor()}`}>
+                    {currentValue}
+                  </span>
+                  <span className="text-xs text-gray-500">
+                    {minVal} - {maxVal}
+                  </span>
+                </div>
               </div>
-            )}
-          </div>
-        );
+              <div className="flex space-x-4 mt-2 text-xs">
+                <div className="flex items-center">
+                  <div className="w-2 h-2 bg-green-500 rounded-full mr-1"></div>
+                  <span>&lt;{warningThreshold}</span>
+                </div>
+                <div className="flex items-center">
+                  <div className="w-2 h-2 bg-yellow-500 rounded-full mr-1"></div>
+                  <span>{warningThreshold}-{criticalThreshold}</span>
+                </div>
+                <div className="flex items-center">
+                  <div className="w-2 h-2 bg-red-500 rounded-full mr-1"></div>
+                  <span>&gt;{criticalThreshold}</span>
+                </div>
+              </div>
+            </div>
+          );
+        } else {
+          // Affichage KPI métrique standard
+          const kpiData = data || { value: 94.5, unit: '%', trend: 2.3 };
+          return (
+            <div className="h-full flex flex-col justify-center items-center text-center">
+              <h4 className="text-sm font-medium text-gray-500 mb-4">{widget.title}</h4>
+              <div className="text-3xl font-bold text-blue-600">
+                {formatValue(kpiData.value || 0, widget.config.displayFormat || 'number')}
+              </div>
+              {kpiData.trend && (
+                <div className={`text-sm mt-2 flex items-center ${kpiData.trend > 0 ? 'text-green-500' : 'text-red-500'}`}>
+                  {kpiData.trend > 0 ? (
+                    <ArrowTrendingUpIcon className="h-4 w-4 mr-1" />
+                  ) : (
+                    <ArrowTrendingDownIcon className="h-4 w-4 mr-1" />
+                  )}
+                  {Math.abs(kpiData.trend)}% vs mois dernier
+                </div>
+              )}
+            </div>
+          );
+        }
 
       case 'alert_list':
         return (
