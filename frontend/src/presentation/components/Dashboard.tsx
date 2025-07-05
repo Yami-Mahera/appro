@@ -5,13 +5,35 @@ import {
   DocumentTextIcon,
   ExclamationTriangleIcon,
   ArrowTrendingDownIcon,
-  ClockIcon
+  ClockIcon,
+  PlusIcon,
+  PencilIcon,
+  TrashIcon,
+  ShareIcon,
+  ChartBarIcon,
+  Cog6ToothIcon,
+  EyeIcon
 } from '@heroicons/react/24/outline';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell } from 'recharts';
 import { DashboardStats } from '../../data/types';
 import apiService from '../../services/api';
+import { useAuth } from '../../hooks/useAuth';
 import { formatNumber } from '../../common/utils';
 import StockEvolutionChart from './StockEvolutionChart';
+import DashboardBuilder from './DashboardBuilder';
+import DashboardViewer from './DashboardViewer';
+
+interface CustomDashboard {
+  id: string;
+  nom: string;
+  description?: string;
+  user_id: string;
+  widgets: any[];
+  layout: any;
+  partage: boolean;
+  created_at: string;
+  updated_at: string;
+}
 
 const Dashboard: React.FC = () => {
   const [stats, setStats] = useState<DashboardStats | null>(null);
