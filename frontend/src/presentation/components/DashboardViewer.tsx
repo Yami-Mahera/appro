@@ -188,7 +188,7 @@ const DashboardViewer: React.FC<DashboardViewerProps> = ({
       </div>
 
       {/* Print styles */}
-      <style jsx>{`
+      <style>{`
         @media print {
           .no-print {
             display: none !important;
