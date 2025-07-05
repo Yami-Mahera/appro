@@ -325,31 +325,59 @@ const WidgetDisplay: React.FC<WidgetDisplayProps> = ({ widget, refreshTrigger })
 
       case 'pie_chart':
       case 'chart_pie':
+      case 'pie_chart':
+      case 'chart_pie':
+        const pieData = data && Array.isArray(data) ? data : [
+          { name: 'Électronique', value: 35, color: '#3B82F6' },
+          { name: 'Fournitures', value: 25, color: '#10B981' },
+          { name: 'Outils', value: 20, color: '#8B5CF6' },
+          { name: 'Autres', value: 20, color: '#F59E0B' }
+        ];
+        const isDonut = widget.config.displayType === 'doughnut';
+        const showPercentage = widget.config.showPercentage !== 'false';
+        const legendPos = widget.config.legendPosition || 'right';
         return (
           <div className="h-full">
-            <h4 className="text-sm font-medium text-gray-900 mb-4">{widget.title}</h4>
-            <ResponsiveContainer width="100%" height="85%">
-              <PieChart>
-                <Pie
-                  data={data}
-                  cx="50%"
-                  cy="50%"
-                  labelLine={false}
-                  label={({ name, percent }) => `${name} ${((percent || 0) * 100).toFixed(0)}%`}
-                  outerRadius={80}
-                  dataKey="value"
-                >
-                  {data?.map((entry: any, index: number) => (
-                    <Cell key={`cell-${index}`} fill={entry.color} />
+            <h4 className="text-sm font-medium text-gray-900 mb-2">{widget.title}</h4>
+            <div className="flex h-full">
+              <ResponsiveContainer width={legendPos !== 'none' ? "70%" : "100%"} height="90%">
+                <PieChart>
+                  <Pie
+                    data={pieData}
+                    cx="50%"
+                    cy="50%"
+                    innerRadius={isDonut ? 30 : 0}
+                    outerRadius={60}
+                    dataKey="value"
+                    label={showPercentage ? ({ value }: { value?: number }) => 
+                      value ? `${value.toFixed(1)}%` : '' : false}
+                  >
+                    {pieData.map((entry, index) => (
+                      <Cell key={`cell-${index}`} fill={entry.color} />
+                    ))}
+                  </Pie>
+                  <Tooltip />
+                </PieChart>
+              </ResponsiveContainer>
+              {legendPos !== 'none' && (
+                <div className="flex flex-col justify-center space-y-1 text-xs">
+                  {pieData.map((entry, index) => (
+                    <div key={index} className="flex items-center">
+                      <div 
+                        className="w-3 h-3 rounded-sm mr-2" 
+                        style={{ backgroundColor: entry.color }}
+                      ></div>
+                      <span className="truncate">{entry.name}</span>
+                    </div>
                   ))}
-                </Pie>
-                <Tooltip />
-              </PieChart>
-            </ResponsiveContainer>
+                </div>
+              )}
+            </div>
           </div>
         );
 
       case 'data_table':
+      case 'table':
         return (
           <div className="h-full">
             <h4 className="text-sm font-medium text-gray-900 mb-4">{widget.title}</h4>
