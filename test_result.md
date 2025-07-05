@@ -664,15 +664,18 @@ frontend:
 
   - task: "Interface Tableaux de Bord Personnalisés"
     implemented: true
-    working: "NA"
+    working: true
     file: "/app/frontend/src/presentation/screens/DashboardsPersonnalises.tsx"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
         comment: "Créé l'écran principal de gestion des dashboards personnalisés avec liste, création, édition et suppression des tableaux de bord"
+      - working: true
+        agent: "testing"
+        comment: "L'interface des tableaux de bord personnalisés fonctionne correctement. La liste des dashboards s'affiche bien, et les fonctionnalités de création, édition et suppression sont opérationnelles. Le dashboard de test 'Dashboard Test - Problème Widgets' est visible et accessible."
 
   - task: "Constructeur de Dashboard"
     implemented: true
