@@ -253,7 +253,7 @@ const DashboardBuilder: React.FC<DashboardBuilderProps> = ({
                         className="w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-700 rounded-md transition-colors duration-150"
                       >
                         <PlusIcon className="h-4 w-4 mr-2 inline" />
-                        {widget.name}
+                        {widget.nom || widget.name}
                       </button>
                     ))}
                   </div>
