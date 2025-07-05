@@ -232,14 +232,7 @@ const WidgetPreview: React.FC<WidgetPreviewProps> = ({ widget }) => {
   };
 
   const mockData = {
-    stats: {
-      total_fournisseurs: 45,
-      total_articles: 234,
-      total_commandes: 156,
-      alertes_non_lues: 8,
-      articles_stock_bas: 12,
-      commandes_en_cours: 23
-    },
+    // Données de fallback uniquement - les vraies données viennent de l'API
     chartData: [
       { name: 'Jan', value: 65 },
       { name: 'Fév', value: 59 },
@@ -253,13 +246,20 @@ const WidgetPreview: React.FC<WidgetPreviewProps> = ({ widget }) => {
       { name: 'Fournitures', value: 25, color: '#10B981' },
       { name: 'Outils', value: 20, color: '#8B5CF6' },
       { name: 'Autres', value: 20, color: '#F59E0B' }
-    ],
-    alerts: [
-      { id: 1, message: 'Stock bas: Vis M6', priority: 'high' },
-      { id: 2, message: 'Retard livraison CMD-001', priority: 'medium' },
-      { id: 3, message: 'Nouveau fournisseur', priority: 'low' }
     ]
   };
+
+  if (loading) {
+    return (
+      <div className="h-full flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-2 border-blue-500 border-t-transparent mx-auto mb-2"></div>
+          <p className="text-sm text-blue-600 font-medium">{widget.title}</p>
+          <p className="text-xs text-blue-400">Chargement...</p>
+        </div>
+      </div>
+    );
+  }
 
   const renderWidget = () => {
     switch (widget.type) {
