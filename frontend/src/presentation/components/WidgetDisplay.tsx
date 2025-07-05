@@ -2,12 +2,11 @@ import React, { useState, useEffect } from 'react';
 import { 
   ChartBarIcon, 
   ExclamationTriangleIcon,
-  TrendingUpIcon,
+  ArrowTrendingUpIcon,
   ClockIcon,
   CubeIcon,
   BuildingOfficeIcon,
   DocumentTextIcon,
-  ArrowTrendingUpIcon,
   ArrowTrendingDownIcon
 } from '@heroicons/react/24/outline';
 import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell, Tooltip } from 'recharts';
