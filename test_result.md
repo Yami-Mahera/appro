@@ -679,15 +679,18 @@ frontend:
 
   - task: "Constructeur de Dashboard"
     implemented: true
-    working: "NA"
+    working: true
     file: "/app/frontend/src/presentation/components/DashboardBuilder.tsx"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
         comment: "Créé le constructeur de dashboard avec interface drag & drop, bibliothèque de widgets, configuration des propriétés et aperçu en temps réel"
+      - working: true
+        agent: "testing"
+        comment: "Le constructeur de dashboard fonctionne correctement. L'interface permet d'ajouter des widgets depuis la bibliothèque, de les configurer et de les prévisualiser. Les widgets s'affichent avec leurs couleurs et styles appropriés en mode aperçu."
 
   - task: "Configuration des Widgets"
     implemented: true
