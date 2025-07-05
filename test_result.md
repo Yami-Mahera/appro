@@ -631,6 +631,78 @@ frontend:
         agent: "main"
         comment: "Ajouté la route /stocks-avances dans App.tsx et le lien de navigation 'Stocks Avancés' dans Layout.tsx avec icône Squares2X2Icon"
 
+  - task: "Interface Tableaux de Bord Personnalisés"
+    implemented: true
+    working: "NA"
+    file: "/app/frontend/src/presentation/screens/DashboardsPersonnalises.tsx"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Créé l'écran principal de gestion des dashboards personnalisés avec liste, création, édition et suppression des tableaux de bord"
+
+  - task: "Constructeur de Dashboard"
+    implemented: true
+    working: "NA"
+    file: "/app/frontend/src/presentation/components/DashboardBuilder.tsx"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Créé le constructeur de dashboard avec interface drag & drop, bibliothèque de widgets, configuration des propriétés et aperçu en temps réel"
+
+  - task: "Configuration des Widgets"
+    implemented: true
+    working: "NA"
+    file: "/app/frontend/src/presentation/components/WidgetConfigModal.tsx"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Créé le modal de configuration des widgets avec paramètres spécifiques par type (stats, graphiques, tableaux, KPIs, alertes, tendances)"
+
+  - task: "Aperçu et Affichage des Widgets"
+    implemented: true
+    working: "NA"
+    file: "/app/frontend/src/presentation/components/WidgetPreview.tsx, /app/frontend/src/presentation/components/WidgetDisplay.tsx"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Créé les composants pour l'aperçu (mode édition) et l'affichage (mode visualisation) des widgets avec données en temps réel"
+
+  - task: "Visualiseur de Dashboard"
+    implemented: true
+    working: "NA"
+    file: "/app/frontend/src/presentation/components/DashboardViewer.tsx"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Créé le visualiseur de dashboard avec mode plein écran, rafraîchissement automatique, partage, impression et édition"
+
+  - task: "Navigation Dashboard KPI"
+    implemented: true
+    working: "NA"
+    file: "/app/frontend/src/App.tsx, /app/frontend/src/presentation/components/Layout.tsx"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Ajouté la route /dashboards et le lien de navigation 'Dashboards KPI' avec icône PresentationChartBarIcon"
+
 metadata:
   created_by: "main_agent"
   version: "1.0"
