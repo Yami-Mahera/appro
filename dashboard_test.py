@@ -135,8 +135,8 @@ def create_test_article(token, fournisseur_id):
         print(f"❌ Failed to create article: {message}")
         return None
 
-def create_test_commande(token, fournisseur_id, article_id):
-    print_header("Creating Test Commande")
+def create_test_commande(token, fournisseur_id, article_id, status="brouillon"):
+    print_header(f"Creating Test Commande with status: {status}")
     commande_data = {
         "fournisseur_id": fournisseur_id,
         "lignes": [
@@ -148,13 +148,13 @@ def create_test_commande(token, fournisseur_id, article_id):
             }
         ],
         "date_livraison_prevue": (datetime.now() + timedelta(days=7)).isoformat(),
-        "notes": "Commande test"
+        "notes": f"Commande test avec status {status}"
     }
     
     success, message, data = make_request("post", "/commandes", commande_data, token=token, expected_status=200)
     
     if success and data and "id" in data:
-        print(f"✅ Created commande: {data['numero_commande']} (ID: {data['id']})")
+        print(f"✅ Created commande: {data['numero_commande']} (ID: {data['id']}) with status: {data['status']}")
         return data["id"]
     else:
         print(f"❌ Failed to create commande: {message}")
