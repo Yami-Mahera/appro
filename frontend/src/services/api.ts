@@ -412,6 +412,16 @@ class ApiService {
     return response.data;
   }
 
+  async updateDashboardPersonnalise(id: string, data: any) {
+    const response = await this.api.put(`/dashboards/personnalises/${id}`, data);
+    return response.data;
+  }
+
+  async deleteDashboardPersonnalise(id: string) {
+    const response = await this.api.delete(`/dashboards/personnalises/${id}`);
+    return response.data;
+  }
+
   async getWidgetsDisponibles() {
     const response = await this.api.get('/dashboards/widgets-disponibles');
     return response.data;
