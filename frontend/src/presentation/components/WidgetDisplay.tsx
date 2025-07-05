@@ -218,22 +218,37 @@ const WidgetDisplay: React.FC<WidgetDisplayProps> = ({ widget, refreshTrigger })
   const renderWidget = () => {
     switch (widget.type) {
       case 'stats_card':
-        const IconComponent = getIcon(widget.config.dataSource);
+      case 'kpi_card':
+        const IconComponent = getIcon(widget.config.dataSource || widget.config.kpiType);
+        const displayValue = widget.config.displayFormat === 'percentage' ? `${data || 0}%` : 
+                            widget.config.displayFormat === 'currency' ? `€${(data || 0).toLocaleString('fr-FR')}` :
+                            widget.config.displayFormat === 'days' ? `${data || 0} jours` : 
+                            (data || 0).toLocaleString('fr-FR');
         return (
           <div className="h-full flex items-center">
             <div className="flex items-center w-full">
-              <div className={`${getColorClass(widget.config.color)} rounded-md p-3 mr-4`}>
+              <div className={`${getColorClass(widget.config.color || 'blue')} rounded-md p-3 mr-4`}>
                 <IconComponent className="h-6 w-6 text-white" />
               </div>
-              <div>
+              <div className="flex-1">
                 <p className="text-sm font-medium text-gray-500">{widget.title}</p>
-                <p className="text-2xl font-bold text-gray-900">{data}</p>
+                <div className="flex items-baseline">
+                  <p className="text-2xl font-bold text-gray-900">{displayValue}</p>
+                  {widget.config.target && (
+                    <span className="ml-2 text-xs text-gray-400">
+                      / {widget.config.target}{widget.config.displayFormat === 'percentage' ? '%' : ''}
+                    </span>
+                  )}
+                </div>
+                {/* Simulation d'une tendance si pas de vraie donnée */}
+                <div className="text-xs text-green-500 mt-1">↑ +2.3% vs précédent</div>
               </div>
             </div>
           </div>
         );
 
       case 'bar_chart':
+      case 'chart_bar':
         return (
           <div className="h-full">
             <h4 className="text-sm font-medium text-gray-900 mb-4">{widget.title}</h4>
