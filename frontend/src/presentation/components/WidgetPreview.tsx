@@ -160,13 +160,24 @@ const WidgetPreview: React.FC<WidgetPreviewProps> = ({ widget }) => {
               <span className="text-xs text-gray-500">Top {widget.config.maxItems || 10}</span>
             </div>
             <ResponsiveContainer width="100%" height="80%">
-              <BarChart 
-                data={mockData.chartData.slice(0, widget.config.maxItems || 10)}
-              >
-                <XAxis dataKey="name" />
-                <YAxis />
-                <Bar dataKey="value" fill={barColor} radius={2} />
-              </BarChart>
+              {isHorizontal ? (
+                <BarChart 
+                  data={mockData.chartData.slice(0, widget.config.maxItems || 10)}
+                  layout="verseBar"
+                >
+                  <XAxis type="number" />
+                  <YAxis dataKey="name" type="category" />
+                  <Bar dataKey="value" fill={barColor} radius={2} />
+                </BarChart>
+              ) : (
+                <BarChart 
+                  data={mockData.chartData.slice(0, widget.config.maxItems || 10)}
+                >
+                  <XAxis dataKey="name" />
+                  <YAxis />
+                  <Bar dataKey="value" fill={barColor} radius={2} />
+                </BarChart>
+              )}
             </ResponsiveContainer>
           </div>
         );
