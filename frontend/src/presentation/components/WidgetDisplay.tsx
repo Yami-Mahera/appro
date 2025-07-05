@@ -249,21 +249,40 @@ const WidgetDisplay: React.FC<WidgetDisplayProps> = ({ widget, refreshTrigger })
 
       case 'bar_chart':
       case 'chart_bar':
+      case 'bar_chart':
+      case 'chart_bar':
+        const chartData = data && Array.isArray(data) ? data : [
+          { name: 'Jan', value: 65 },
+          { name: 'Fév', value: 59 },
+          { name: 'Mar', value: 80 },
+          { name: 'Avr', value: 81 },
+          { name: 'Mai', value: 56 },
+          { name: 'Jun', value: 55 }
+        ];
+        const barColor = widget.config.colorScheme === 'green' ? '#10B981' :
+                        widget.config.colorScheme === 'multicolor' ? '#8B5CF6' :
+                        widget.config.colorScheme === 'gradient' ? '#F59E0B' : '#3B82F6';
         return (
           <div className="h-full">
-            <h4 className="text-sm font-medium text-gray-900 mb-4">{widget.title}</h4>
-            <ResponsiveContainer width="100%" height="85%">
-              <BarChart data={data}>
+            <div className="flex justify-between items-center mb-2">
+              <h4 className="text-sm font-medium text-gray-900">{widget.title}</h4>
+              <span className="text-xs text-gray-500">
+                {widget.config.orientation === 'horizontal' ? 'Horizontal' : 'Vertical'} - Top {widget.config.maxItems || 10}
+              </span>
+            </div>
+            <ResponsiveContainer width="100%" height="80%">
+              <BarChart data={chartData.slice(0, widget.config.maxItems || 10)}>
                 <XAxis dataKey="name" />
                 <YAxis />
                 <Tooltip />
-                <Bar dataKey="value" fill="#3B82F6" />
+                <Bar dataKey="value" fill={barColor} radius={2} />
               </BarChart>
             </ResponsiveContainer>
           </div>
         );
 
       case 'line_chart':
+      case 'chart_line':
         return (
           <div className="h-full">
             <h4 className="text-sm font-medium text-gray-900 mb-4">{widget.title}</h4>
