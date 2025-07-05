@@ -424,7 +424,7 @@ class ApiService {
 
   async getWidgetsDisponibles() {
     const response = await this.api.get('/dashboards/widgets-disponibles');
-    return response.data;
+    return response.data.widgets || [];
   }
 
   async exportData(type: string, format: string, params?: any) {
