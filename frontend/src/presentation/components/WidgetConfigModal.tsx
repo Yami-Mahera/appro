@@ -25,6 +25,8 @@ const WidgetConfigModal: React.FC<WidgetConfigModalProps> = ({
     title: widget.title,
     ...widget.config
   });
+  
+  const [position, setPosition] = useState(widget.position);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
     const { name, value, type } = e.target;
@@ -34,11 +36,19 @@ const WidgetConfigModal: React.FC<WidgetConfigModalProps> = ({
     }));
   };
 
+  const handlePositionChange = (dimension: 'w' | 'h', value: number) => {
+    setPosition(prev => ({
+      ...prev,
+      [dimension]: value
+    }));
+  };
+
   const handleSave = () => {
     const updatedWidget = {
       ...widget,
       title: config.title,
-      config: { ...config, title: undefined } // Remove title from config as it's separate
+      config: { ...config, title: undefined }, // Remove title from config as it's separate
+      position: position
     };
     onSave(updatedWidget);
   };
