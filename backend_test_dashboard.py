@@ -4,7 +4,7 @@ import time
 from datetime import datetime
 
 # Configuration
-BASE_URL = "http://localhost:8000/api"  # Using the local URL for testing
+BASE_URL = "http://localhost:8001/api"  # Using the local URL for testing
 ADMIN_USER = {
     "email": "admin@test.com",
     "password": "admin123"
