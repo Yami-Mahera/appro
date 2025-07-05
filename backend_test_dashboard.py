@@ -174,6 +174,121 @@ def test_alertes_api(token):
         print(f"❌ Failed to retrieve alertes: {message}")
         return False
 
+def create_test_data(token):
+    print_header("Creating Test Data")
+    
+    # Create a test fournisseur
+    fournisseur_data = {
+        "nom": "Fournisseur Test",
+        "code_fournisseur": f"FOUR-{int(time.time())}",
+        "adresse": "123 Rue de Test",
+        "ville": "Paris",
+        "code_postal": "75001",
+        "pays": "France",
+        "telephone": "+33123456789",
+        "email": f"contact_{int(time.time())}@fournisseur-test.com",
+        "site_web": "https://www.fournisseur-test.com",
+        "conditions_paiement": "30 jours",
+        "delai_livraison_moyen": 5,
+        "contacts": [
+            {
+                "nom": "Dupont",
+                "prenom": "Jean",
+                "telephone": "+33612345678",
+                "email": f"jean.dupont_{int(time.time())}@fournisseur-test.com",
+                "poste": "Responsable commercial"
+            }
+        ]
+    }
+    
+    print("Creating test fournisseur...")
+    success, message, fournisseur = make_request("post", "/fournisseurs", fournisseur_data, token=token, expected_status=200)
+    
+    if success and fournisseur and "id" in fournisseur:
+        print(f"✅ Successfully created fournisseur: {fournisseur['nom']} (ID: {fournisseur['id']})")
+        fournisseur_id = fournisseur["id"]
+        
+        # Create a test article
+        article_data = {
+            "reference": f"ART-{int(time.time())}",
+            "nom": "Article Test",
+            "description": "Description de l'article test",
+            "famille": "Test",
+            "fournisseur_id": fournisseur_id,
+            "prix_unitaire": 19.99,
+            "unite": "pièce",
+            "seuil_min": 10,
+            "seuil_max": 100,
+            "stock_actuel": 5,  # Below seuil_min to test stock_bas
+            "duree_vie": 365,
+            "emplacement_stockage": "Étagère A1"
+        }
+        
+        print("Creating test article...")
+        success, message, article = make_request("post", "/articles", article_data, token=token, expected_status=200)
+        
+        if success and article and "id" in article:
+            print(f"✅ Successfully created article: {article['nom']} (ID: {article['id']})")
+            article_id = article["id"]
+            
+            # Create a test commande with status 'en_attente'
+            commande_data = {
+                "fournisseur_id": fournisseur_id,
+                "lignes": [
+                    {
+                        "article_id": article_id,
+                        "quantite": 10,
+                        "prix_unitaire": 19.99,
+                        "total": 199.90
+                    }
+                ],
+                "date_livraison_prevue": datetime.now().isoformat(),
+                "notes": "Commande test"
+            }
+            
+            print("Creating test commande...")
+            success, message, commande = make_request("post", "/commandes", commande_data, token=token, expected_status=200)
+            
+            if success and commande and "id" in commande:
+                print(f"✅ Successfully created commande: {commande['numero_commande']} (ID: {commande['id']})")
+                commande_id = commande["id"]
+                
+                # Update the commande status to 'en_attente'
+                update_data = {
+                    "status": "en_attente"
+                }
+                
+                print("Updating commande status to 'en_attente'...")
+                success, message, updated_commande = make_request("put", f"/commandes/{commande_id}", update_data, token=token, expected_status=200)
+                
+                if success and updated_commande and updated_commande.get("status") == "en_attente":
+                    print(f"✅ Successfully updated commande status to 'en_attente'")
+                else:
+                    print(f"❌ Failed to update commande status: {message}")
+            else:
+                print(f"❌ Failed to create commande: {message}")
+        else:
+            print(f"❌ Failed to create article: {message}")
+    else:
+        print(f"❌ Failed to create fournisseur: {message}")
+    
+    # Create a test alerte
+    alerte_data = {
+        "type": "stock_bas",
+        "priorite": "high",
+        "titre": "Stock bas pour article test",
+        "message": "Le stock de l'article test est en dessous du seuil minimum",
+        "lue": False
+    }
+    
+    print("Creating test alerte...")
+    success, message, alerte = make_request("post", "/alertes/test-create", alerte_data, token=token, expected_status=200)
+    
+    if success and alerte and "id" in alerte:
+        print(f"✅ Successfully created alerte: {alerte['titre']} (ID: {alerte['id']})")
+    else:
+        print(f"❌ Failed to create alerte: {message}")
+
 def run_tests():
     print_header("STARTING BACKEND API TESTS FOR DASHBOARD STATS")
     
@@ -182,6 +297,9 @@ def run_tests():
     if not token:
         print("Authentication failed, cannot proceed with tests")
         return
+    
+    # Create test data
+    create_test_data(token)
     
     # Run tests
     dashboard_stats_success = test_dashboard_stats(token)
