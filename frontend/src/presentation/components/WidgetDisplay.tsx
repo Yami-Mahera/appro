@@ -135,7 +135,8 @@ const WidgetDisplay: React.FC<WidgetDisplayProps> = ({ widget, refreshTrigger })
 
   const fetchStatsData = async () => {
     const stats = await apiService.getDashboardStats();
-    return stats[widget.config.dataSource] || 0;
+    const dataKey = widget.config.dataSource || widget.config.kpiType;
+    return stats[dataKey] || 0;
   };
 
   const fetchChartData = async () => {
