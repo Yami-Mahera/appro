@@ -252,10 +252,10 @@ def test_dashboard_stats():
             if fournisseur_id:
                 article_id = create_test_article(admin_token, fournisseur_id)
                 if article_id:
-                    commande_id = create_test_commande(admin_token, fournisseur_id, article_id)
-                    if commande_id:
-                        # Update commande status to test commandes_en_cours
-                        update_commande_status(admin_token, commande_id, "en_attente")
+                    # Create commandes with different statuses
+                    statuses = ["brouillon", "en_attente", "approuvee", "commandee", "livree", "annulee"]
+                    for status in statuses:
+                        create_test_commande(admin_token, fournisseur_id, article_id, status)
                     
                     # Create an alert
                     create_test_alerte(admin_token, article_id)
@@ -274,6 +274,38 @@ def test_dashboard_stats():
                 if zero_fields_after:
                     print(f"⚠️ The following fields still have zero values after creating test data: {', '.join(zero_fields_after)}")
                     print("This might indicate an issue with the dashboard stats calculation.")
+                    
+                    # Check the implementation of commandes_en_cours in server.py
+                    print("\n--- Analyzing the issue with commandes_en_cours ---")
+                    print("According to the server.py implementation, commandes_en_cours should count commandes with status in:")
+                    print("- en_attente (PENDING)")
+                    print("- approuvee (APPROVED)")
+                    print("- commandee (ORDERED)")
+                    print("\nBut we created commandes with all these statuses and still got zero.")
+                    print("This suggests there might be an issue with how the status is set when creating a commande.")
+                    print("The default status in the Commande model is 'brouillon' (DRAFT), and there seems to be no way to update it.")
+                    print("The CommandeCreate model doesn't include a status field, so we can't set it directly.")
+                    
+                    # Check if we can see the commandes we created
+                    print("\n--- Checking created commandes ---")
+                    success, message, commandes_data = make_request("get", "/commandes", token=admin_token, expected_status=200)
+                    if success and isinstance(commandes_data, list):
+                        print(f"✅ Retrieved {len(commandes_data)} commandes")
+                        statuses = [c["status"] for c in commandes_data]
+                        print(f"Commande statuses: {statuses}")
+                        
+                        # Count commandes with status in [PENDING, APPROVED, ORDERED]
+                        en_cours_count = sum(1 for s in statuses if s in ["en_attente", "approuvee", "commandee"])
+                        print(f"Commandes en cours (manually counted): {en_cours_count}")
+                        
+                        if en_cours_count > 0 and stats_data["commandes_en_cours"] == 0:
+                            print("❌ There's a discrepancy between our manual count and the API's count!")
+                            print("This confirms there's an issue with the commandes_en_cours calculation in the API.")
+                        elif en_cours_count == 0:
+                            print("⚠️ None of our commandes have the required status for 'commandes_en_cours'.")
+                            print("This suggests we can't set the status when creating a commande.")
+                    else:
+                        print(f"❌ Failed to retrieve commandes: {message}")
                 else:
                     print("✅ All fields now have non-zero values after creating test data.")
             else:
