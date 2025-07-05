@@ -188,8 +188,8 @@ const WidgetPreview: React.FC<WidgetPreviewProps> = ({ widget }) => {
                     innerRadius={isDonut ? 30 : 0}
                     outerRadius={60}
                     dataKey="value"
-                    label={showPercentage ? ({ value, total }) => 
-                      `${((value / total) * 100).toFixed(1)}%` : false}
+                    label={showPercentage ? ({ value }: { value?: number }) => 
+                      value ? `${value.toFixed(1)}%` : '' : false}
                   >
                     {mockData.pieData.map((entry, index) => (
                       <Cell key={`cell-${index}`} fill={entry.color} />
