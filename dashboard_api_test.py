@@ -4,7 +4,7 @@ import uuid
 from datetime import datetime
 
 # Configuration
-BASE_URL = "http://localhost:8001/api"
+BASE_URL = "http://localhost:8000/api"
 ADMIN_USER = {
     "email": "admin@test.com",
     "password": "admin123"
