@@ -132,11 +132,83 @@ const Dashboard: React.FC = () => {
     { name: 'Consommables', value: 20, color: '#F59E0B' },
   ];
 
+  const handleCreateDashboard = () => {
+    setSelectedDashboard(null);
+    setEditMode(false);
+    setShowBuilder(true);
+  };
+
+  const handleEditDashboard = (dashboard: CustomDashboard) => {
+    setSelectedDashboard(dashboard);
+    setEditMode(true);
+    setShowBuilder(true);
+  };
+
+  const handleViewDashboard = (dashboard: CustomDashboard) => {
+    setSelectedDashboard(dashboard);
+    setShowViewer(true);
+  };
+
+  const handleDeleteDashboard = async (dashboardId: string) => {
+    if (window.confirm('Êtes-vous sûr de vouloir supprimer ce dashboard ?')) {
+      try {
+        await apiService.deleteDashboardPersonnalise(dashboardId);
+        fetchCustomDashboards();
+      } catch (error) {
+        console.error('Erreur lors de la suppression:', error);
+      }
+    }
+  };
+
+  const handleSaveDashboard = async (dashboardData: any) => {
+    try {
+      if (editMode && selectedDashboard) {
+        await apiService.updateDashboardPersonnalise(selectedDashboard.id, dashboardData);
+      } else {
+        await apiService.createDashboardPersonnalise(dashboardData);
+      }
+      fetchCustomDashboards();
+      setShowBuilder(false);
+      setSelectedDashboard(null);
+    } catch (error) {
+      console.error('Erreur lors de la sauvegarde:', error);
+    }
+  };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
         <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-500"></div>
       </div>
+    );
+  }
+
+  if (showBuilder) {
+    return (
+      <DashboardBuilder
+        dashboard={selectedDashboard}
+        onSave={handleSaveDashboard}
+        onCancel={() => {
+          setShowBuilder(false);
+          setSelectedDashboard(null);
+        }}
+      />
+    );
+  }
+
+  if (showViewer && selectedDashboard) {
+    return (
+      <DashboardViewer
+        dashboard={selectedDashboard}
+        onEdit={() => {
+          setShowViewer(false);
+          handleEditDashboard(selectedDashboard);
+        }}
+        onClose={() => {
+          setShowViewer(false);
+          setSelectedDashboard(null);
+        }}
+      />
     );
   }
 
