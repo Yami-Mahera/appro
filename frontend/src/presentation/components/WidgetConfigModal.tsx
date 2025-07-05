@@ -497,14 +497,8 @@ const WidgetConfigModal: React.FC<WidgetConfigModalProps> = ({
               <label className="block text-sm font-medium text-gray-700">Largeur</label>
               <select
                 name="width"
-                value={widget.position.w}
-                onChange={(e) => {
-                  const newWidget = {
-                    ...widget,
-                    position: { ...widget.position, w: parseInt(e.target.value) }
-                  };
-                  // Update the widget position
-                }}
+                value={position.w}
+                onChange={(e) => handlePositionChange('w', parseInt(e.target.value))}
                 className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
               >
                 <option value="3">Petite (3)</option>
@@ -518,14 +512,8 @@ const WidgetConfigModal: React.FC<WidgetConfigModalProps> = ({
               <label className="block text-sm font-medium text-gray-700">Hauteur</label>
               <select
                 name="height"
-                value={widget.position.h}
-                onChange={(e) => {
-                  const newWidget = {
-                    ...widget,
-                    position: { ...widget.position, h: parseInt(e.target.value) }
-                  };
-                  // Update the widget position
-                }}
+                value={position.h}
+                onChange={(e) => handlePositionChange('h', parseInt(e.target.value))}
                 className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
               >
                 <option value="2">Petite (2)</option>
