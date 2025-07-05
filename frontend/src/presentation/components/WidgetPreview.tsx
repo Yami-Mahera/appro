@@ -43,7 +43,7 @@ const WidgetPreview: React.FC<WidgetPreviewProps> = ({ widget }) => {
       total_articles: CubeIcon,
       total_commandes: DocumentTextIcon,
       alertes_non_lues: ExclamationTriangleIcon,
-      articles_stock_bas: TrendingUpIcon,
+      articles_stock_bas: ArrowTrendingUpIcon,
       commandes_en_cours: ClockIcon
     };
     return icons[dataSource as keyof typeof icons] || ChartBarIcon;
