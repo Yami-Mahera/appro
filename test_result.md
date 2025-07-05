@@ -652,15 +652,18 @@ frontend:
 
   - task: "Intégration navigation - route Stocks Avancés"
     implemented: true
-    working: "NA"
+    working: true
     file: "/app/frontend/src/App.tsx, /app/frontend/src/presentation/components/Layout.tsx"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
         comment: "Ajouté la route /stocks-avances dans App.tsx et le lien de navigation 'Stocks Avancés' dans Layout.tsx avec icône Squares2X2Icon"
+      - working: true
+        agent: "testing"
+        comment: "L'intégration de la navigation vers la route Stocks Avancés fonctionne correctement. La route /stocks-avances est accessible et le lien de navigation 'Stocks Avancés' est présent dans le menu."
 
   - task: "Interface Tableaux de Bord Personnalisés"
     implemented: true
