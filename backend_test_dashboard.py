@@ -254,9 +254,8 @@ def create_test_data(token):
                 commande_id = commande["id"]
                 
                 # Update the commande status to 'en_attente'
-                update_data = {
-                    "status": "en_attente"
-                }
+                update_data = commande.copy()  # Copy all fields from the original commande
+                update_data["status"] = "en_attente"  # Update the status
                 
                 print("Updating commande status to 'en_attente'...")
                 success, message, updated_commande = make_request("put", f"/commandes/{commande_id}", update_data, token=token, expected_status=200)
