@@ -36,3 +36,4 @@ pyparsing
 -e cycler
 kiwisolver
 narwhals
+fontTools
