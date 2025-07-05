@@ -283,21 +283,48 @@ const WidgetDisplay: React.FC<WidgetDisplayProps> = ({ widget, refreshTrigger })
 
       case 'line_chart':
       case 'chart_line':
+      case 'line_chart':
+      case 'chart_line':
+        const lineData = data && Array.isArray(data) ? data : [
+          { name: 'Jan', value: 65 },
+          { name: 'Fév', value: 59 },
+          { name: 'Mar', value: 80 },
+          { name: 'Avr', value: 81 },
+          { name: 'Mai', value: 56 },
+          { name: 'Jun', value: 55 }
+        ];
+        const lineColor = widget.config.chartColor === 'gradient' ? '#8B5CF6' :
+                         widget.config.chartColor === 'green' ? '#10B981' :
+                         widget.config.chartColor === 'red' ? '#EF4444' :
+                         widget.config.chartColor === 'orange' ? '#F59E0B' : '#3B82F6';
+        const strokeDasharray = widget.config.lineStyle === 'dashed' ? '5 5' :
+                               widget.config.lineStyle === 'dotted' ? '2 2' : '0';
         return (
           <div className="h-full">
-            <h4 className="text-sm font-medium text-gray-900 mb-4">{widget.title}</h4>
-            <ResponsiveContainer width="100%" height="85%">
-              <LineChart data={data}>
+            <div className="flex justify-between items-center mb-2">
+              <h4 className="text-sm font-medium text-gray-900">{widget.title}</h4>
+              <span className="text-xs text-gray-500">{widget.config.periode || '6 mois'}</span>
+            </div>
+            <ResponsiveContainer width="100%" height="80%">
+              <LineChart data={lineData}>
                 <XAxis dataKey="name" />
                 <YAxis />
                 <Tooltip />
-                <Line type="monotone" dataKey="value" stroke="#3B82F6" strokeWidth={2} />
+                <Line 
+                  type="monotone" 
+                  dataKey="value" 
+                  stroke={lineColor} 
+                  strokeWidth={2}
+                  strokeDasharray={strokeDasharray}
+                  dot={{ fill: lineColor, strokeWidth: 2, r: 3 }}
+                />
               </LineChart>
             </ResponsiveContainer>
           </div>
         );
 
       case 'pie_chart':
+      case 'chart_pie':
         return (
           <div className="h-full">
             <h4 className="text-sm font-medium text-gray-900 mb-4">{widget.title}</h4>
