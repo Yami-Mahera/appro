@@ -120,7 +120,7 @@ def test_articles_api(token):
     print_header("Testing Articles API")
     success, message, data = make_request("get", "/articles", token=token, expected_status=200)
     
-    if success and data:
+    if success and data is not None:
         print(f"✅ Successfully retrieved articles")
         print(f"Retrieved {len(data)} articles")
         return True
