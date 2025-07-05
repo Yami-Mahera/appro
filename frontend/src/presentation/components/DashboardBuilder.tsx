@@ -147,12 +147,12 @@ const DashboardBuilder: React.FC<DashboardBuilderProps> = ({
     onSave(formData);
   };
 
-  const widgetCategories = availableWidgets.reduce((acc: any, widget) => {
+  const widgetCategories = Array.isArray(availableWidgets) ? availableWidgets.reduce((acc: any, widget) => {
     const category = widget.category || 'Autres';
     if (!acc[category]) acc[category] = [];
     acc[category].push(widget);
     return acc;
-  }, {});
+  }, {}) : {};
 
   return (
     <div className="h-screen flex flex-col bg-gray-100">
