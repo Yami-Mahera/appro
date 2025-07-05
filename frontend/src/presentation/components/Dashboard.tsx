@@ -38,21 +38,40 @@ interface CustomDashboard {
 const Dashboard: React.FC = () => {
   const [stats, setStats] = useState<DashboardStats | null>(null);
   const [loading, setLoading] = useState(true);
+  const [activeTab, setActiveTab] = useState<'overview' | 'kpi'>('overview');
+  
+  // States pour les tableaux de bord personnalisés
+  const [customDashboards, setCustomDashboards] = useState<CustomDashboard[]>([]);
+  const [selectedDashboard, setSelectedDashboard] = useState<CustomDashboard | null>(null);
+  const [showBuilder, setShowBuilder] = useState(false);
+  const [showViewer, setShowViewer] = useState(false);
+  const [editMode, setEditMode] = useState(false);
+  const { user } = useAuth();
 
   useEffect(() => {
-    const fetchStats = async () => {
-      try {
-        const data = await apiService.getDashboardStats();
-        setStats(data);
-      } catch (error) {
-        console.error('Error fetching dashboard stats:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchStats();
+    fetchCustomDashboards();
   }, []);
+
+  const fetchStats = async () => {
+    try {
+      const data = await apiService.getDashboardStats();
+      setStats(data);
+    } catch (error) {
+      console.error('Error fetching dashboard stats:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchCustomDashboards = async () => {
+    try {
+      const data = await apiService.getDashboardsPersonnalises();
+      setCustomDashboards(data);
+    } catch (error) {
+      console.error('Erreur lors du chargement des dashboards:', error);
+    }
+  };
 
   const statCards = [
     {
