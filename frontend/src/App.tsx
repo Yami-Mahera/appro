@@ -10,6 +10,7 @@ import ArticlesAdvanced from './presentation/screens/ArticlesAdvanced';
 import CommandesAdvanced from './presentation/screens/CommandesAdvanced';
 import Reporting from './presentation/screens/Reporting';
 import GestionStocksAvancee from './presentation/screens/GestionStocksAvancee';
+import DashboardsPersonnalises from './presentation/screens/DashboardsPersonnalises';
 import UsersAdvanced from './presentation/screens/UsersAdvanced';
 import "./App.css";
 
