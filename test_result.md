@@ -752,16 +752,16 @@ frontend:
         comment: "Le visualiseur de dashboard fonctionne correctement. Les widgets s'affichent avec leurs couleurs et données appropriées, et non plus en gris comme auparavant. Les fonctionnalités de plein écran, rafraîchissement automatique, partage et impression sont opérationnelles. Le bouton d'édition permet de basculer vers le mode édition sans problème."
 
   - task: "Alertes cliquables avec modal détaillé"
-    implemented: false
+    implemented: true
     working: false
     file: "/app/frontend/src/presentation/screens/AlertesTableauBord.tsx"
     stuck_count: 0
     priority: "high"
-    needs_retesting: false
+    needs_retesting: true
     status_history:
       - working: false
         agent: "main"
-        comment: "Implémentation en cours pour rendre les alertes cliquables avec modal de détails, navigation vers entités liées et actions utilisateur"
+        comment: "Implémentation terminée pour rendre les alertes cliquables avec modal de détails, navigation vers entités liées et actions utilisateur. Ajout du composant AlerteDetailModal.tsx et modification d'AlertesTableauBord.tsx. Prêt pour test backend."
 
   - task: "Navigation Dashboard KPI"
     implemented: true
