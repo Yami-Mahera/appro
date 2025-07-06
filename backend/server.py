@@ -226,6 +226,9 @@ class CommandeCreate(BaseModel):
     fournisseur_id: str
     lignes: List[LigneCommande]
     date_livraison_prevue: Optional[datetime] = None
+    date_production: Optional[datetime] = None
+    date_mise_disposition: Optional[datetime] = None
+    date_embarquement_cible: Optional[datetime] = None
     notes: Optional[str] = None
 
 # Alerte Models
