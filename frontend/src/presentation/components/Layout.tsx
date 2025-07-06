@@ -1,6 +1,5 @@
 import React, { useState, ReactNode } from "react";
 import { useAuth } from "../../hooks/useAuth";
-import { ThemeProvider } from "../../hooks/useTheme";
 import {
   HomeIcon,
   BuildingOfficeIcon,
