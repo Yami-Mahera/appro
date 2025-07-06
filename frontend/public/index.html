@@ -22,9 +22,21 @@
         <script>
             // Prevent flash of unstyled content (FOUC) for dark mode
             (function() {
-                const savedTheme = localStorage.getItem('theme');
-                if (savedTheme === 'dark' || (!savedTheme && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-                    document.documentElement.classList.add('dark');
+                try {
+                    const savedTheme = localStorage.getItem('theme');
+                    const isDark = savedTheme === 'dark' || (!savedTheme && window.matchMedia('(prefers-color-scheme: dark)').matches);
+                    
+                    if (isDark) {
+                        document.documentElement.classList.add('dark');
+                        // Ensure the theme is saved
+                        localStorage.setItem('theme', 'dark');
+                    } else {
+                        document.documentElement.classList.remove('dark');
+                        localStorage.setItem('theme', 'light');
+                    }
+                } catch (e) {
+                    // Fallback to light mode if localStorage is not available
+                    console.warn('Theme initialization failed:', e);
                 }
             })();
         </script>
