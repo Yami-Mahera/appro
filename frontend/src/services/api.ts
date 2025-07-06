@@ -289,13 +289,22 @@ class ApiService {
   }
 
   async getSyntheseReport(params?: { date_from?: string; date_to?: string }) {
+    console.log('🔍 ApiService.getSyntheseReport called with params:', params);
     const queryParams = new URLSearchParams();
     if (params?.date_from) queryParams.append('date_from', params.date_from);
     if (params?.date_to) queryParams.append('date_to', params.date_to);
     
     const url = queryParams.toString() ? `/api/reports/synthese?${queryParams.toString()}` : '/api/reports/synthese';
-    const response = await this.api.get(url);
-    return response.data;
+    console.log('🌐 Making request to:', url);
+    
+    try {
+      const response = await this.api.get(url);
+      console.log('✅ Synthese API response:', response.data);
+      return response.data;
+    } catch (error) {
+      console.error('❌ Synthese API error:', error);
+      throw error;
+    }
   }
 
   // Méthodes pour la gestion avancée des stocks
