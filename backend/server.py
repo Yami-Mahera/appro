@@ -622,11 +622,14 @@ async def calculer_niveau_alerte_nouvelle_commande(article_id: str, delai_passat
     else:  # ecart_jours < -4
         return NiveauAlerte.CRITIQUE, ecart_jours, details_calcul  # Commande Critique
 
-async def calculer_niveau_alerte_commande_en_cours(article_id: str, commande_id: str) -> NiveauAlerte:
+async def calculer_niveau_alerte_commande_en_cours(article_id: str, commande_id: str) -> tuple[NiveauAlerte, float, dict]:
     """
-    Calcule le niveau d'alerte pour une commande en cours
+    Calcule le niveau d'alerte pour une commande en cours selon la formule:
+    (Cp-CMS) / (CMS+da)
+    
+    Returns: (niveau_alerte, pourcentage_variation, details_calcul)
     """
-    cms = await calculer_couverture_minimale_securite(article_id)
+    cms = await calculer_couverture_minimale_securite(article_id)  # CMS
     
     # Récupérer la couverture prévue pour cette commande
     calcul = await db.calculs_couverture.find_one({
@@ -635,22 +638,40 @@ async def calculer_niveau_alerte_commande_en_cours(article_id: str, commande_id:
     })
     
     if not calcul:
-        return NiveauAlerte.NORMAL
+        # Si pas de calcul, utiliser la couverture actuelle comme approximation
+        cp = await calculer_couverture_actuelle(article_id)
+    else:
+        cp = calcul.get("couverture_prevue", 0)
     
-    cp = calcul.get("couverture_prevue", 0)
-    da = calcul.get("delai_acheminement", 1)
+    # Récupérer le délai d'acheminement
+    article = await db.articles.find_one({"id": article_id})
+    if article:
+        fournisseur = await db.fournisseurs.find_one({"id": article["fournisseur_id"]})
+        da = (fournisseur.get("delai_livraison_moyen", 14) / 7) if fournisseur else 2  # en semaines
+    else:
+        da = 2
     
+    details_calcul = {
+        "couverture_prevue": cp,
+        "couverture_minimale_securite": cms,
+        "delai_acheminement": da,
+        "formule": "(Cp-CMS) / (CMS+da)"
+    }
+    
+    # Calculer le pourcentage selon la formule: (Cp-CMS) / (CMS+da)
     if (cms + da) > 0:
-        variation_pourcent = (cp - cms) / (cms + da)
+        pourcentage_variation = (cp - cms) / (cms + da)
+        details_calcul["pourcentage_variation"] = pourcentage_variation
         
-        if variation_pourcent > 0.1:  # > 10%
-            return NiveauAlerte.NORMAL
-        elif 0 < variation_pourcent <= 0.1:  # 0% à 10%
-            return NiveauAlerte.A_SUIVRE
+        # Définition des seuils selon vos spécifications
+        if pourcentage_variation > 0.1:  # > 10%
+            return NiveauAlerte.NORMAL, pourcentage_variation, details_calcul  # Commande Normale
+        elif 0 < pourcentage_variation <= 0.1:  # 0% à 10%
+            return NiveauAlerte.A_SUIVRE, pourcentage_variation, details_calcul  # Commande à suivre
         else:  # < 0%
-            return NiveauAlerte.URGENT
+            return NiveauAlerte.URGENT, pourcentage_variation, details_calcul  # Commande Urgente
     
-    return NiveauAlerte.NORMAL
+    return NiveauAlerte.NORMAL, 0.0, details_calcul
 
 async def calculer_composition_tc(articles_ids: List[str]) -> Dict[str, Any]:
     """
