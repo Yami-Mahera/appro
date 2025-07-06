@@ -16,6 +16,7 @@ import {
 import { classNames } from "../../common/utils";
 import { images } from "../../data/constants/images";
 import Header from "./Header";
+import { Link, useLocation } from "react-router-dom";
 
 const navigation = [
   { name: "Dashboard", href: "/", icon: HomeIcon },
@@ -41,6 +42,7 @@ interface LayoutProps {
 const Layout: React.FC<LayoutProps> = ({ children, currentPath = "/" }) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const { user, logout } = useAuth();
+  const location = useLocation();
 
   return (
     <ThemeProvider>
@@ -81,17 +83,17 @@ const Layout: React.FC<LayoutProps> = ({ children, currentPath = "/" }) => {
                     (item) => !item.adminOnly || user?.role === "administrateur"
                   )
                   .map((item) => (
-                    <a
+                    <Link
                       key={item.name}
-                      href={item.href}
+                      to={item.href}
                       className={classNames(
                         "sidebar-link",
-                        currentPath === item.href ? "active" : ""
+                        location.pathname === item.href ? "active" : ""
                       )}
                     >
                       <item.icon className="mr-3 h-5 w-5" />
                       {item.name}
-                    </a>
+                    </Link>
                   ))}
               </nav>
             </div>
@@ -144,17 +146,17 @@ const Layout: React.FC<LayoutProps> = ({ children, currentPath = "/" }) => {
                     (item) => !item.adminOnly || user?.role === "administrateur"
                   )
                   .map((item) => (
-                    <a
+                    <Link
                       key={item.name}
-                      href={item.href}
+                      to={item.href}
                       className={classNames(
                         "sidebar-link",
-                        currentPath === item.href ? "active" : ""
+                        location.pathname === item.href ? "active" : ""
                       )}
                     >
                       <item.icon className="mr-4 h-5 w-5" />
                       <span className="font-medium">{item.name}</span>
-                    </a>
+                    </Link>
                   ))}
               </nav>
             </div>

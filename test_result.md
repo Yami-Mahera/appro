@@ -212,6 +212,12 @@ backend:
       - working: true
         agent: "testing"
         comment: "L'API pour récupérer les statistiques du dashboard fonctionne correctement. Toutes les statistiques (fournisseurs, articles, commandes, alertes, articles en stock bas, commandes en cours) sont correctement calculées et renvoyées."
+      - working: true
+        agent: "testing"
+        comment: "Tests approfondis de l'API dashboard stats. L'API fonctionne correctement et retourne toutes les statistiques attendues. Cependant, la valeur 'commandes_en_cours' est toujours à 0 car il n'existe pas d'endpoint pour mettre à jour le statut d'une commande, et le statut par défaut est 'brouillon' (DRAFT). L'API compte correctement les commandes avec statut 'en_attente', 'approuvee' ou 'commandee' comme 'commandes_en_cours', mais aucune commande n'a ces statuts."
+      - working: true
+        agent: "testing"
+        comment: "Tests supplémentaires de l'API dashboard stats suite à la modification du composant WidgetPreview.tsx. L'API /api/dashboard/stats fonctionne correctement et retourne toutes les statistiques attendues. La valeur 'commandes_en_cours' est bien à 0 car il n'existe pas d'endpoint pour mettre à jour le statut d'une commande. Le composant WidgetPreview.tsx a été correctement modifié pour utiliser les vraies données de l'API comme WidgetDisplay.tsx, et les données de fallback ont été harmonisées (commandes_en_cours = 0)."
         
   - task: "APIs améliorées avec tri et recherche"
     implemented: true
@@ -407,6 +413,37 @@ backend:
       - working: true
         agent: "testing"
         comment: "APIs tableaux de bord personnalisés testées avec succès. Création, gestion, et récupération des widgets fonctionnent parfaitement avec support configuration avancée."
+      - working: true
+  - task: "API Widgets Disponibles"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Implémenté l'API pour récupérer la liste des widgets disponibles pour les tableaux de bord personnalisés"
+      - working: true
+        agent: "testing"
+  - task: "APIs de données pour widgets"
+    implemented: true
+    working: true
+    file: "/app/backend/server.py"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Implémenté les APIs pour alimenter les widgets des tableaux de bord personnalisés"
+      - working: true
+        agent: "testing"
+        comment: "Les APIs pour alimenter les widgets fonctionnent correctement. GET /api/dashboard/stats retourne les statistiques générales (6 métriques). GET /api/kpis/taux-service-client, GET /api/kpis/delai-moyen-livraison et GET /api/kpis/synthese retournent les données KPI correctement. GET /api/alertes?lue=false retourne les alertes non lues."
+        comment: "L'API GET /api/dashboards/widgets-disponibles fonctionne correctement et retourne la liste des 6 types de widgets disponibles (kpi_card, chart_line, chart_bar, chart_pie, table, gauge) avec leurs options de configuration."
+        agent: "testing"
+        comment: "Tests complets des APIs de tableaux de bord personnalisés effectués. Les endpoints GET, POST, PUT et DELETE /api/dashboards/personnalises fonctionnent correctement. L'API GET /api/dashboards/widgets-disponibles retourne bien la liste des widgets disponibles avec leurs options de configuration."
 
 frontend:
   - task: "Architecture TypeScript modulaire"
@@ -621,15 +658,108 @@ frontend:
 
   - task: "Intégration navigation - route Stocks Avancés"
     implemented: true
-    working: "NA"
+    working: true
     file: "/app/frontend/src/App.tsx, /app/frontend/src/presentation/components/Layout.tsx"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
         comment: "Ajouté la route /stocks-avances dans App.tsx et le lien de navigation 'Stocks Avancés' dans Layout.tsx avec icône Squares2X2Icon"
+      - working: true
+        agent: "testing"
+        comment: "L'intégration de la navigation vers la route Stocks Avancés fonctionne correctement. La route /stocks-avances est accessible et le lien de navigation 'Stocks Avancés' est présent dans le menu."
+
+  - task: "Interface Tableaux de Bord Personnalisés"
+    implemented: true
+    working: true
+    file: "/app/frontend/src/presentation/screens/DashboardsPersonnalises.tsx"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Créé l'écran principal de gestion des dashboards personnalisés avec liste, création, édition et suppression des tableaux de bord"
+      - working: true
+        agent: "testing"
+        comment: "L'interface des tableaux de bord personnalisés fonctionne correctement. La liste des dashboards s'affiche bien, et les fonctionnalités de création, édition et suppression sont opérationnelles. Le dashboard de test 'Dashboard Test - Problème Widgets' est visible et accessible."
+
+  - task: "Constructeur de Dashboard"
+    implemented: true
+    working: true
+    file: "/app/frontend/src/presentation/components/DashboardBuilder.tsx"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Créé le constructeur de dashboard avec interface drag & drop, bibliothèque de widgets, configuration des propriétés et aperçu en temps réel"
+      - working: true
+        agent: "testing"
+        comment: "Le constructeur de dashboard fonctionne correctement. L'interface permet d'ajouter des widgets depuis la bibliothèque, de les configurer et de les prévisualiser. Les widgets s'affichent avec leurs couleurs et styles appropriés en mode aperçu."
+
+  - task: "Configuration des Widgets"
+    implemented: true
+    working: true
+    file: "/app/frontend/src/presentation/components/WidgetConfigModal.tsx"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Créé le modal de configuration des widgets avec paramètres spécifiques par type (stats, graphiques, tableaux, KPIs, alertes, tendances)"
+      - working: true
+        agent: "testing"
+        comment: "Le modal de configuration des widgets fonctionne correctement. Les paramètres spécifiques à chaque type de widget sont bien présents et fonctionnels. La configuration permet de personnaliser l'apparence et les données des widgets, qui s'affichent ensuite correctement en mode visualisation."
+
+  - task: "Aperçu et Affichage des Widgets"
+    implemented: true
+    working: true
+    file: "/app/frontend/src/presentation/components/WidgetPreview.tsx, /app/frontend/src/presentation/components/WidgetDisplay.tsx"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Créé les composants pour l'aperçu (mode édition) et l'affichage (mode visualisation) des widgets avec données en temps réel"
+      - working: true
+        agent: "testing"
+        comment: "Les composants WidgetPreview et WidgetDisplay fonctionnent correctement. Le problème des widgets grisés en mode visualisation a été résolu grâce à la synchronisation des types de widgets entre les deux composants, l'amélioration de la gestion des données vides, et l'ajout de données de fallback. Les widgets affichent maintenant leurs vraies couleurs et données en mode visualisation comme en mode édition."
+
+  - task: "Visualiseur de Dashboard"
+    implemented: true
+    working: true
+    file: "/app/frontend/src/presentation/components/DashboardViewer.tsx"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Créé le visualiseur de dashboard avec mode plein écran, rafraîchissement automatique, partage, impression et édition"
+      - working: true
+        agent: "testing"
+        comment: "Le visualiseur de dashboard fonctionne correctement. Les widgets s'affichent avec leurs couleurs et données appropriées, et non plus en gris comme auparavant. Les fonctionnalités de plein écran, rafraîchissement automatique, partage et impression sont opérationnelles. Le bouton d'édition permet de basculer vers le mode édition sans problème."
+
+  - task: "Navigation Dashboard KPI"
+    implemented: true
+    working: true
+    file: "/app/frontend/src/App.tsx, /app/frontend/src/presentation/components/Layout.tsx"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: false
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Ajouté la route /dashboards et le lien de navigation 'Dashboards KPI' avec icône PresentationChartBarIcon"
+      - working: true
+        agent: "testing"
+        comment: "La navigation vers les Dashboards KPI fonctionne correctement. L'onglet 'Dashboards KPI' est accessible depuis le dashboard principal et permet d'accéder à la liste des tableaux de bord personnalisés."
 
 metadata:
   created_by: "main_agent"
@@ -638,13 +768,7 @@ metadata:
   run_ui: false
 
 test_plan:
-  current_focus:
-    - "Tableau de projection de la couverture de stock"
-    - "Tableau de simulation de commande"
-    - "Tableau de suivi des commandes en cours"
-    - "Page Gestion Stocks Avancée"
-    - "Extension API Service pour nouveaux endpoints"
-    - "Intégration navigation - route Stocks Avancés"
+  current_focus: []
   stuck_tasks: []
   test_all: false
   test_priority: "high_first"
@@ -652,3 +776,15 @@ test_plan:
 agent_communication:
   - agent: "main"
     message: "PHASE 1 TERMINÉE - IMPLÉMENTATION DES 3 TABLEAUX PRINCIPAUX selon les images fournies ! ✅ Tableau de projection de la couverture de stock avec calculs CMS/CMC/QM ✅ Tableau de simulation de commande avec validation avancée ✅ Tableau de suivi des commandes en cours avec alertes temps réel ✅ Page intégrée avec navigation par onglets ✅ Extension API service avec nouvelles méthodes ✅ Route et navigation ajoutées. Tous les composants créés utilisent les APIs backend existantes et respectent le design existant. Prêt pour test backend puis test frontend avec permission utilisateur."
+  - agent: "main"
+    message: "NOUVELLE FONCTIONNALITÉ IMPLÉMENTÉE - TABLEAUX DE BORD PERSONNALISÉS ! ✅ Interface complète de gestion des dashboards personnalisés ✅ Constructeur de dashboard avec drag & drop et bibliothèque de widgets ✅ 8 types de widgets configurables (stats, graphiques, tableaux, KPIs, alertes, tendances) ✅ Modal de configuration avancée pour chaque type de widget ✅ Visualiseur avec mode plein écran, rafraîchissement auto, partage ✅ Navigation ajoutée. Les APIs backend sont déjà implémentées et testées. Prêt pour test backend des nouvelles fonctionnalités frontend."
+  - agent: "testing"
+    message: "TESTS BACKEND RÉUSSIS - TABLEAUX DE BORD PERSONNALISÉS ! ✅ Toutes les APIs pour les tableaux de bord personnalisés fonctionnent correctement (GET, POST, PUT, DELETE /api/dashboards/personnalises) ✅ L'API GET /api/dashboards/widgets-disponibles retourne bien les 6 types de widgets disponibles ✅ Les APIs de données pour alimenter les widgets fonctionnent parfaitement (dashboard/stats, kpis/*, alertes) ✅ Tous les tests ont réussi sans erreur. Le backend est prêt pour l'intégration avec le frontend."
+  - agent: "main"
+    message: "INTÉGRATION DASHBOARDS KPI TERMINÉE ! ✅ Contenu du menu 'Dashboards KPI' transféré vers le Dashboard principal ✅ Ajout d'onglets 'Vue d'ensemble' et 'Dashboards KPI' dans le Dashboard ✅ Suppression du menu 'Dashboards KPI' séparé ✅ Suppression de la route /dashboards ✅ Ajout des méthodes API manquantes (update, delete) ✅ Interface unifiée avec gestion complète des tableaux de bord personnalisés. L'utilisateur peut désormais accéder aux fonctionnalités KPI directement depuis le Dashboard principal via l'onglet dédié."
+  - agent: "testing"
+    message: "TESTS FRONTEND RÉUSSIS - PROBLÈME DES WIDGETS GRISÉS RÉSOLU ! ✅ Les widgets affichent maintenant leurs vraies couleurs et données en mode visualisation ✅ Le widget KPI 'Total Fournisseurs' s'affiche correctement en bleu avec icône et chiffre ✅ Le graphique en barres 'Évolution Mensuelle' affiche des barres colorées ✅ Le camembert 'Répartition par Catégorie' affiche différentes couleurs ✅ La jauge 'Performance KPI' affiche les couleurs verte/jaune/rouge ✅ Les widgets ont la même apparence en mode édition et visualisation ✅ Les données de fallback s'affichent correctement si les APIs échouent. Le problème a été résolu grâce à la synchronisation des types de widgets entre WidgetDisplay et WidgetPreview, l'amélioration de la gestion des données vides, et l'ajout de données de fallback."
+  - agent: "testing"
+    message: "TEST DE L'API DASHBOARD STATS TERMINÉ ! ✅ L'API /api/dashboard/stats fonctionne correctement et retourne toutes les statistiques attendues (total_fournisseurs, total_articles, total_commandes, alertes_non_lues, articles_stock_bas, commandes_en_cours). ⚠️ Cependant, la valeur 'commandes_en_cours' est toujours à 0 car il n'existe pas d'endpoint pour mettre à jour le statut d'une commande, et le statut par défaut est 'brouillon' (DRAFT). L'API compte correctement les commandes avec statut 'en_attente', 'approuvee' ou 'commandee' comme 'commandes_en_cours', mais aucune commande n'a ces statuts. Ce problème explique la différence d'affichage entre la vue 'edit' et la vue 'details' mentionnée dans la demande."
+  - agent: "testing"
+    message: "TESTS BACKEND RÉUSSIS - MODIFICATION WIDGETPREVIEW.TSX ! ✅ L'API /api/dashboard/stats fonctionne correctement et retourne toutes les statistiques attendues. ✅ La valeur 'commandes_en_cours' est bien à 0 comme attendu. ✅ Les APIs articles, fournisseurs, commandes et alertes fonctionnent correctement. ✅ Le composant WidgetPreview.tsx a été correctement modifié pour utiliser les vraies données de l'API comme WidgetDisplay.tsx. ✅ Les données de fallback ont été harmonisées entre les deux composants (commandes_en_cours = 0). ✅ Les icônes ont été harmonisées entre les deux composants. ✅ Les états de chargement et d'erreur ont été ajoutés. Le bug d'affichage des KPIs est maintenant résolu, les valeurs sont identiques entre la vue 'details' et la vue 'modifier'."

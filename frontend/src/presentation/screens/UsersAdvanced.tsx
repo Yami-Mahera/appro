@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from 'react';
-import { 
-  PlusIcon, 
-  PencilIcon, 
+import React, { useState, useEffect } from "react";
+import {
+  PlusIcon,
+  PencilIcon,
   TrashIcon,
   MagnifyingGlassIcon,
   AdjustmentsHorizontalIcon,
@@ -10,24 +10,25 @@ import {
   EyeIcon,
   KeyIcon,
   ShieldCheckIcon,
-  UserCircleIcon
-} from '@heroicons/react/24/outline';
-import ApiService from '../../services/api';
-import { useAuth } from '../../hooks/useAuth';
+  UserCircleIcon,
+} from "@heroicons/react/24/outline";
+import ApiService from "../../services/api";
+import { useAuth } from "../../hooks/useAuth";
+import { debounce } from "lodash";
 
 interface User {
   id: string;
   email: string;
   nom: string;
   prenom: string;
-  role: 'administrateur' | 'manager' | 'utilisateur';
+  role: "administrateur" | "manager" | "utilisateur";
   active: boolean;
   created_at: string;
   last_login?: string;
 }
 
-type SortField = 'nom' | 'prenom' | 'email' | 'role' | 'created_at';
-type SortOrder = 'asc' | 'desc';
+type SortField = "nom" | "prenom" | "email" | "role" | "created_at";
+type SortOrder = "asc" | "desc";
 
 const UsersAdvanced: React.FC = () => {
   const { user: currentUser } = useAuth();
@@ -43,40 +44,47 @@ const UsersAdvanced: React.FC = () => {
   const [showFilters, setShowFilters] = useState(false);
 
   // Vérifier si l'utilisateur actuel est administrateur
-  const isAdmin = currentUser?.role === 'administrateur';
+  const isAdmin = currentUser?.role === "administrateur";
 
   // Rediriger si pas admin
   useEffect(() => {
     if (currentUser && !isAdmin) {
-      window.location.href = '/';
+      window.location.href = "/";
       return;
     }
   }, [currentUser, isAdmin]);
-  
+
   // Search and filter states
-  const [searchTerm, setSearchTerm] = useState('');
-  const [sortField, setSortField] = useState<SortField>('nom');
-  const [sortOrder, setSortOrder] = useState<SortOrder>('asc');
+  const [searchTerm, setSearchTerm] = useState("");
+  const [sortField, setSortField] = useState<SortField>("nom");
+  const [sortOrder, setSortOrder] = useState<SortOrder>("asc");
   const [filters, setFilters] = useState({
-    role: '',
-    active: true as boolean | undefined
+    role: "",
+    active: true as boolean | undefined,
   });
 
   const [formData, setFormData] = useState({
-    email: '',
-    password: '',
-    nom: '',
-    prenom: '',
-    role: 'utilisateur' as 'administrateur' | 'manager' | 'utilisateur'
+    email: "",
+    password: "",
+    nom: "",
+    prenom: "",
+    role: "utilisateur" as "administrateur" | "manager" | "utilisateur",
   });
 
   const [passwordData, setPasswordData] = useState({
-    newPassword: '',
-    confirmPassword: ''
+    newPassword: "",
+    confirmPassword: "",
   });
 
   useEffect(() => {
-    loadUsers();
+    const debouncedLoad = debounce(() => {
+      loadUsers();
+    }, 300); // délai de 300ms
+
+    debouncedLoad();
+
+    // Nettoyage pour éviter des appels en cascade
+    return () => debouncedLoad.cancel();
   }, [searchTerm, sortField, sortOrder, filters]);
 
   const loadUsers = async () => {
@@ -87,13 +95,16 @@ const UsersAdvanced: React.FC = () => {
         sort_by: sortField,
         sort_order: sortOrder,
         role: filters.role || undefined,
-        active: filters.active
+        active: filters.active,
       };
-      
+
       const data = await ApiService.getUsers(params);
       setUsers(data);
     } catch (err: any) {
-      setError(err.response?.data?.detail || 'Erreur lors du chargement des utilisateurs');
+      setError(
+        err.response?.data?.detail ||
+          "Erreur lors du chargement des utilisateurs"
+      );
     } finally {
       setLoading(false);
     }
@@ -101,10 +112,10 @@ const UsersAdvanced: React.FC = () => {
 
   const handleSort = (field: SortField) => {
     if (sortField === field) {
-      setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
+      setSortOrder(sortOrder === "asc" ? "desc" : "asc");
     } else {
       setSortField(field);
-      setSortOrder('asc');
+      setSortOrder("asc");
     }
   };
 
@@ -124,49 +135,63 @@ const UsersAdvanced: React.FC = () => {
       resetForm();
       loadUsers();
     } catch (err: any) {
-      setError(err.response?.data?.detail || 'Erreur lors de la sauvegarde');
+      setError(err.response?.data?.detail || "Erreur lors de la sauvegarde");
     }
   };
 
   const handlePasswordReset = async (e: React.FormEvent) => {
     e.preventDefault();
     if (passwordData.newPassword !== passwordData.confirmPassword) {
-      setError('Les mots de passe ne correspondent pas');
+      setError("Les mots de passe ne correspondent pas");
       return;
     }
-    
+
     try {
-      await ApiService.resetUserPassword(resetPasswordUser!.id, passwordData.newPassword);
+      await ApiService.resetUserPassword(
+        resetPasswordUser!.id,
+        passwordData.newPassword
+      );
       setShowPasswordModal(false);
       setResetPasswordUser(null);
-      setPasswordData({ newPassword: '', confirmPassword: '' });
+      setPasswordData({ newPassword: "", confirmPassword: "" });
       setError(null);
-      alert('Mot de passe réinitialisé avec succès');
+      alert("Mot de passe réinitialisé avec succès");
     } catch (err: any) {
-      setError(err.response?.data?.detail || 'Erreur lors de la réinitialisation du mot de passe');
+      setError(
+        err.response?.data?.detail ||
+          "Erreur lors de la réinitialisation du mot de passe"
+      );
     }
   };
 
   const handleDelete = async (user: User) => {
     // Empêcher la suppression de son propre compte
     if (user.id === currentUser?.id) {
-      setError('Vous ne pouvez pas supprimer votre propre compte');
+      setError("Vous ne pouvez pas supprimer votre propre compte");
       return;
     }
-    
-    if (window.confirm(`Êtes-vous sûr de vouloir supprimer l'utilisateur ${user.prenom} ${user.nom} ?`)) {
+
+    if (
+      window.confirm(
+        `Êtes-vous sûr de vouloir supprimer l'utilisateur ${user.prenom} ${user.nom} ?`
+      )
+    ) {
       try {
         await ApiService.deleteUser(user.id);
         loadUsers();
       } catch (err: any) {
-        setError(err.response?.data?.detail || 'Erreur lors de la suppression');
+        setError(err.response?.data?.detail || "Erreur lors de la suppression");
       }
     }
   };
 
   const resetForm = () => {
     setFormData({
-      email: '', password: '', nom: '', prenom: '', role: 'utilisateur'
+      email: "",
+      password: "",
+      nom: "",
+      prenom: "",
+      role: "utilisateur",
     });
   };
 
@@ -174,10 +199,10 @@ const UsersAdvanced: React.FC = () => {
     setEditingUser(user);
     setFormData({
       email: user.email,
-      password: '', // Don't populate password for security
+      password: "", // Don't populate password for security
       nom: user.nom,
       prenom: user.prenom,
-      role: user.role
+      role: user.role,
     });
     setShowModal(true);
   };
@@ -195,37 +220,46 @@ const UsersAdvanced: React.FC = () => {
 
   const openPasswordResetModal = (user: User) => {
     setResetPasswordUser(user);
-    setPasswordData({ newPassword: '', confirmPassword: '' });
+    setPasswordData({ newPassword: "", confirmPassword: "" });
     setShowPasswordModal(true);
   };
 
   const getRoleBadge = (role: string) => {
     const styles = {
-      administrateur: 'bg-red-100 text-red-800',
-      manager: 'bg-blue-100 text-blue-800',
-      utilisateur: 'bg-green-100 text-green-800'
+      administrateur: "bg-red-100 text-red-800",
+      manager: "bg-blue-100 text-blue-800",
+      utilisateur: "bg-green-100 text-green-800",
     };
     const labels = {
-      administrateur: 'Admin',
-      manager: 'Manager',
-      utilisateur: 'Utilisateur'
+      administrateur: "Admin",
+      manager: "Manager",
+      utilisateur: "Utilisateur",
     };
     return {
       style: styles[role as keyof typeof styles] || styles.utilisateur,
-      label: labels[role as keyof typeof labels] || 'Utilisateur'
+      label: labels[role as keyof typeof labels] || "Utilisateur",
     };
   };
 
-  const SortableHeader = ({ field, children }: { field: SortField; children: React.ReactNode }) => (
-    <th 
+  const SortableHeader = ({
+    field,
+    children,
+  }: {
+    field: SortField;
+    children: React.ReactNode;
+  }) => (
+    <th
       className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
       onClick={() => handleSort(field)}
     >
       <div className="flex items-center space-x-1">
         <span>{children}</span>
-        {sortField === field && (
-          sortOrder === 'asc' ? <ChevronUpIcon className="w-4 h-4" /> : <ChevronDownIcon className="w-4 h-4" />
-        )}
+        {sortField === field &&
+          (sortOrder === "asc" ? (
+            <ChevronUpIcon className="w-4 h-4" />
+          ) : (
+            <ChevronDownIcon className="w-4 h-4" />
+          ))}
       </div>
     </th>
   );
@@ -243,8 +277,12 @@ const UsersAdvanced: React.FC = () => {
     return (
       <div className="flex flex-col items-center justify-center h-64">
         <ShieldCheckIcon className="w-16 h-16 text-red-500 mb-4" />
-        <h2 className="text-xl font-semibold text-gray-900 mb-2">Accès refusé</h2>
-        <p className="text-gray-600">Vous devez être administrateur pour accéder à cette page.</p>
+        <h2 className="text-xl font-semibold text-gray-900 mb-2">
+          Accès refusé
+        </h2>
+        <p className="text-gray-600">
+          Vous devez être administrateur pour accéder à cette page.
+        </p>
       </div>
     );
   }
@@ -254,7 +292,9 @@ const UsersAdvanced: React.FC = () => {
       <div className="flex justify-between items-center">
         <div className="flex items-center space-x-3">
           <UserCircleIcon className="w-8 h-8 text-blue-600" />
-          <h1 className="text-2xl font-bold text-gray-900">Gestion des Utilisateurs</h1>
+          <h1 className="text-2xl font-bold text-gray-900">
+            Gestion des Utilisateurs
+          </h1>
         </div>
         <button
           onClick={handleAdd}
@@ -296,10 +336,14 @@ const UsersAdvanced: React.FC = () => {
         {showFilters && (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4 border-t">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Rôle</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Rôle
+              </label>
               <select
                 value={filters.role}
-                onChange={(e) => setFilters({ ...filters, role: e.target.value })}
+                onChange={(e) =>
+                  setFilters({ ...filters, role: e.target.value })
+                }
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
               >
                 <option value="">Tous les rôles</option>
@@ -309,13 +353,24 @@ const UsersAdvanced: React.FC = () => {
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">Statut</label>
+              <label className="block text-sm font-medium text-gray-700 mb-1">
+                Statut
+              </label>
               <select
-                value={filters.active === undefined ? 'all' : filters.active.toString()}
-                onChange={(e) => setFilters({ 
-                  ...filters, 
-                  active: e.target.value === 'all' ? undefined : e.target.value === 'true' 
-                })}
+                value={
+                  filters.active === undefined
+                    ? "all"
+                    : filters.active.toString()
+                }
+                onChange={(e) =>
+                  setFilters({
+                    ...filters,
+                    active:
+                      e.target.value === "all"
+                        ? undefined
+                        : e.target.value === "true",
+                  })
+                }
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
               >
                 <option value="all">Tous</option>
@@ -358,7 +413,8 @@ const UsersAdvanced: React.FC = () => {
                         <div className="flex-shrink-0 h-10 w-10">
                           <div className="h-10 w-10 rounded-full bg-gray-300 flex items-center justify-center">
                             <span className="text-sm font-medium text-gray-700">
-                              {user.prenom[0]}{user.nom[0]}
+                              {user.prenom[0]}
+                              {user.nom[0]}
                             </span>
                           </div>
                         </div>
@@ -373,22 +429,30 @@ const UsersAdvanced: React.FC = () => {
                       {user.email}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${roleBadge.style}`}>
+                      <span
+                        className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${roleBadge.style}`}
+                      >
                         {roleBadge.label}
                       </span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
-                        user.active ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
-                      }`}>
-                        {user.active ? 'Actif' : 'Inactif'}
+                      <span
+                        className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
+                          user.active
+                            ? "bg-green-100 text-green-800"
+                            : "bg-red-100 text-red-800"
+                        }`}
+                      >
+                        {user.active ? "Actif" : "Inactif"}
                       </span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {new Date(user.created_at).toLocaleDateString('fr-FR')}
+                      {new Date(user.created_at).toLocaleDateString("fr-FR")}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      {user.last_login ? new Date(user.last_login).toLocaleDateString('fr-FR') : 'Jamais'}
+                      {user.last_login
+                        ? new Date(user.last_login).toLocaleDateString("fr-FR")
+                        : "Jamais"}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                       <div className="flex space-x-2">
@@ -431,7 +495,7 @@ const UsersAdvanced: React.FC = () => {
             </tbody>
           </table>
         </div>
-        
+
         {users.length === 0 && (
           <div className="text-center py-8">
             <UserCircleIcon className="mx-auto h-12 w-12 text-gray-400" />
@@ -445,26 +509,36 @@ const UsersAdvanced: React.FC = () => {
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
           <div className="bg-white rounded-lg p-6 w-full max-w-md">
             <h2 className="text-xl font-bold mb-4">
-              {editingUser ? 'Modifier l\'utilisateur' : 'Ajouter un utilisateur'}
+              {editingUser
+                ? "Modifier l'utilisateur"
+                : "Ajouter un utilisateur"}
             </h2>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">Prénom *</label>
+                  <label className="block text-sm font-medium text-gray-700">
+                    Prénom *
+                  </label>
                   <input
                     type="text"
                     value={formData.prenom}
-                    onChange={(e) => setFormData({ ...formData, prenom: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, prenom: e.target.value })
+                    }
                     className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                     required
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">Nom *</label>
+                  <label className="block text-sm font-medium text-gray-700">
+                    Nom *
+                  </label>
                   <input
                     type="text"
                     value={formData.nom}
-                    onChange={(e) => setFormData({ ...formData, nom: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, nom: e.target.value })
+                    }
                     className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                     required
                   />
@@ -472,11 +546,15 @@ const UsersAdvanced: React.FC = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700">Email *</label>
+                <label className="block text-sm font-medium text-gray-700">
+                  Email *
+                </label>
                 <input
                   type="email"
                   value={formData.email}
-                  onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                  onChange={(e) =>
+                    setFormData({ ...formData, email: e.target.value })
+                  }
                   className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                   required
                 />
@@ -484,11 +562,15 @@ const UsersAdvanced: React.FC = () => {
 
               {!editingUser && (
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">Mot de passe *</label>
+                  <label className="block text-sm font-medium text-gray-700">
+                    Mot de passe *
+                  </label>
                   <input
                     type="password"
                     value={formData.password}
-                    onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                    onChange={(e) =>
+                      setFormData({ ...formData, password: e.target.value })
+                    }
                     className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                     required={!editingUser}
                     minLength={6}
@@ -497,10 +579,14 @@ const UsersAdvanced: React.FC = () => {
               )}
 
               <div>
-                <label className="block text-sm font-medium text-gray-700">Rôle *</label>
+                <label className="block text-sm font-medium text-gray-700">
+                  Rôle *
+                </label>
                 <select
                   value={formData.role}
-                  onChange={(e) => setFormData({ ...formData, role: e.target.value as any })}
+                  onChange={(e) =>
+                    setFormData({ ...formData, role: e.target.value as any })
+                  }
                   className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                   required
                 >
@@ -522,7 +608,7 @@ const UsersAdvanced: React.FC = () => {
                   type="submit"
                   className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
                 >
-                  {editingUser ? 'Modifier' : 'Ajouter'}
+                  {editingUser ? "Modifier" : "Ajouter"}
                 </button>
               </div>
             </form>
@@ -543,35 +629,58 @@ const UsersAdvanced: React.FC = () => {
                 ✕
               </button>
             </div>
-            
+
             <div className="space-y-4">
               <div className="text-center">
                 <div className="h-16 w-16 rounded-full bg-gray-300 flex items-center justify-center mx-auto mb-3">
                   <span className="text-xl font-medium text-gray-700">
-                    {viewingUser.prenom[0]}{viewingUser.nom[0]}
+                    {viewingUser.prenom[0]}
+                    {viewingUser.nom[0]}
                   </span>
                 </div>
-                <h3 className="text-lg font-semibold">{viewingUser.prenom} {viewingUser.nom}</h3>
+                <h3 className="text-lg font-semibold">
+                  {viewingUser.prenom} {viewingUser.nom}
+                </h3>
                 <p className="text-gray-500">{viewingUser.email}</p>
               </div>
 
               <div className="grid grid-cols-2 gap-4 pt-4 border-t">
                 <div>
-                  <span className="text-sm font-medium text-gray-500">Rôle:</span>
-                  <p className="text-gray-900">{getRoleBadge(viewingUser.role).label}</p>
-                </div>
-                <div>
-                  <span className="text-sm font-medium text-gray-500">Statut:</span>
-                  <p className="text-gray-900">{viewingUser.active ? 'Actif' : 'Inactif'}</p>
-                </div>
-                <div>
-                  <span className="text-sm font-medium text-gray-500">Créé le:</span>
-                  <p className="text-gray-900">{new Date(viewingUser.created_at).toLocaleDateString('fr-FR')}</p>
-                </div>
-                <div>
-                  <span className="text-sm font-medium text-gray-500">Dernière connexion:</span>
+                  <span className="text-sm font-medium text-gray-500">
+                    Rôle:
+                  </span>
                   <p className="text-gray-900">
-                    {viewingUser.last_login ? new Date(viewingUser.last_login).toLocaleDateString('fr-FR') : 'Jamais'}
+                    {getRoleBadge(viewingUser.role).label}
+                  </p>
+                </div>
+                <div>
+                  <span className="text-sm font-medium text-gray-500">
+                    Statut:
+                  </span>
+                  <p className="text-gray-900">
+                    {viewingUser.active ? "Actif" : "Inactif"}
+                  </p>
+                </div>
+                <div>
+                  <span className="text-sm font-medium text-gray-500">
+                    Créé le:
+                  </span>
+                  <p className="text-gray-900">
+                    {new Date(viewingUser.created_at).toLocaleDateString(
+                      "fr-FR"
+                    )}
+                  </p>
+                </div>
+                <div>
+                  <span className="text-sm font-medium text-gray-500">
+                    Dernière connexion:
+                  </span>
+                  <p className="text-gray-900">
+                    {viewingUser.last_login
+                      ? new Date(viewingUser.last_login).toLocaleDateString(
+                          "fr-FR"
+                        )
+                      : "Jamais"}
                   </p>
                 </div>
               </div>
@@ -586,20 +695,32 @@ const UsersAdvanced: React.FC = () => {
           <div className="bg-white rounded-lg p-6 w-full max-w-md">
             <div className="flex items-center space-x-3 mb-4">
               <KeyIcon className="w-6 h-6 text-orange-600" />
-              <h2 className="text-xl font-bold">Réinitialiser le mot de passe</h2>
+              <h2 className="text-xl font-bold">
+                Réinitialiser le mot de passe
+              </h2>
             </div>
-            
+
             <p className="text-gray-600 mb-4">
-              Utilisateur: <span className="font-medium">{resetPasswordUser.prenom} {resetPasswordUser.nom}</span>
+              Utilisateur:{" "}
+              <span className="font-medium">
+                {resetPasswordUser.prenom} {resetPasswordUser.nom}
+              </span>
             </p>
 
             <form onSubmit={handlePasswordReset} className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700">Nouveau mot de passe *</label>
+                <label className="block text-sm font-medium text-gray-700">
+                  Nouveau mot de passe *
+                </label>
                 <input
                   type="password"
                   value={passwordData.newPassword}
-                  onChange={(e) => setPasswordData({ ...passwordData, newPassword: e.target.value })}
+                  onChange={(e) =>
+                    setPasswordData({
+                      ...passwordData,
+                      newPassword: e.target.value,
+                    })
+                  }
                   className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                   required
                   minLength={6}
@@ -607,11 +728,18 @@ const UsersAdvanced: React.FC = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700">Confirmer le mot de passe *</label>
+                <label className="block text-sm font-medium text-gray-700">
+                  Confirmer le mot de passe *
+                </label>
                 <input
                   type="password"
                   value={passwordData.confirmPassword}
-                  onChange={(e) => setPasswordData({ ...passwordData, confirmPassword: e.target.value })}
+                  onChange={(e) =>
+                    setPasswordData({
+                      ...passwordData,
+                      confirmPassword: e.target.value,
+                    })
+                  }
                   className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                   required
                   minLength={6}

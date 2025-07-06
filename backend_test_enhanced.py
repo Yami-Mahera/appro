@@ -5,7 +5,7 @@ import uuid
 from typing import Dict, List, Optional, Any
 
 # Configuration
-BASE_URL = "https://329da72e-8ebd-4dc9-9b0f-e0ad59dd85bc.preview.emergentagent.com/api"
+BASE_URL = "https://32d22d0d-c0a2-447a-af80-18e1d3c219a9.preview.emergentagent.com/api"
 ADMIN_CREDENTIALS = {
     "email": "admin@test.com",
     "password": "admin123"

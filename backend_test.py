@@ -7,7 +7,7 @@ from datetime import datetime, timedelta
 from typing import Dict, List, Optional, Any
 
 # Configuration
-BASE_URL = "http://localhost:8001/api"
+BASE_URL = "https://32d22d0d-c0a2-447a-af80-18e1d3c219a9.preview.emergentagent.com/api"
 ADMIN_USER = {
     "email": "admin@test.com",
     "password": "admin123",
@@ -1190,6 +1190,206 @@ def create_test_data(admin_token):
     
     print("Test data creation completed")
 
+def test_specific_endpoints():
+    print_header("TESTING SPECIFIC ENDPOINTS REPORTED WITH ISSUES")
+    
+    # First, authenticate to get a token
+    print("Authenticating to get access token...")
+    admin_token = test_auth_login(ADMIN_USER)
+    
+    if not admin_token:
+        print("❌ Authentication failed. Cannot proceed with endpoint tests.")
+        print("Trying to register a new admin user...")
+        
+        # Try to register a new admin user
+        admin_registered = test_auth_register(ADMIN_USER)
+        if admin_registered:
+            admin_token = test_auth_login(ADMIN_USER)
+        else:
+            print("❌ Failed to register admin user. Cannot proceed with endpoint tests.")
+            return False
+    
+    print("✅ Authentication successful. Proceeding with endpoint tests.")
+    
+    # Test 1: /api/fournisseurs endpoint
+    print("\n--- Testing /api/fournisseurs endpoint ---")
+    success, message, fournisseurs_data = make_request("get", "/fournisseurs", token=admin_token, expected_status=200)
+    
+    if success and isinstance(fournisseurs_data, list):
+        print(f"✅ Successfully retrieved {len(fournisseurs_data)} suppliers from /api/fournisseurs")
+        print(f"   Response contains {len(fournisseurs_data)} suppliers")
+        if len(fournisseurs_data) > 0:
+            print(f"   First supplier: {fournisseurs_data[0]['nom']} (ID: {fournisseurs_data[0]['id']})")
+        test_results["fournisseurs"]["list"]["success"] = True
+        test_results["fournisseurs"]["list"]["message"] = f"Successfully retrieved {len(fournisseurs_data)} suppliers"
+    else:
+        print(f"❌ Failed to retrieve suppliers from /api/fournisseurs")
+        print(f"   Error: {message}")
+        test_results["fournisseurs"]["list"]["success"] = False
+        test_results["fournisseurs"]["list"]["message"] = message
+    
+    # Test 2: /api/articles endpoint
+    print("\n--- Testing /api/articles endpoint ---")
+    success, message, articles_data = make_request("get", "/articles", token=admin_token, expected_status=200)
+    
+    if success and isinstance(articles_data, list):
+        print(f"✅ Successfully retrieved {len(articles_data)} articles from /api/articles")
+        print(f"   Response contains {len(articles_data)} articles")
+        if len(articles_data) > 0:
+            print(f"   First article: {articles_data[0]['nom']} (ID: {articles_data[0]['id']})")
+        test_results["articles"]["list"]["success"] = True
+        test_results["articles"]["list"]["message"] = f"Successfully retrieved {len(articles_data)} articles"
+    else:
+        print(f"❌ Failed to retrieve articles from /api/articles")
+        print(f"   Error: {message}")
+        test_results["articles"]["list"]["success"] = False
+        test_results["articles"]["list"]["message"] = message
+    
+    # Create test data if no suppliers or articles were found
+    fournisseur_id = None
+    if (not test_results["fournisseurs"]["list"]["success"] or 
+        (test_results["fournisseurs"]["list"]["success"] and len(fournisseurs_data) == 0)):
+        print("\n--- No suppliers found. Creating test data... ---")
+        fournisseur_id = test_create_fournisseur(admin_token)
+        if fournisseur_id:
+            print(f"✅ Created test supplier with ID: {fournisseur_id}")
+            # Test the endpoint again
+            success, message, fournisseurs_data = make_request("get", "/fournisseurs", token=admin_token, expected_status=200)
+            if success and isinstance(fournisseurs_data, list) and len(fournisseurs_data) > 0:
+                print(f"✅ Successfully retrieved {len(fournisseurs_data)} suppliers after creating test data")
+                test_results["fournisseurs"]["list"]["success"] = True
+                test_results["fournisseurs"]["list"]["message"] = f"Successfully retrieved {len(fournisseurs_data)} suppliers after creating test data"
+    else:
+        # Use the first supplier from the list
+        if len(fournisseurs_data) > 0:
+            fournisseur_id = fournisseurs_data[0]['id']
+    
+    if (not test_results["articles"]["list"]["success"] or 
+        (test_results["articles"]["list"]["success"] and len(articles_data) == 0)):
+        print("\n--- No articles found. Creating test data... ---")
+        # First ensure we have a supplier
+        if not fournisseur_id:
+            if created_ids["fournisseur"]:
+                fournisseur_id = created_ids["fournisseur"]
+            else:
+                fournisseur_id = test_create_fournisseur(admin_token)
+                if not fournisseur_id:
+                    print("❌ Failed to create test supplier. Cannot create test article.")
+                    return False
+        
+        # Create a test article
+        article_id = test_create_article(admin_token, fournisseur_id)
+        if article_id:
+            print(f"✅ Created test article with ID: {article_id}")
+            # Test the endpoint again
+            success, message, articles_data = make_request("get", "/articles", token=admin_token, expected_status=200)
+            if success and isinstance(articles_data, list) and len(articles_data) > 0:
+                print(f"✅ Successfully retrieved {len(articles_data)} articles after creating test data")
+                test_results["articles"]["list"]["success"] = True
+                test_results["articles"]["list"]["message"] = f"Successfully retrieved {len(articles_data)} articles after creating test data"
+    
+    # Summary
+    print("\n--- ENDPOINT TESTS SUMMARY ---")
+    fournisseurs_status = "✅ PASSED" if test_results["fournisseurs"]["list"]["success"] else "❌ FAILED"
+    articles_status = "✅ PASSED" if test_results["articles"]["list"]["success"] else "❌ FAILED"
+    
+    print(f"Fournisseurs endpoint: {fournisseurs_status}")
+    print(f"Articles endpoint: {articles_status}")
+    
+    return test_results["fournisseurs"]["list"]["success"] and test_results["articles"]["list"]["success"]
+
+def test_dashboard_stats_detailed():
+    print_header("TESTING DASHBOARD STATS API")
+    
+    # First, authenticate to get a token
+    print("Authenticating to get access token...")
+    admin_token = test_auth_login(ADMIN_USER)
+    
+    if not admin_token:
+        print("❌ Authentication failed. Cannot proceed with dashboard stats test.")
+        print("Trying to register a new admin user...")
+        
+        # Try to register a new admin user
+        admin_registered = test_auth_register(ADMIN_USER)
+        if admin_registered:
+            admin_token = test_auth_login(ADMIN_USER)
+        else:
+            print("❌ Failed to register admin user. Cannot proceed with dashboard stats test.")
+            return False
+    
+    print("✅ Authentication successful. Proceeding with dashboard stats test.")
+    
+    # Test the dashboard stats endpoint
+    print("\n--- Testing /api/dashboard/stats endpoint ---")
+    success, message, stats_data = make_request("get", "/dashboard/stats", token=admin_token, expected_status=200)
+    
+    if success and isinstance(stats_data, dict):
+        print(f"✅ Successfully retrieved dashboard stats from /api/dashboard/stats")
+        print(f"   Response: {stats_data}")
+        
+        # Check if all required fields are present
+        required_fields = [
+            "total_fournisseurs", 
+            "total_articles", 
+            "total_commandes", 
+            "alertes_non_lues", 
+            "articles_stock_bas", 
+            "commandes_en_cours"
+        ]
+        
+        missing_fields = [field for field in required_fields if field not in stats_data]
+        
+        if missing_fields:
+            print(f"❌ Missing fields in dashboard stats response: {', '.join(missing_fields)}")
+            test_results["dashboard"]["stats"]["success"] = False
+            test_results["dashboard"]["stats"]["message"] = f"Missing fields in response: {', '.join(missing_fields)}"
+            return False
+        
+        # Check if all values are non-zero
+        zero_fields = [field for field in required_fields if stats_data.get(field, 0) == 0]
+        
+        if zero_fields:
+            print(f"⚠️ The following fields have zero values: {', '.join(zero_fields)}")
+            print("Creating test data to populate these fields...")
+            
+            # Create test data
+            create_test_data(admin_token)
+            
+            # Test the endpoint again
+            print("\n--- Testing /api/dashboard/stats endpoint after creating test data ---")
+            success, message, stats_data = make_request("get", "/dashboard/stats", token=admin_token, expected_status=200)
+            
+            if success and isinstance(stats_data, dict):
+                print(f"✅ Successfully retrieved dashboard stats after creating test data")
+                print(f"   Response: {stats_data}")
+                
+                # Check if values are now non-zero
+                zero_fields_after = [field for field in required_fields if stats_data.get(field, 0) == 0]
+                
+                if zero_fields_after:
+                    print(f"⚠️ The following fields still have zero values after creating test data: {', '.join(zero_fields_after)}")
+                    print("This might indicate an issue with the dashboard stats calculation.")
+                else:
+                    print("✅ All fields now have non-zero values after creating test data.")
+            else:
+                print(f"❌ Failed to retrieve dashboard stats after creating test data")
+                print(f"   Error: {message}")
+                test_results["dashboard"]["stats"]["success"] = False
+                test_results["dashboard"]["stats"]["message"] = message
+                return False
+        else:
+            print("✅ All fields have non-zero values.")
+        
+        test_results["dashboard"]["stats"]["success"] = True
+        test_results["dashboard"]["stats"]["message"] = "Successfully retrieved dashboard stats with all required fields"
+        return True
+    else:
+        print(f"❌ Failed to retrieve dashboard stats from /api/dashboard/stats")
+        print(f"   Error: {message}")
+        test_results["dashboard"]["stats"]["success"] = False
+        test_results["dashboard"]["stats"]["message"] = message
+        return False
+
 if __name__ == "__main__":
-    # Run specific alert system tests
-    test_alertes_system()
+    # Test dashboard stats API
+    test_dashboard_stats_detailed()
