@@ -1,6 +1,7 @@
 import React from 'react';
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from './hooks/useAuth';
+import { ThemeProvider } from './hooks/useTheme';
 import ProtectedRoute from './presentation/components/ProtectedRoute';
 import Layout from './presentation/components/Layout';
 import Dashboard from './presentation/components/Dashboard';
@@ -16,9 +17,10 @@ import "./App.css";
 
 function App() {
   return (
-    <AuthProvider>
-      <div className="App">
-        <BrowserRouter>
+    <ThemeProvider>
+      <AuthProvider>
+        <div className="App">
+          <BrowserRouter>
           <Routes>
             <Route path="/login" element={<Login />} />
             <Route
