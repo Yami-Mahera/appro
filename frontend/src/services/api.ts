@@ -294,7 +294,7 @@ class ApiService {
     if (params?.date_from) queryParams.append('date_from', params.date_from);
     if (params?.date_to) queryParams.append('date_to', params.date_to);
     
-    const url = queryParams.toString() ? `/api/reports/synthese?${queryParams.toString()}` : '/api/reports/synthese';
+    const url = queryParams.toString() ? `/reports/synthese?${queryParams.toString()}` : '/reports/synthese';
     console.log('🌐 Making request to:', url);
     
     try {
