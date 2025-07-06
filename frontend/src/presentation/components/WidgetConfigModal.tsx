@@ -442,7 +442,7 @@ const WidgetConfigModal: React.FC<WidgetConfigModalProps> = ({
                 name="colorZones"
                 value={config.colorZones || 'traffic_light'}
                 onChange={handleInputChange}
-                className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                className="mt-1 block w-full border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
               >
                 <option value="traffic_light">Feu tricolore (Vert/Orange/Rouge)</option>
                 <option value="blue_gradient">Dégradé de bleu</option>
