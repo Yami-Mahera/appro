@@ -102,7 +102,12 @@
 # Testing Data - Main Agent and testing sub agent both should log testing data below this section
 #====================================================================================================
 
-user_problem_statement: "Créer un outil de gestion des approvisionnements et des commandes avec dashboard analytics, fournisseurs, articles, commandes, alertes. Interface moderne avec Tailwind CSS basée sur l'architecture du projet GitHub https://github.com/Yami-Mahera/appro/tree/based. NOUVEAU: Implémentation d'un système avancé de gestion des stocks avec graphique d'évolution sophistiqué selon les modalités de calcul CMS, CMC, QM et seuils d'alerte avancés. PHASE 1: Implémentation des 3 tableaux principaux selon les images fournies: Tableau de projection de la couverture de stock, Tableau de simulation de commande, Tableau de suivi des commandes en cours."
+user_problem_statement: "Le système d'approvisionnement contient déjà un système d'alerte avancé avec les fonctionnalités suivantes :
+1. Alertes de commandes en retard par rapport aux dates de production, mise à disposition et embarquement
+2. Alertes de risque de rupture basées sur les prévisions et la consommation
+3. Alertes de fournisseurs dépassant les délais de livraison moyens
+
+Objectif actuel : Explorer et continuer le développement du système d'alerte existant tout en préservant l'architecture et le design actuels. Améliorer les fonctionnalités selon les besoins identifiés."
 
 backend:
   - task: "Modèles de données MongoDB"
