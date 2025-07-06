@@ -155,22 +155,22 @@ const DashboardBuilder: React.FC<DashboardBuilderProps> = ({
   }, {}) : {};
 
   return (
-    <div className="h-screen flex flex-col bg-gray-100">
+    <div className="h-screen flex flex-col bg-gray-100 dark:bg-gray-900">
       {/* Header */}
-      <div className="bg-white shadow-sm border-b border-gray-200 px-6 py-4">
+      <div className="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700 px-6 py-4">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-xl font-semibold text-gray-900">
+            <h1 className="text-xl font-semibold text-gray-900 dark:text-white">
               {isEdit ? 'Modifier' : 'Créer'} un Tableau de Bord
             </h1>
-            <p className="text-sm text-gray-500">
+            <p className="text-sm text-gray-500 dark:text-gray-400">
               Configurez votre tableau de bord personnalisé
             </p>
           </div>
           <div className="flex space-x-3">
             <button
               onClick={onCancel}
-              className="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50"
+              className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-sm font-medium text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600"
             >
               Annuler
             </button>
@@ -187,14 +187,14 @@ const DashboardBuilder: React.FC<DashboardBuilderProps> = ({
 
       <div className="flex-1 flex overflow-hidden">
         {/* Sidebar - Widget Library */}
-        <div className="w-80 bg-white shadow-sm border-r border-gray-200 overflow-y-auto">
+        <div className="w-80 bg-white dark:bg-gray-800 shadow-sm border-r border-gray-200 dark:border-gray-700 overflow-y-auto">
           <div className="p-4">
-            <h3 className="text-lg font-medium text-gray-900 mb-4">Configuration</h3>
+            <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">Configuration</h3>
             
             {/* Dashboard Info */}
             <div className="space-y-4 mb-6">
               <div>
-                <label className="block text-sm font-medium text-gray-700">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                   Nom du tableau de bord *
                 </label>
                 <input
@@ -202,13 +202,13 @@ const DashboardBuilder: React.FC<DashboardBuilderProps> = ({
                   name="nom"
                   value={formData.nom}
                   onChange={handleInputChange}
-                  className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                  className="mt-1 block w-full border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                   placeholder="Ex: Dashboard Ventes"
                 />
               </div>
               
               <div>
-                <label className="block text-sm font-medium text-gray-700">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                   Description
                 </label>
                 <textarea
@@ -216,7 +216,7 @@ const DashboardBuilder: React.FC<DashboardBuilderProps> = ({
                   value={formData.description}
                   onChange={handleInputChange}
                   rows={3}
-                  className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                  className="mt-1 block w-full border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                   placeholder="Description optionnelle..."
                 />
               </div>
