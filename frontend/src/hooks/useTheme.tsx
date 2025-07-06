@@ -21,44 +21,61 @@ interface ThemeProviderProps {
 
 export const ThemeProvider = ({ children }: ThemeProviderProps) => {
   const [isDarkMode, setIsDarkMode] = useState(false);
+  const [isInitialized, setIsInitialized] = useState(false);
 
   useEffect(() => {
-    // Check localStorage for saved theme preference
-    const savedTheme = localStorage.getItem('theme');
-    if (savedTheme) {
-      const isDark = savedTheme === 'dark';
-      setIsDarkMode(isDark);
-      // Apply theme immediately to avoid flash
-      if (isDark) {
-        document.documentElement.classList.add('dark');
-      } else {
-        document.documentElement.classList.remove('dark');
+    // Initialize theme on component mount
+    const initializeTheme = () => {
+      try {
+        const savedTheme = localStorage.getItem('theme');
+        let shouldBeDark = false;
+        
+        if (savedTheme) {
+          shouldBeDark = savedTheme === 'dark';
+        } else {
+          // Check system preference
+          shouldBeDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+          // Save system preference
+          localStorage.setItem('theme', shouldBeDark ? 'dark' : 'light');
+        }
+        
+        setIsDarkMode(shouldBeDark);
+        
+        // Apply theme immediately to prevent flash
+        if (shouldBeDark) {
+          document.documentElement.classList.add('dark');
+        } else {
+          document.documentElement.classList.remove('dark');
+        }
+        
+        setIsInitialized(true);
+      } catch (error) {
+        console.warn('Theme initialization failed:', error);
+        // Fallback to light mode
+        setIsDarkMode(false);
+        setIsInitialized(true);
       }
-    } else {
-      // Check system preference
-      const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-      setIsDarkMode(systemPrefersDark);
-      // Apply theme immediately
-      if (systemPrefersDark) {
-        document.documentElement.classList.add('dark');
-      } else {
-        document.documentElement.classList.remove('dark');
-      }
-      // Save to localStorage
-      localStorage.setItem('theme', systemPrefersDark ? 'dark' : 'light');
-    }
+    };
+
+    initializeTheme();
   }, []);
 
   useEffect(() => {
-    // Apply theme to document
-    if (isDarkMode) {
-      document.documentElement.classList.add('dark');
-      localStorage.setItem('theme', 'dark');
-    } else {
-      document.documentElement.classList.remove('dark');
-      localStorage.setItem('theme', 'light');
+    // Only apply theme changes after initialization
+    if (!isInitialized) return;
+    
+    try {
+      if (isDarkMode) {
+        document.documentElement.classList.add('dark');
+        localStorage.setItem('theme', 'dark');
+      } else {
+        document.documentElement.classList.remove('dark');
+        localStorage.setItem('theme', 'light');
+      }
+    } catch (error) {
+      console.warn('Theme change failed:', error);
     }
-  }, [isDarkMode]);
+  }, [isDarkMode, isInitialized]);
 
   const toggleDarkMode = () => {
     setIsDarkMode(!isDarkMode);
