@@ -26,6 +26,11 @@ module.exports = {
           ignored: /.*/, // Ignore all files
         };
       }
+
+      // Update resolve extensions to include TypeScript
+      webpackConfig.resolve.extensions = [
+        '.tsx', '.ts', '.js', '.jsx', '.json'
+      ];
       
       return webpackConfig;
     },
