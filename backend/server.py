@@ -73,6 +73,13 @@ class AlerteType(str, Enum):
     RETARD_LIVRAISON = "retard_livraison"
     SEUIL_ATTEINT = "seuil_atteint"
     COMMANDE_URGENTE = "commande_urgente"
+    # Nouveaux types d'alertes avancées
+    COMMANDE_RETARD_PRODUCTION = "commande_retard_production"
+    COMMANDE_RETARD_MISE_DISPOSITION = "commande_retard_mise_disposition"
+    COMMANDE_RETARD_EMBARQUEMENT = "commande_retard_embarquement"
+    RISQUE_RUPTURE_PREVISION = "risque_rupture_prevision"
+    RISQUE_RUPTURE_CONSOMMATION = "risque_rupture_consommation"
+    FOURNISSEUR_DELAI_DEPASSE = "fournisseur_delai_depasse"
 
 class AlertePriorite(str, Enum):
     LOW = "low"
