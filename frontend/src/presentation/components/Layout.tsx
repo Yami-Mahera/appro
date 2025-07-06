@@ -201,7 +201,7 @@ const Layout: React.FC<LayoutProps> = ({ children, currentPath = "/" }) => {
           </main>
         </div>
       </div>
-    </ThemeProvider>
+    </div>
   );
 };
 
