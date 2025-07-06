@@ -76,7 +76,6 @@ const WidgetDisplay: React.FC<WidgetDisplayProps> = ({ widget, refreshTrigger })
 
   const getFallbackData = () => {
     switch (widget.type) {
-      case 'stats_card':
       case 'kpi_card':
         // Utiliser des valeurs cohérentes avec WidgetPreview
         const dataKey = widget.config.dataSource || widget.config.kpiType;
@@ -86,12 +85,10 @@ const WidgetDisplay: React.FC<WidgetDisplayProps> = ({ widget, refreshTrigger })
           total_commandes: 156,
           alertes_non_lues: 8,
           articles_stock_bas: 12,
-          commandes_en_cours: 23
+          commandes_en_cours: 0
         };
         return fallbackStats[dataKey] ?? 156;
-      case 'bar_chart':
       case 'chart_bar':
-      case 'line_chart':
       case 'chart_line':
         return [
           { name: 'Jan', value: 65 },
@@ -101,7 +98,6 @@ const WidgetDisplay: React.FC<WidgetDisplayProps> = ({ widget, refreshTrigger })
           { name: 'Mai', value: 56 },
           { name: 'Jun', value: 55 }
         ];
-      case 'pie_chart':
       case 'chart_pie':
         return [
           { name: 'Électronique', value: 35, color: '#3B82F6' },
@@ -109,23 +105,14 @@ const WidgetDisplay: React.FC<WidgetDisplayProps> = ({ widget, refreshTrigger })
           { name: 'Outils', value: 20, color: '#8B5CF6' },
           { name: 'Autres', value: 20, color: '#F59E0B' }
         ];
-      case 'kpi_metric':
       case 'gauge':
         return { value: 94.5, unit: '%', trend: 2.3 };
-      case 'data_table':
       case 'table':
         return [
           { nom: 'Article A', valeur: '150', statut: 'En stock' },
           { nom: 'Article B', valeur: '89', statut: 'Stock bas' },
           { nom: 'Article C', valeur: '67', statut: 'En stock' }
         ];
-      case 'alert_list':
-        return [
-          { id: 1, titre: 'Stock bas: Vis M6', message: 'Quantité insuffisante', priorite: 'high' },
-          { id: 2, titre: 'Retard livraison', message: 'CMD-001 en retard', priorite: 'medium' }
-        ];
-      case 'trend_indicator':
-        return { value: 15.3, direction: 'up', comparison: 'previous_month' };
       default:
         return null;
     }
