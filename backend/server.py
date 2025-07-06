@@ -1435,6 +1435,7 @@ async def get_commandes_report(
         },
         {
             "$project": {
+                "_id": 0,
                 "numero_commande": 1,
                 "fournisseur_nom": 1,
                 "status": 1,
