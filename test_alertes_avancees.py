@@ -58,6 +58,8 @@ def make_request(method, endpoint, data=None, token=None, expected_status=200):
 
 def login():
     print_header("Authenticating")
+    
+    # First try to login
     login_data = {
         "email": ADMIN_USER["email"],
         "password": ADMIN_USER["password"]
@@ -70,7 +72,26 @@ def login():
         return data["access_token"]
     else:
         print_test_result("Login", False, message)
-        return None
+        
+        # Try to register if login fails
+        print("Login failed, trying to register...")
+        success, message, data = make_request("post", "/auth/register", ADMIN_USER, expected_status=200)
+        
+        if success:
+            print_test_result("Register", True, f"Registered user: {ADMIN_USER['email']}")
+            
+            # Try login again
+            success, message, data = make_request("post", "/auth/login", login_data, expected_status=200)
+            
+            if success and data and "access_token" in data:
+                print_test_result("Login after register", True, f"Logged in as: {ADMIN_USER['email']}")
+                return data["access_token"]
+            else:
+                print_test_result("Login after register", False, message)
+                return None
+        else:
+            print_test_result("Register", False, message)
+            return None
 
 def create_test_data(token):
     print_header("Creating Test Data")
