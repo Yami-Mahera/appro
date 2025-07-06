@@ -66,9 +66,9 @@ const WidgetDisplay: React.FC<WidgetDisplayProps> = ({ widget, refreshTrigger })
       setData(widgetData);
     } catch (err) {
       console.warn('Widget data fetch error (using fallback data):', err);
-      // Au lieu d'afficher une erreur, utiliser des données de fallback
+      // Toujours utiliser des données de fallback, jamais d'état d'erreur
       setData(getFallbackData());
-      setError(null); // Ne pas afficher d'erreur pour une meilleure UX
+      setError(null);
     } finally {
       setLoading(false);
     }
