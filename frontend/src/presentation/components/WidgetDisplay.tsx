@@ -42,37 +42,25 @@ const WidgetDisplay: React.FC<WidgetDisplayProps> = ({ widget, refreshTrigger })
       let widgetData = null;
 
       switch (widget.type) {
-        case 'stats_card':
         case 'kpi_card':
           widgetData = await fetchStatsData();
           break;
-        case 'bar_chart':
-        case 'chart_bar':
-        case 'line_chart':
         case 'chart_line':
+        case 'chart_bar':
           widgetData = await fetchChartData();
           break;
-        case 'pie_chart':
         case 'chart_pie':
           widgetData = await fetchPieData();
           break;
-        case 'data_table':
         case 'table':
           widgetData = await fetchTableData();
           break;
-        case 'kpi_metric':
         case 'gauge':
           widgetData = await fetchKPIData();
           break;
-        case 'alert_list':
-          widgetData = await fetchAlertsData();
-          break;
-        case 'trend_indicator':
-          widgetData = await fetchTrendData();
-          break;
         default:
           // Données par défaut pour les types non reconnus
-          widgetData = { message: 'Type de widget non supporté' };
+          widgetData = getFallbackData();
       }
 
       setData(widgetData);
