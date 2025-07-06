@@ -153,6 +153,24 @@ def create_test_data(token):
     if success:
         articles.append(article1_data)
         print_test_result("Create critical article", True, f"Created article: {article1_data['nom']} (ID: {article1_data['id']})")
+        
+        # Create movement records for this article to simulate consumption
+        for i in range(5):
+            movement_data = {
+                "article_id": article1_data["id"],
+                "type_mouvement": "sortie",
+                "quantite": 10,
+                "stock_avant": 55 - i*10,
+                "stock_apres": 45 - i*10,
+                "commentaire": f"Mouvement de test {i+1}",
+                "created_by": "admin"
+            }
+            
+            success, message, _ = make_request("post", "/stock/mouvements", movement_data, token=token, expected_status=200)
+            if success:
+                print(f"  - Created movement record {i+1}: -10 units")
+            else:
+                print(f"  - Failed to create movement record: {message}")
     else:
         print_test_result("Create critical article", False, message)
     
@@ -177,6 +195,24 @@ def create_test_data(token):
     if success:
         articles.append(article2_data)
         print_test_result("Create normal article", True, f"Created article: {article2_data['nom']} (ID: {article2_data['id']})")
+        
+        # Create movement records for this article to simulate consumption
+        for i in range(3):
+            movement_data = {
+                "article_id": article2_data["id"],
+                "type_mouvement": "sortie",
+                "quantite": 5,
+                "stock_avant": 45 - i*5,
+                "stock_apres": 40 - i*5,
+                "commentaire": f"Mouvement de test {i+1}",
+                "created_by": "admin"
+            }
+            
+            success, message, _ = make_request("post", "/stock/mouvements", movement_data, token=token, expected_status=200)
+            if success:
+                print(f"  - Created movement record {i+1}: -5 units")
+            else:
+                print(f"  - Failed to create movement record: {message}")
     else:
         print_test_result("Create normal article", False, message)
     
@@ -203,6 +239,18 @@ def create_test_data(token):
         
         if success:
             print_test_result("Create order", True, f"Created order: {commande_data['numero_commande']} (ID: {commande_data['id']})")
+            
+            # Update the order status to PENDING to test commandes_en_cours alerts
+            update_data = {
+                "status": "en_attente"  # CommandeStatus.PENDING
+            }
+            
+            success, message, _ = make_request("put", f"/commandes/{commande_data['id']}", update_data, token=token, expected_status=200)
+            if success:
+                print("  - Updated order status to PENDING")
+            else:
+                print(f"  - Failed to update order status: {message}")
+            
             return supplier_id, articles, commande_data["id"]
         else:
             print_test_result("Create order", False, message)
