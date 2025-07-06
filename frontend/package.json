@@ -8,6 +8,7 @@
     "axios": "^1.8.4",
     "axios-auth-refresh": "^3.3.6",
     "cra-template": "1.2.0",
+    "lodash": "^4.17.21",
     "lucide-react": "^0.525.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
@@ -38,6 +39,7 @@
   "devDependencies": {
     "@craco/craco": "^7.1.0",
     "@eslint/js": "9.23.0",
+    "@types/lodash": "^4.17.20",
     "@types/node": "^24.0.10",
     "@types/react": "^19.1.8",
     "@types/react-dom": "^19.1.6",
