@@ -8,8 +8,8 @@ from typing import Dict, List, Optional, Any
 # Configuration
 BASE_URL = "https://56c87e94-4851-4276-b125-51277abeb343.preview.emergentagent.com/api"
 ADMIN_USER = {
-    "email": "admin@exemple.com",
-    "password": "motdepasse123",
+    "email": "admin@test.com",
+    "password": "admin123",
     "nom": "Admin",
     "prenom": "Test",
     "role": "administrateur"
