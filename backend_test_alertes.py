@@ -6,7 +6,12 @@ from datetime import datetime, timedelta
 from typing import Dict, List, Optional, Any
 
 # Configuration
-BASE_URL = "https://56c87e94-4851-4276-b125-51277abeb343.preview.emergentagent.com/api"
+# Get the backend URL from the frontend .env file
+with open('/app/frontend/.env', 'r') as f:
+    for line in f:
+        if line.startswith('REACT_APP_BACKEND_URL='):
+            BASE_URL = line.strip().split('=')[1].strip('"\'') + "/api"
+            break
 ADMIN_USER = {
     "email": "admin@test.com",
     "password": "admin123",
