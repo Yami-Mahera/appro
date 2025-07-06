@@ -73,6 +73,13 @@ class AlerteType(str, Enum):
     RETARD_LIVRAISON = "retard_livraison"
     SEUIL_ATTEINT = "seuil_atteint"
     COMMANDE_URGENTE = "commande_urgente"
+    # Nouveaux types d'alertes avancées
+    COMMANDE_RETARD_PRODUCTION = "commande_retard_production"
+    COMMANDE_RETARD_MISE_DISPOSITION = "commande_retard_mise_disposition"
+    COMMANDE_RETARD_EMBARQUEMENT = "commande_retard_embarquement"
+    RISQUE_RUPTURE_PREVISION = "risque_rupture_prevision"
+    RISQUE_RUPTURE_CONSOMMATION = "risque_rupture_consommation"
+    FOURNISSEUR_DELAI_DEPASSE = "fournisseur_delai_depasse"
 
 class AlertePriorite(str, Enum):
     LOW = "low"
@@ -206,6 +213,10 @@ class Commande(BaseModel):
     date_commande: Optional[datetime] = None
     date_livraison_prevue: Optional[datetime] = None
     date_livraison_reelle: Optional[datetime] = None
+    # Nouvelles dates pour le système d'alertes avancé
+    date_production: Optional[datetime] = None
+    date_mise_disposition: Optional[datetime] = None 
+    date_embarquement_cible: Optional[datetime] = None
     notes: Optional[str] = None
     created_by: str
     created_at: datetime = Field(default_factory=datetime.utcnow)
@@ -215,6 +226,9 @@ class CommandeCreate(BaseModel):
     fournisseur_id: str
     lignes: List[LigneCommande]
     date_livraison_prevue: Optional[datetime] = None
+    date_production: Optional[datetime] = None
+    date_mise_disposition: Optional[datetime] = None
+    date_embarquement_cible: Optional[datetime] = None
     notes: Optional[str] = None
 
 # Alerte Models
@@ -322,6 +336,44 @@ class AlerteAvancee(BaseModel):
     recommandation: str
     lue: bool = False
     created_at: datetime = Field(default_factory=datetime.utcnow)
+
+# Nouveau modèle pour le tableau de bord d'alertes selon vos spécifications
+class AlerteTableauBord(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    type_alerte: AlerteType
+    niveau_alerte: str  # "normale", "urgente", "critique", "a_suivre"
+    
+    # Références aux entités concernées
+    article_id: Optional[str] = None
+    commande_id: Optional[str] = None
+    fournisseur_id: Optional[str] = None
+    
+    # Détails du calcul selon vos formules
+    formule_utilisee: str  # "Db-Do-Dc" ou "(Cp-CMS)/(CMS+da)"
+    valeur_calculee: float
+    seuil_alerte: float
+    
+    # Dates importantes
+    date_besoin: Optional[datetime] = None  # Db
+    date_observation: datetime = Field(default_factory=datetime.utcnow)  # Do  
+    delai_passation: int = 3  # Dc par défaut
+    
+    # Pour commandes en cours
+    couverture_prevue: Optional[float] = None  # Cp
+    couverture_minimale_securite: Optional[float] = None  # CMS
+    delai_acheminement: Optional[int] = None  # da
+    
+    # Informations affichage
+    titre: str
+    message: str
+    recommandation: str
+    urgence_jours: Optional[int] = None  # Nombre de jours avant action requise
+    
+    # Métadonnées
+    afficher_dashboard: bool = True  # False si niveau "normale" avec valeur > 4
+    lue: bool = False
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+    updated_at: datetime = Field(default_factory=datetime.utcnow)
 
 class CompositionTC(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
@@ -588,36 +640,48 @@ async def calculer_date_besoin(article_id: str) -> Optional[datetime]:
     
     return date_besoin
 
-async def calculer_niveau_alerte_nouvelle_commande(article_id: str) -> NiveauAlerte:
+async def calculer_niveau_alerte_nouvelle_commande(article_id: str, delai_passation: int = 3) -> tuple[NiveauAlerte, int, dict]:
     """
-    Calcule le niveau d'alerte pour une nouvelle commande
+    Calcule le niveau d'alerte pour une nouvelle commande selon la formule:
+    Db - Do - Dc
+    
+    Returns: (niveau_alerte, ecart_jours, details_calcul)
     """
-    date_besoin = await calculer_date_besoin(article_id)
+    date_besoin = await calculer_date_besoin(article_id)  # Db
     if not date_besoin:
-        return NiveauAlerte.NORMAL
+        return NiveauAlerte.NORMAL, 0, {"error": "Impossible de calculer la date de besoin"}
     
-    date_observation = datetime.utcnow()
+    date_observation = datetime.utcnow()  # Do
     
-    # Délai de passation par défaut (3 jours)
-    delai_passation = 3
-    
-    # Calculer l'écart en jours
+    # Calculer l'écart selon la formule: Db - Do - Dc
     ecart_jours = (date_besoin - date_observation).days - delai_passation
     
+    details_calcul = {
+        "date_besoin": date_besoin,
+        "date_observation": date_observation,
+        "delai_passation": delai_passation,
+        "ecart_jours": ecart_jours,
+        "formule": "Db - Do - Dc"
+    }
+    
+    # Définition des seuils selon vos spécifications
     if ecart_jours > 4:
-        return NiveauAlerte.NORMAL
+        return NiveauAlerte.NORMAL, ecart_jours, details_calcul  # Ne pas afficher
     elif 0 < ecart_jours <= 4:
-        return NiveauAlerte.NORMAL
-    elif -4 < ecart_jours < 0:
-        return NiveauAlerte.URGENT
-    else:  # ecart_jours <= -4
-        return NiveauAlerte.CRITIQUE
+        return NiveauAlerte.NORMAL, ecart_jours, details_calcul  # Commande Normale
+    elif -4 < ecart_jours <= 0:
+        return NiveauAlerte.URGENT, ecart_jours, details_calcul  # Commande Urgente
+    else:  # ecart_jours < -4
+        return NiveauAlerte.CRITIQUE, ecart_jours, details_calcul  # Commande Critique
 
-async def calculer_niveau_alerte_commande_en_cours(article_id: str, commande_id: str) -> NiveauAlerte:
+async def calculer_niveau_alerte_commande_en_cours(article_id: str, commande_id: str) -> tuple[NiveauAlerte, float, dict]:
     """
-    Calcule le niveau d'alerte pour une commande en cours
+    Calcule le niveau d'alerte pour une commande en cours selon la formule:
+    (Cp-CMS) / (CMS+da)
+    
+    Returns: (niveau_alerte, pourcentage_variation, details_calcul)
     """
-    cms = await calculer_couverture_minimale_securite(article_id)
+    cms = await calculer_couverture_minimale_securite(article_id)  # CMS
     
     # Récupérer la couverture prévue pour cette commande
     calcul = await db.calculs_couverture.find_one({
@@ -626,22 +690,40 @@ async def calculer_niveau_alerte_commande_en_cours(article_id: str, commande_id:
     })
     
     if not calcul:
-        return NiveauAlerte.NORMAL
+        # Si pas de calcul, utiliser la couverture actuelle comme approximation
+        cp = await calculer_couverture_actuelle(article_id)
+    else:
+        cp = calcul.get("couverture_prevue", 0)
     
-    cp = calcul.get("couverture_prevue", 0)
-    da = calcul.get("delai_acheminement", 1)
+    # Récupérer le délai d'acheminement
+    article = await db.articles.find_one({"id": article_id})
+    if article:
+        fournisseur = await db.fournisseurs.find_one({"id": article["fournisseur_id"]})
+        da = (fournisseur.get("delai_livraison_moyen", 14) / 7) if fournisseur else 2  # en semaines
+    else:
+        da = 2
     
+    details_calcul = {
+        "couverture_prevue": cp,
+        "couverture_minimale_securite": cms,
+        "delai_acheminement": da,
+        "formule": "(Cp-CMS) / (CMS+da)"
+    }
+    
+    # Calculer le pourcentage selon la formule: (Cp-CMS) / (CMS+da)
     if (cms + da) > 0:
-        variation_pourcent = (cp - cms) / (cms + da)
+        pourcentage_variation = (cp - cms) / (cms + da)
+        details_calcul["pourcentage_variation"] = pourcentage_variation
         
-        if variation_pourcent > 0.1:  # > 10%
-            return NiveauAlerte.NORMAL
-        elif 0 < variation_pourcent <= 0.1:  # 0% à 10%
-            return NiveauAlerte.A_SUIVRE
+        # Définition des seuils selon vos spécifications
+        if pourcentage_variation > 0.1:  # > 10%
+            return NiveauAlerte.NORMAL, pourcentage_variation, details_calcul  # Commande Normale
+        elif 0 < pourcentage_variation <= 0.1:  # 0% à 10%
+            return NiveauAlerte.A_SUIVRE, pourcentage_variation, details_calcul  # Commande à suivre
         else:  # < 0%
-            return NiveauAlerte.URGENT
+            return NiveauAlerte.URGENT, pourcentage_variation, details_calcul  # Commande Urgente
     
-    return NiveauAlerte.NORMAL
+    return NiveauAlerte.NORMAL, 0.0, details_calcul
 
 async def calculer_composition_tc(articles_ids: List[str]) -> Dict[str, Any]:
     """
@@ -1197,6 +1279,7 @@ async def get_fournisseurs_report(
         },
         {
             "$project": {
+                "_id": 0,
                 "nom": 1,
                 "code_fournisseur": 1,
                 "ville": 1,
@@ -1267,6 +1350,7 @@ async def get_articles_report(
         },
         {
             "$project": {
+                "_id": 0,
                 "reference": 1,
                 "nom": 1,
                 "famille": 1,
@@ -1351,6 +1435,7 @@ async def get_commandes_report(
         },
         {
             "$project": {
+                "_id": 0,
                 "numero_commande": 1,
                 "fournisseur_nom": 1,
                 "status": 1,

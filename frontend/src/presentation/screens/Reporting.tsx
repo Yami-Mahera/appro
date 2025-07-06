@@ -37,32 +37,47 @@ const Reporting: React.FC = () => {
       setLoading(true);
       setError(null);
       
+      console.log('🔍 Loading report for:', activeReport);
+      
       const params = {
         date_from: dateRange.date_from || undefined,
         date_to: dateRange.date_to || undefined
       };
 
+      console.log('📅 Params:', params);
+
       let data;
       switch (activeReport) {
         case 'fournisseurs':
+          console.log('📊 Calling getFournisseursReport...');
           data = await ApiService.getFournisseursReport(params);
+          console.log('✅ Fournisseurs data:', data);
           setReportData({ fournisseurs: data });
           break;
         case 'articles':
+          console.log('📊 Calling getArticlesReport...');
           data = await ApiService.getArticlesReport(params);
+          console.log('✅ Articles data:', data);
           setReportData({ articles: data });
           break;
         case 'commandes':
+          console.log('📊 Calling getCommandesReport...');
           data = await ApiService.getCommandesReport(params);
+          console.log('✅ Commandes data:', data);
           setReportData({ commandes: data });
           break;
         case 'synthese':
+          console.log('📊 Calling getSyntheseReport...');
           data = await ApiService.getSyntheseReport(params);
+          console.log('✅ Synthese data:', data);
           setReportData({ synthese: data });
           break;
       }
+      console.log('🎉 Report loaded successfully!');
     } catch (err: any) {
-      setError(err.response?.data?.detail || 'Erreur lors du chargement du rapport');
+      console.error('❌ Error loading report:', err);
+      console.error('❌ Error response:', err.response);
+      setError(err.response?.data?.detail || err.message || 'Erreur lors du chargement du rapport');
     } finally {
       setLoading(false);
     }
