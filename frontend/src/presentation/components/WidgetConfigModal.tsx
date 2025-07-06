@@ -137,6 +137,7 @@ const WidgetConfigModal: React.FC<WidgetConfigModalProps> = ({
                 className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
               >
                 <option value="">Sélectionner...</option>
+                <option value="commandes_par_mois">Commandes par Mois</option>
                 <option value="evolution_stock">Évolution du Stock</option>
                 <option value="evolution_commandes">Évolution des Commandes</option>
                 <option value="evolution_kpis">Évolution des KPIs</option>
