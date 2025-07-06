@@ -94,7 +94,7 @@ function App() {
               element={
                 <ProtectedRoute>
                   <Layout currentPath="/alertes">
-                    <Alertes />
+                    <AlertesTableauBord />
                   </Layout>
                 </ProtectedRoute>
               }
