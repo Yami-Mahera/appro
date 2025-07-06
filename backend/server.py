@@ -337,6 +337,44 @@ class AlerteAvancee(BaseModel):
     lue: bool = False
     created_at: datetime = Field(default_factory=datetime.utcnow)
 
+# Nouveau modèle pour le tableau de bord d'alertes selon vos spécifications
+class AlerteTableauBord(BaseModel):
+    id: str = Field(default_factory=lambda: str(uuid.uuid4()))
+    type_alerte: AlerteType
+    niveau_alerte: str  # "normale", "urgente", "critique", "a_suivre"
+    
+    # Références aux entités concernées
+    article_id: Optional[str] = None
+    commande_id: Optional[str] = None
+    fournisseur_id: Optional[str] = None
+    
+    # Détails du calcul selon vos formules
+    formule_utilisee: str  # "Db-Do-Dc" ou "(Cp-CMS)/(CMS+da)"
+    valeur_calculee: float
+    seuil_alerte: float
+    
+    # Dates importantes
+    date_besoin: Optional[datetime] = None  # Db
+    date_observation: datetime = Field(default_factory=datetime.utcnow)  # Do  
+    delai_passation: int = 3  # Dc par défaut
+    
+    # Pour commandes en cours
+    couverture_prevue: Optional[float] = None  # Cp
+    couverture_minimale_securite: Optional[float] = None  # CMS
+    delai_acheminement: Optional[int] = None  # da
+    
+    # Informations affichage
+    titre: str
+    message: str
+    recommandation: str
+    urgence_jours: Optional[int] = None  # Nombre de jours avant action requise
+    
+    # Métadonnées
+    afficher_dashboard: bool = True  # False si niveau "normale" avec valeur > 4
+    lue: bool = False
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+    updated_at: datetime = Field(default_factory=datetime.utcnow)
+
 class CompositionTC(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
     reference_tc: str
