@@ -13,6 +13,7 @@ import {
 } from '@heroicons/react/24/outline';
 import { classNames } from '../../common/utils';
 import apiService from '../../services/api';
+import AlerteDetailModal from '../components/AlerteDetailModal';
 
 interface AlerteAvancee {
   id: string;
