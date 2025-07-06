@@ -588,30 +588,39 @@ async def calculer_date_besoin(article_id: str) -> Optional[datetime]:
     
     return date_besoin
 
-async def calculer_niveau_alerte_nouvelle_commande(article_id: str) -> NiveauAlerte:
+async def calculer_niveau_alerte_nouvelle_commande(article_id: str, delai_passation: int = 3) -> tuple[NiveauAlerte, int, dict]:
     """
-    Calcule le niveau d'alerte pour une nouvelle commande
+    Calcule le niveau d'alerte pour une nouvelle commande selon la formule:
+    Db - Do - Dc
+    
+    Returns: (niveau_alerte, ecart_jours, details_calcul)
     """
-    date_besoin = await calculer_date_besoin(article_id)
+    date_besoin = await calculer_date_besoin(article_id)  # Db
     if not date_besoin:
-        return NiveauAlerte.NORMAL
+        return NiveauAlerte.NORMAL, 0, {"error": "Impossible de calculer la date de besoin"}
     
-    date_observation = datetime.utcnow()
+    date_observation = datetime.utcnow()  # Do
     
-    # Délai de passation par défaut (3 jours)
-    delai_passation = 3
-    
-    # Calculer l'écart en jours
+    # Calculer l'écart selon la formule: Db - Do - Dc
     ecart_jours = (date_besoin - date_observation).days - delai_passation
     
+    details_calcul = {
+        "date_besoin": date_besoin,
+        "date_observation": date_observation,
+        "delai_passation": delai_passation,
+        "ecart_jours": ecart_jours,
+        "formule": "Db - Do - Dc"
+    }
+    
+    # Définition des seuils selon vos spécifications
     if ecart_jours > 4:
-        return NiveauAlerte.NORMAL
+        return NiveauAlerte.NORMAL, ecart_jours, details_calcul  # Ne pas afficher
     elif 0 < ecart_jours <= 4:
-        return NiveauAlerte.NORMAL
-    elif -4 < ecart_jours < 0:
-        return NiveauAlerte.URGENT
-    else:  # ecart_jours <= -4
-        return NiveauAlerte.CRITIQUE
+        return NiveauAlerte.NORMAL, ecart_jours, details_calcul  # Commande Normale
+    elif -4 < ecart_jours <= 0:
+        return NiveauAlerte.URGENT, ecart_jours, details_calcul  # Commande Urgente
+    else:  # ecart_jours < -4
+        return NiveauAlerte.CRITIQUE, ecart_jours, details_calcul  # Commande Critique
 
 async def calculer_niveau_alerte_commande_en_cours(article_id: str, commande_id: str) -> NiveauAlerte:
     """
