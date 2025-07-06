@@ -227,22 +227,22 @@ const DashboardBuilder: React.FC<DashboardBuilderProps> = ({
                   name="partage"
                   checked={formData.partage}
                   onChange={handleInputChange}
-                  className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                  className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 dark:border-gray-600 rounded"
                 />
-                <label className="ml-2 block text-sm text-gray-900">
+                <label className="ml-2 block text-sm text-gray-900 dark:text-white">
                   Partager avec d'autres utilisateurs
                 </label>
               </div>
             </div>
 
-            <hr className="my-6" />
+            <hr className="my-6 border-gray-200 dark:border-gray-600" />
 
             {/* Available Widgets */}
-            <h4 className="text-md font-medium text-gray-900 mb-3">Widgets Disponibles</h4>
+            <h4 className="text-md font-medium text-gray-900 dark:text-white mb-3">Widgets Disponibles</h4>
             <div className="space-y-3">
               {Object.entries(widgetCategories).map(([category, widgets]: [string, any]) => (
                 <div key={category}>
-                  <h5 className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">
+                  <h5 className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-2">
                     {category}
                   </h5>
                   <div className="space-y-1">
@@ -250,7 +250,7 @@ const DashboardBuilder: React.FC<DashboardBuilderProps> = ({
                       <button
                         key={widget.type}
                         onClick={() => handleAddWidget(widget)}
-                        className="w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-700 rounded-md transition-colors duration-150"
+                        className="w-full text-left px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:text-blue-700 dark:hover:text-blue-300 rounded-md transition-colors duration-150"
                       >
                         <PlusIcon className="h-4 w-4 mr-2 inline" />
                         {widget.nom || widget.name}
@@ -264,24 +264,24 @@ const DashboardBuilder: React.FC<DashboardBuilderProps> = ({
         </div>
 
         {/* Main Canvas */}
-        <div className="flex-1 p-6 overflow-auto">
-          <div className="bg-white rounded-lg shadow-sm min-h-full p-6">
+        <div className="flex-1 p-6 overflow-auto bg-gray-50 dark:bg-gray-900">
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm min-h-full p-6">
             <div className="mb-4 flex items-center justify-between">
-              <h3 className="text-lg font-medium text-gray-900">
+              <h3 className="text-lg font-medium text-gray-900 dark:text-white">
                 Aperçu du Tableau de Bord
               </h3>
-              <span className="text-sm text-gray-500">
+              <span className="text-sm text-gray-500 dark:text-gray-400">
                 {formData.widgets.length} widget(s)
               </span>
             </div>
 
             {formData.widgets.length === 0 ? (
-              <div className="border-2 border-dashed border-gray-300 rounded-lg p-12 text-center">
-                <ArrowsPointingOutIcon className="mx-auto h-12 w-12 text-gray-400" />
-                <h3 className="mt-2 text-sm font-medium text-gray-900">
+              <div className="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-12 text-center">
+                <ArrowsPointingOutIcon className="mx-auto h-12 w-12 text-gray-400 dark:text-gray-500" />
+                <h3 className="mt-2 text-sm font-medium text-gray-900 dark:text-white">
                   Aucun widget ajouté
                 </h3>
-                <p className="mt-1 text-sm text-gray-500">
+                <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
                   Commencez par ajouter des widgets depuis la bibliothèque.
                 </p>
               </div>
