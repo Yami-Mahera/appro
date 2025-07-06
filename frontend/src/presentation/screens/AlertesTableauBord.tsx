@@ -334,9 +334,11 @@ const AlertesTableauBord: React.FC = () => {
           <ul className="divide-y divide-gray-200 dark:divide-gray-700">
             {filteredAlertes.map((alerte) => (
               <li key={alerte.id} className={classNames(
-                "p-6 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors",
+                "p-6 hover:bg-gray-50 dark:hover:bg-gray-700 transition-colors cursor-pointer",
                 !alerte.lue ? "bg-blue-50 dark:bg-blue-900/10" : ""
-              )}>
+              )}
+              onClick={() => handleAlerteClick(alerte)}
+              >
                 <div className="flex items-start space-x-4">
                   <div className="flex-shrink-0">
                     {getAlertIcon(alerte.niveau_alerte)}
@@ -358,7 +360,10 @@ const AlertesTableauBord: React.FC = () => {
                       <div className="flex items-center space-x-2">
                         {!alerte.lue && (
                           <button
-                            onClick={() => marquerCommeLue(alerte.id)}
+                            onClick={(e) => {
+                              e.stopPropagation(); // Empêche le clic sur l'alerte
+                              marquerCommeLue(alerte.id);
+                            }}
                             className="text-xs text-blue-600 hover:text-blue-700 font-medium"
                             title="Marquer comme lue"
                           >
@@ -389,6 +394,33 @@ const AlertesTableauBord: React.FC = () => {
                         Action requise dans {Math.abs(alerte.urgence_jours)} jour{Math.abs(alerte.urgence_jours) > 1 ? 's' : ''}
                       </div>
                     )}
+                    
+                    {/* Indicateur de cliquabilité */}
+                    <div className="flex items-center justify-between mt-3">
+                      <div className="flex items-center space-x-2 text-xs text-gray-500 dark:text-gray-400">
+                        {alerte.article_id && (
+                          <span className="flex items-center">
+                            <span className="w-2 h-2 bg-blue-500 rounded-full mr-1"></span>
+                            Article
+                          </span>
+                        )}
+                        {alerte.commande_id && (
+                          <span className="flex items-center">
+                            <span className="w-2 h-2 bg-green-500 rounded-full mr-1"></span>
+                            Commande
+                          </span>
+                        )}
+                        {alerte.fournisseur_id && (
+                          <span className="flex items-center">
+                            <span className="w-2 h-2 bg-purple-500 rounded-full mr-1"></span>
+                            Fournisseur
+                          </span>
+                        )}
+                      </div>
+                      <span className="text-xs text-blue-600 font-medium">
+                        Cliquer pour plus de détails
+                      </span>
+                    </div>
                   </div>
                   
                   <div className="flex-shrink-0">
@@ -400,6 +432,17 @@ const AlertesTableauBord: React.FC = () => {
           </ul>
         )}
       </div>
+
+      {/* Modal de détails */}
+      {selectedAlerte && (
+        <AlerteDetailModal
+          alerte={selectedAlerte}
+          isOpen={isModalOpen}
+          onClose={handleCloseModal}
+          onUpdate={handleUpdateAlerte}
+          onNavigate={handleNavigate}
+        />
+      )}
 
       {filteredAlertes.length > 0 && (
         <div className="mt-6 text-center">
