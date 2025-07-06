@@ -180,7 +180,7 @@ const WidgetConfigModal: React.FC<WidgetConfigModalProps> = ({
                 name="chartColor"
                 value={config.chartColor || 'blue'}
                 onChange={handleInputChange}
-                className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                className="mt-1 block w-full border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
               >
                 <option value="blue">Bleu</option>
                 <option value="green">Vert</option>
