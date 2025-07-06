@@ -290,7 +290,7 @@ const DashboardBuilder: React.FC<DashboardBuilderProps> = ({
                 {formData.widgets.map((widget) => (
                   <div
                     key={widget.id}
-                    className={`col-span-${widget.position.w} relative bg-gray-50 border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow`}
+                    className={`col-span-${widget.position.w} relative bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg p-4 hover:shadow-md transition-shadow`}
                     style={{ 
                       gridColumn: `span ${widget.position.w}`,
                       minHeight: `${widget.position.h * 60}px`
@@ -299,14 +299,14 @@ const DashboardBuilder: React.FC<DashboardBuilderProps> = ({
                     <div className="absolute top-2 right-2 flex space-x-1">
                       <button
                         onClick={() => handleConfigureWidget(widget)}
-                        className="p-1 text-gray-400 hover:text-blue-600 rounded"
+                        className="p-1 text-gray-400 dark:text-gray-500 hover:text-blue-600 dark:hover:text-blue-400 rounded"
                         title="Configurer"
                       >
                         <Cog6ToothIcon className="h-4 w-4" />
                       </button>
                       <button
                         onClick={() => handleDeleteWidget(widget.id)}
-                        className="p-1 text-gray-400 hover:text-red-600 rounded"
+                        className="p-1 text-gray-400 dark:text-gray-500 hover:text-red-600 dark:hover:text-red-400 rounded"
                         title="Supprimer"
                       >
                         <TrashIcon className="h-4 w-4" />
