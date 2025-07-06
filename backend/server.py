@@ -213,6 +213,10 @@ class Commande(BaseModel):
     date_commande: Optional[datetime] = None
     date_livraison_prevue: Optional[datetime] = None
     date_livraison_reelle: Optional[datetime] = None
+    # Nouvelles dates pour le système d'alertes avancé
+    date_production: Optional[datetime] = None
+    date_mise_disposition: Optional[datetime] = None 
+    date_embarquement_cible: Optional[datetime] = None
     notes: Optional[str] = None
     created_by: str
     created_at: datetime = Field(default_factory=datetime.utcnow)
