@@ -43,6 +43,8 @@ const AlertesTableauBord: React.FC = () => {
   const [filter, setFilter] = useState<'all' | 'urgent' | 'critique' | 'a_suivre'>('all');
   const [typeFilter, setTypeFilter] = useState<'all' | 'nouvelle_commande' | 'commande_en_cours'>('all');
   const [showRead, setShowRead] = useState(false);
+  const [selectedAlerte, setSelectedAlerte] = useState<AlerteAvancee | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
     fetchAlertes();
