@@ -18,8 +18,12 @@ class ApiService {
     // Add auth interceptor
     this.api.interceptors.request.use((config) => {
       const token = localStorage.getItem('auth_token');
+      console.log('🔑 Token from localStorage:', token ? 'EXISTS' : 'NOT FOUND');
       if (token) {
         config.headers.Authorization = `Bearer ${token}`;
+        console.log('🔑 Authorization header set');
+      } else {
+        console.warn('⚠️ No token found in localStorage');
       }
       return config;
     });
