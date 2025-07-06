@@ -11,6 +11,7 @@ import CommandesAdvanced from './presentation/screens/CommandesAdvanced';
 import Reporting from './presentation/screens/Reporting';
 import GestionStocksAvancee from './presentation/screens/GestionStocksAvancee';
 import UsersAdvanced from './presentation/screens/UsersAdvanced';
+import AlertesTableauBord from './presentation/screens/AlertesTableauBord';
 import "./App.css";
 
 // Placeholder component for alertes (can be enhanced later)
