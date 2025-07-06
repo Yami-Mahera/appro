@@ -1279,6 +1279,7 @@ async def get_fournisseurs_report(
         },
         {
             "$project": {
+                "_id": 0,
                 "nom": 1,
                 "code_fournisseur": 1,
                 "ville": 1,
