@@ -85,6 +85,29 @@ const AlertesTableauBord: React.FC = () => {
     }
   };
 
+  const handleAlerteClick = (alerte: AlerteAvancee) => {
+    setSelectedAlerte(alerte);
+    setIsModalOpen(true);
+  };
+
+  const handleCloseModal = () => {
+    setIsModalOpen(false);
+    setSelectedAlerte(null);
+  };
+
+  const handleUpdateAlerte = (alerteId: string, updates: Partial<AlerteAvancee>) => {
+    setAlertes(prev => prev.map(alerte => 
+      alerte.id === alerteId ? { ...alerte, ...updates } : alerte
+    ));
+  };
+
+  const handleNavigate = (type: 'article' | 'commande' | 'fournisseur', id: string) => {
+    // Pour l'instant, on affiche juste une alerte
+    // Dans une vraie application, on naviguerait vers la page appropriée
+    alert(`Navigation vers ${type} ID: ${id}`);
+    console.log(`Navigate to ${type} with ID: ${id}`);
+  };
+
   const filteredAlertes = alertes.filter(alerte => {
     if (!showRead && alerte.lue) return false;
     if (filter !== 'all' && alerte.niveau_alerte !== filter) return false;
