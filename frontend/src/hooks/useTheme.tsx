@@ -26,11 +26,26 @@ export const ThemeProvider = ({ children }: ThemeProviderProps) => {
     // Check localStorage for saved theme preference
     const savedTheme = localStorage.getItem('theme');
     if (savedTheme) {
-      setIsDarkMode(savedTheme === 'dark');
+      const isDark = savedTheme === 'dark';
+      setIsDarkMode(isDark);
+      // Apply theme immediately to avoid flash
+      if (isDark) {
+        document.documentElement.classList.add('dark');
+      } else {
+        document.documentElement.classList.remove('dark');
+      }
     } else {
       // Check system preference
       const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
       setIsDarkMode(systemPrefersDark);
+      // Apply theme immediately
+      if (systemPrefersDark) {
+        document.documentElement.classList.add('dark');
+      } else {
+        document.documentElement.classList.remove('dark');
+      }
+      // Save to localStorage
+      localStorage.setItem('theme', systemPrefersDark ? 'dark' : 'light');
     }
   }, []);
 
