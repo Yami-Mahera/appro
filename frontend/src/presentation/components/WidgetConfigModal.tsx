@@ -493,7 +493,7 @@ const WidgetConfigModal: React.FC<WidgetConfigModalProps> = ({
               name="title"
               value={config.title}
               onChange={handleInputChange}
-              className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+              className="mt-1 block w-full border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
               placeholder="Titre du widget"
             />
           </div>
@@ -501,12 +501,12 @@ const WidgetConfigModal: React.FC<WidgetConfigModalProps> = ({
           {/* Taille du widget */}
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700">Largeur</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Largeur</label>
               <select
                 name="width"
                 value={position.w}
                 onChange={(e) => handlePositionChange('w', parseInt(e.target.value))}
-                className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                className="mt-1 block w-full border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
               >
                 <option value="3">Petite (3)</option>
                 <option value="4">Moyenne (4)</option>
