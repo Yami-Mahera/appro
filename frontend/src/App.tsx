@@ -11,15 +11,8 @@ import CommandesAdvanced from './presentation/screens/CommandesAdvanced';
 import Reporting from './presentation/screens/Reporting';
 import GestionStocksAvancee from './presentation/screens/GestionStocksAvancee';
 import UsersAdvanced from './presentation/screens/UsersAdvanced';
+import AlertesTableauBord from './presentation/screens/AlertesTableauBord';
 import "./App.css";
-
-// Placeholder component for alertes (can be enhanced later)
-const Alertes = () => (
-  <div>
-    <h1 className="text-2xl font-bold text-gray-900 mb-4">Alertes</h1>
-    <p className="text-gray-600">Interface de gestion des alertes (en développement)</p>
-  </div>
-);
 
 function App() {
   return (
@@ -93,7 +86,7 @@ function App() {
               element={
                 <ProtectedRoute>
                   <Layout currentPath="/alertes">
-                    <Alertes />
+                    <AlertesTableauBord />
                   </Layout>
                 </ProtectedRoute>
               }
