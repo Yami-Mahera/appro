@@ -167,7 +167,7 @@ const WidgetConfigModal: React.FC<WidgetConfigModalProps> = ({
                 name="lineStyle"
                 value={config.lineStyle || 'solid'}
                 onChange={handleInputChange}
-                className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                className="mt-1 block w-full border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
               >
                 <option value="solid">Ligne continue</option>
                 <option value="dashed">Ligne pointillée</option>
