@@ -1350,6 +1350,7 @@ async def get_articles_report(
         },
         {
             "$project": {
+                "_id": 0,
                 "reference": 1,
                 "nom": 1,
                 "famille": 1,
