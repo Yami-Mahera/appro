@@ -259,7 +259,7 @@ class ApiService {
     if (params?.date_from) queryParams.append('date_from', params.date_from);
     if (params?.date_to) queryParams.append('date_to', params.date_to);
     
-    const url = queryParams.toString() ? `/reports/fournisseurs?${queryParams.toString()}` : '/reports/fournisseurs';
+    const url = queryParams.toString() ? `/api/reports/fournisseurs?${queryParams.toString()}` : '/api/reports/fournisseurs';
     const response = await this.api.get(url);
     return response.data;
   }
@@ -269,7 +269,7 @@ class ApiService {
     if (params?.date_from) queryParams.append('date_from', params.date_from);
     if (params?.date_to) queryParams.append('date_to', params.date_to);
     
-    const url = queryParams.toString() ? `/reports/articles?${queryParams.toString()}` : '/reports/articles';
+    const url = queryParams.toString() ? `/api/reports/articles?${queryParams.toString()}` : '/api/reports/articles';
     const response = await this.api.get(url);
     return response.data;
   }
@@ -279,7 +279,7 @@ class ApiService {
     if (params?.date_from) queryParams.append('date_from', params.date_from);
     if (params?.date_to) queryParams.append('date_to', params.date_to);
     
-    const url = queryParams.toString() ? `/reports/commandes?${queryParams.toString()}` : '/reports/commandes';
+    const url = queryParams.toString() ? `/api/reports/commandes?${queryParams.toString()}` : '/api/reports/commandes';
     const response = await this.api.get(url);
     return response.data;
   }
@@ -289,7 +289,7 @@ class ApiService {
     if (params?.date_from) queryParams.append('date_from', params.date_from);
     if (params?.date_to) queryParams.append('date_to', params.date_to);
     
-    const url = queryParams.toString() ? `/reports/synthese?${queryParams.toString()}` : '/reports/synthese';
+    const url = queryParams.toString() ? `/api/reports/synthese?${queryParams.toString()}` : '/api/reports/synthese';
     const response = await this.api.get(url);
     return response.data;
   }
