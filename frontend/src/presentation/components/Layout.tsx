@@ -1,6 +1,5 @@
 import React, { useState, ReactNode } from "react";
 import { useAuth } from "../../hooks/useAuth";
-import { ThemeProvider } from "../../hooks/useTheme";
 import {
   HomeIcon,
   BuildingOfficeIcon,
@@ -45,8 +44,7 @@ const Layout: React.FC<LayoutProps> = ({ children, currentPath = "/" }) => {
   const location = useLocation();
 
   return (
-    <ThemeProvider>
-      <div className="h-screen flex bg-gradient-to-br from-gray-50 via-white to-blue-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 transition-colors duration-200">
+    <div className="h-screen flex bg-gradient-to-br from-gray-50 via-white to-blue-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 transition-colors duration-200">
         {/* Mobile menu */}
         <div
           className={classNames(
@@ -203,7 +201,6 @@ const Layout: React.FC<LayoutProps> = ({ children, currentPath = "/" }) => {
           </main>
         </div>
       </div>
-    </ThemeProvider>
   );
 };
 

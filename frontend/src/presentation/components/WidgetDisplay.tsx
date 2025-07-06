@@ -42,45 +42,33 @@ const WidgetDisplay: React.FC<WidgetDisplayProps> = ({ widget, refreshTrigger })
       let widgetData = null;
 
       switch (widget.type) {
-        case 'stats_card':
         case 'kpi_card':
           widgetData = await fetchStatsData();
           break;
-        case 'bar_chart':
-        case 'chart_bar':
-        case 'line_chart':
         case 'chart_line':
+        case 'chart_bar':
           widgetData = await fetchChartData();
           break;
-        case 'pie_chart':
         case 'chart_pie':
           widgetData = await fetchPieData();
           break;
-        case 'data_table':
         case 'table':
           widgetData = await fetchTableData();
           break;
-        case 'kpi_metric':
         case 'gauge':
           widgetData = await fetchKPIData();
           break;
-        case 'alert_list':
-          widgetData = await fetchAlertsData();
-          break;
-        case 'trend_indicator':
-          widgetData = await fetchTrendData();
-          break;
         default:
           // Données par défaut pour les types non reconnus
-          widgetData = { message: 'Type de widget non supporté' };
+          widgetData = getFallbackData();
       }
 
       setData(widgetData);
     } catch (err) {
       console.warn('Widget data fetch error (using fallback data):', err);
-      // Au lieu d'afficher une erreur, utiliser des données de fallback
+      // Toujours utiliser des données de fallback, jamais d'état d'erreur
       setData(getFallbackData());
-      setError(null); // Ne pas afficher d'erreur pour une meilleure UX
+      setError(null);
     } finally {
       setLoading(false);
     }
@@ -88,7 +76,6 @@ const WidgetDisplay: React.FC<WidgetDisplayProps> = ({ widget, refreshTrigger })
 
   const getFallbackData = () => {
     switch (widget.type) {
-      case 'stats_card':
       case 'kpi_card':
         // Utiliser des valeurs cohérentes avec WidgetPreview
         const dataKey = widget.config.dataSource || widget.config.kpiType;
@@ -98,12 +85,10 @@ const WidgetDisplay: React.FC<WidgetDisplayProps> = ({ widget, refreshTrigger })
           total_commandes: 156,
           alertes_non_lues: 8,
           articles_stock_bas: 12,
-          commandes_en_cours: 23
+          commandes_en_cours: 0
         };
         return fallbackStats[dataKey] ?? 156;
-      case 'bar_chart':
       case 'chart_bar':
-      case 'line_chart':
       case 'chart_line':
         return [
           { name: 'Jan', value: 65 },
@@ -113,7 +98,6 @@ const WidgetDisplay: React.FC<WidgetDisplayProps> = ({ widget, refreshTrigger })
           { name: 'Mai', value: 56 },
           { name: 'Jun', value: 55 }
         ];
-      case 'pie_chart':
       case 'chart_pie':
         return [
           { name: 'Électronique', value: 35, color: '#3B82F6' },
@@ -121,23 +105,14 @@ const WidgetDisplay: React.FC<WidgetDisplayProps> = ({ widget, refreshTrigger })
           { name: 'Outils', value: 20, color: '#8B5CF6' },
           { name: 'Autres', value: 20, color: '#F59E0B' }
         ];
-      case 'kpi_metric':
       case 'gauge':
         return { value: 94.5, unit: '%', trend: 2.3 };
-      case 'data_table':
       case 'table':
         return [
           { nom: 'Article A', valeur: '150', statut: 'En stock' },
           { nom: 'Article B', valeur: '89', statut: 'Stock bas' },
           { nom: 'Article C', valeur: '67', statut: 'En stock' }
         ];
-      case 'alert_list':
-        return [
-          { id: 1, titre: 'Stock bas: Vis M6', message: 'Quantité insuffisante', priorite: 'high' },
-          { id: 2, titre: 'Retard livraison', message: 'CMD-001 en retard', priorite: 'medium' }
-        ];
-      case 'trend_indicator':
-        return { value: 15.3, direction: 'up', comparison: 'previous_month' };
       default:
         return null;
     }
@@ -172,7 +147,15 @@ const WidgetDisplay: React.FC<WidgetDisplayProps> = ({ widget, refreshTrigger })
           { name: 'S6', value: 108 }
         ];
       default:
-        return [];
+        // Données de fallback par défaut au lieu d'un tableau vide
+        return [
+          { name: 'Jan', value: 65 },
+          { name: 'Fév', value: 59 },
+          { name: 'Mar', value: 80 },
+          { name: 'Avr', value: 81 },
+          { name: 'Mai', value: 56 },
+          { name: 'Jun', value: 55 }
+        ];
     }
   };
 
@@ -197,7 +180,12 @@ const WidgetDisplay: React.FC<WidgetDisplayProps> = ({ widget, refreshTrigger })
       case 'commandes':
         return await apiService.getCommandes({ limit: widget.config.rowCount || 10 });
       default:
-        return [];
+        // Données de fallback par défaut au lieu d'un tableau vide
+        return [
+          { nom: 'Article A', valeur: '150', statut: 'En stock' },
+          { nom: 'Article B', valeur: '89', statut: 'Stock bas' },
+          { nom: 'Article C', valeur: '67', statut: 'En stock' }
+        ];
     }
   };
 
@@ -300,7 +288,6 @@ const WidgetDisplay: React.FC<WidgetDisplayProps> = ({ widget, refreshTrigger })
 
   const renderWidget = () => {
     switch (widget.type) {
-      case 'stats_card':
       case 'kpi_card':
         const IconComponent = getIcon(widget.config.dataSource || widget.config.kpiType);
         const displayValue = widget.config.displayFormat === 'percentage' ? `${data || 0}%` : 
@@ -330,9 +317,6 @@ const WidgetDisplay: React.FC<WidgetDisplayProps> = ({ widget, refreshTrigger })
           </div>
         );
 
-      case 'bar_chart':
-      case 'chart_bar':
-      case 'bar_chart':
       case 'chart_bar':
         const chartData = data && Array.isArray(data) ? data : [
           { name: 'Jan', value: 65 },
@@ -364,9 +348,6 @@ const WidgetDisplay: React.FC<WidgetDisplayProps> = ({ widget, refreshTrigger })
           </div>
         );
 
-      case 'line_chart':
-      case 'chart_line':
-      case 'line_chart':
       case 'chart_line':
         const lineData = data && Array.isArray(data) ? data : [
           { name: 'Jan', value: 65 },
@@ -406,9 +387,6 @@ const WidgetDisplay: React.FC<WidgetDisplayProps> = ({ widget, refreshTrigger })
           </div>
         );
 
-      case 'pie_chart':
-      case 'chart_pie':
-      case 'pie_chart':
       case 'chart_pie':
         const pieData = data && Array.isArray(data) ? data : [
           { name: 'Électronique', value: 35, color: '#3B82F6' },
@@ -459,9 +437,6 @@ const WidgetDisplay: React.FC<WidgetDisplayProps> = ({ widget, refreshTrigger })
           </div>
         );
 
-      case 'data_table':
-      case 'table':
-      case 'data_table':
       case 'table':
         const tableData = data && Array.isArray(data) && data.length > 0 ? data : [
           { nom: 'Article A', valeur: '150', statut: 'En stock' },
@@ -512,134 +487,67 @@ const WidgetDisplay: React.FC<WidgetDisplayProps> = ({ widget, refreshTrigger })
           </div>
         );
 
-      case 'kpi_metric':
       case 'gauge':
-      case 'kpi_metric':
-      case 'gauge':
-        if (widget.type === 'gauge') {
-          // Affichage en jauge
-          const currentValue = data?.value || 78;
-          const minVal = widget.config.minValue || 0;
-          const maxVal = widget.config.maxValue || 100;
-          const warningThreshold = widget.config.warningThreshold || 70;
-          const criticalThreshold = widget.config.criticalThreshold || 90;
-          
-          const getGaugeColor = () => {
-            if (currentValue >= criticalThreshold) return 'text-red-500';
-            if (currentValue >= warningThreshold) return 'text-yellow-500';
-            return 'text-green-500';
-          };
+        // Affichage en jauge
+        const currentValue = data?.value || 78;
+        const minVal = widget.config.minValue || 0;
+        const maxVal = widget.config.maxValue || 100;
+        const warningThreshold = widget.config.warningThreshold || 70;
+        const criticalThreshold = widget.config.criticalThreshold || 90;
+        
+        const getGaugeColor = () => {
+          if (currentValue >= criticalThreshold) return 'text-red-500';
+          if (currentValue >= warningThreshold) return 'text-yellow-500';
+          return 'text-green-500';
+        };
 
-          const percentage = ((currentValue - minVal) / (maxVal - minVal)) * 100;
-          
-          return (
-            <div className="h-full flex flex-col justify-center items-center">
-              <h4 className="text-sm font-medium text-gray-900 mb-4">{widget.title}</h4>
-              <div className="relative">
-                <svg width="120" height="80" viewBox="0 0 120 80">
-                  {/* Background arc */}
-                  <path
-                    d="M 20 60 A 40 40 0 0 1 100 60"
-                    fill="none"
-                    stroke="#E5E7EB"
-                    strokeWidth="8"
-                    strokeLinecap="round"
-                  />
-                  {/* Progress arc */}
-                  <path
-                    d="M 20 60 A 40 40 0 0 1 100 60"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="8"
-                    strokeLinecap="round"
-                    strokeDasharray={`${percentage * 1.26} 126`}
-                    className={getGaugeColor()}
-                  />
-                </svg>
-                <div className="absolute inset-0 flex flex-col items-center justify-center mt-4">
-                  <span className={`text-xl font-bold ${getGaugeColor()}`}>
-                    {currentValue}
-                  </span>
-                  <span className="text-xs text-gray-500">
-                    {minVal} - {maxVal}
-                  </span>
-                </div>
-              </div>
-              <div className="flex space-x-4 mt-2 text-xs">
-                <div className="flex items-center">
-                  <div className="w-2 h-2 bg-green-500 rounded-full mr-1"></div>
-                  <span>&lt;{warningThreshold}</span>
-                </div>
-                <div className="flex items-center">
-                  <div className="w-2 h-2 bg-yellow-500 rounded-full mr-1"></div>
-                  <span>{warningThreshold}-{criticalThreshold}</span>
-                </div>
-                <div className="flex items-center">
-                  <div className="w-2 h-2 bg-red-500 rounded-full mr-1"></div>
-                  <span>&gt;{criticalThreshold}</span>
-                </div>
-              </div>
-            </div>
-          );
-        } else {
-          // Affichage KPI métrique standard
-          const kpiData = data || { value: 94.5, unit: '%', trend: 2.3 };
-          return (
-            <div className="h-full flex flex-col justify-center items-center text-center">
-              <h4 className="text-sm font-medium text-gray-500 mb-4">{widget.title}</h4>
-              <div className="text-3xl font-bold text-blue-600">
-                {formatValue(kpiData.value || 0, widget.config.displayFormat || 'number')}
-              </div>
-              {kpiData.trend && (
-                <div className={`text-sm mt-2 flex items-center ${kpiData.trend > 0 ? 'text-green-500' : 'text-red-500'}`}>
-                  {kpiData.trend > 0 ? (
-                    <ArrowTrendingUpIcon className="h-4 w-4 mr-1" />
-                  ) : (
-                    <ArrowTrendingDownIcon className="h-4 w-4 mr-1" />
-                  )}
-                  {Math.abs(kpiData.trend)}% vs mois dernier
-                </div>
-              )}
-            </div>
-          );
-        }
-
-      case 'alert_list':
+        const percentage = ((currentValue - minVal) / (maxVal - minVal)) * 100;
+        
         return (
-          <div className="h-full">
+          <div className="h-full flex flex-col justify-center items-center">
             <h4 className="text-sm font-medium text-gray-900 mb-4">{widget.title}</h4>
-            <div className="space-y-2">
-              {data?.map((alert: any, index: number) => (
-                <div key={alert.id || index} className="flex items-start text-sm">
-                  <div className={`w-2 h-2 rounded-full mr-3 mt-1 ${
-                    alert.priorite === 'high' || alert.priorite === 'critical' ? 'bg-red-500' :
-                    alert.priorite === 'medium' ? 'bg-yellow-500' : 'bg-green-500'
-                  }`}></div>
-                  <div className="flex-1">
-                    <p className="text-gray-900 truncate">{alert.titre || alert.message}</p>
-                    <p className="text-gray-500 text-xs truncate">{alert.message}</p>
-                  </div>
-                </div>
-              ))}
+            <div className="relative">
+              <svg width="120" height="80" viewBox="0 0 120 80">
+                {/* Background arc */}
+                <path
+                  d="M 20 60 A 40 40 0 0 1 100 60"
+                  fill="none"
+                  stroke="#E5E7EB"
+                  strokeWidth="8"
+                  strokeLinecap="round"
+                />
+                {/* Progress arc */}
+                <path
+                  d="M 20 60 A 40 40 0 0 1 100 60"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="8"
+                  strokeLinecap="round"
+                  strokeDasharray={`${percentage * 1.26} 126`}
+                  className={getGaugeColor()}
+                />
+              </svg>
+              <div className="absolute inset-0 flex flex-col items-center justify-center mt-4">
+                <span className={`text-xl font-bold ${getGaugeColor()}`}>
+                  {currentValue}
+                </span>
+                <span className="text-xs text-gray-500">
+                  {minVal} - {maxVal}
+                </span>
+              </div>
             </div>
-          </div>
-        );
-
-      case 'trend_indicator':
-        return (
-          <div className="h-full flex flex-col justify-center items-center text-center">
-            <h4 className="text-sm font-medium text-gray-500 mb-4">{widget.title}</h4>
-            <div className="flex items-center">
-              {data?.direction === 'up' ? (
-                <ArrowTrendingUpIcon className="h-8 w-8 text-green-500 mr-2" />
-              ) : (
-                <ArrowTrendingDownIcon className="h-8 w-8 text-red-500 mr-2" />
-              )}
-              <div>
-                <div className="text-xl font-bold text-gray-900">
-                  {data?.direction === 'up' ? '+' : ''}{data?.value}%
-                </div>
-                <div className="text-xs text-gray-500">vs {data?.comparison}</div>
+            <div className="flex space-x-4 mt-2 text-xs">
+              <div className="flex items-center">
+                <div className="w-2 h-2 bg-green-500 rounded-full mr-1"></div>
+                <span>&lt;{warningThreshold}</span>
+              </div>
+              <div className="flex items-center">
+                <div className="w-2 h-2 bg-yellow-500 rounded-full mr-1"></div>
+                <span>{warningThreshold}-{criticalThreshold}</span>
+              </div>
+              <div className="flex items-center">
+                <div className="w-2 h-2 bg-red-500 rounded-full mr-1"></div>
+                <span>&gt;{criticalThreshold}</span>
               </div>
             </div>
           </div>

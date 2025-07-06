@@ -74,7 +74,7 @@ const WidgetPreview: React.FC<WidgetPreviewProps> = ({ widget }) => {
 
   const fetchStatsData = async () => {
     const stats = await apiService.getDashboardStats();
-    const dataKey = widget.config.kpiType;
+    const dataKey = widget.config.dataSource || widget.config.kpiType;
     return stats[dataKey] || 0;
   };
 
