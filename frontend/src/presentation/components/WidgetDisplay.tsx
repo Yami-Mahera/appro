@@ -147,7 +147,15 @@ const WidgetDisplay: React.FC<WidgetDisplayProps> = ({ widget, refreshTrigger })
           { name: 'S6', value: 108 }
         ];
       default:
-        return [];
+        // Données de fallback par défaut au lieu d'un tableau vide
+        return [
+          { name: 'Jan', value: 65 },
+          { name: 'Fév', value: 59 },
+          { name: 'Mar', value: 80 },
+          { name: 'Avr', value: 81 },
+          { name: 'Mai', value: 56 },
+          { name: 'Jun', value: 55 }
+        ];
     }
   };
 
