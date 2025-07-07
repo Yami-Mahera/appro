@@ -51,15 +51,42 @@ const Articles: React.FC = () => {
 
   useEffect(() => {
     loadData();
-  }, []);
+  }, [currentPage, itemsPerPage, filter, showStockBas]);
 
   const loadData = async () => {
     try {
       setLoading(true);
-      const [articlesData, fournisseursData] = await Promise.all([
-        ApiService.getArticles(),
+      const skip = (currentPage - 1) * itemsPerPage;
+      
+      const [articlesResponse, fournisseursData] = await Promise.all([
+        ApiService.getArticles({
+          search: filter || undefined,
+          stock_bas: showStockBas || undefined,
+          limit: itemsPerPage,
+          skip: skip
+        }),
         ApiService.getFournisseurs()
       ]);
+      
+      // Handle response - it might return articles array directly or a response object
+      let articlesData = articlesResponse;
+      let total = articlesResponse.length;
+      
+      // If the API returns a paginated response with metadata
+      if (articlesResponse && typeof articlesResponse === 'object' && !Array.isArray(articlesResponse)) {
+        articlesData = articlesResponse.articles || articlesResponse.data || articlesResponse;
+        total = articlesResponse.total || articlesResponse.count || articlesData.length;
+      }
+      
+      // If we got fewer items than requested and it's the first page, use the actual count
+      if (currentPage === 1 && articlesData.length < itemsPerPage) {
+        total = articlesData.length;
+      }
+      
+      // Estimate total if not provided
+      if (!total || total < skip + articlesData.length) {
+        total = skip + articlesData.length + (articlesData.length === itemsPerPage ? itemsPerPage : 0);
+      }
       
       // Enrichir les articles avec le nom du fournisseur
       const enrichedArticles = articlesData.map((article: Article) => ({
@@ -69,6 +96,8 @@ const Articles: React.FC = () => {
       
       setArticles(enrichedArticles);
       setFournisseurs(fournisseursData);
+      setTotalItems(total);
+      setTotalPages(Math.ceil(total / itemsPerPage));
     } catch (err: any) {
       setError(err.response?.data?.detail || 'Erreur lors du chargement des données');
     } finally {
