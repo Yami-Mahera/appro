@@ -304,8 +304,8 @@ const WidgetPreview: React.FC<WidgetPreviewProps> = ({ widget }) => {
         return (
           <div className="h-full">
             <div className="flex justify-between items-center mb-2">
-              <h4 className="text-sm font-medium text-gray-900">{widget.title}</h4>
-              <span className="text-xs text-gray-500">{widget.config.periode || '6 mois'}</span>
+              <h4 className="text-sm font-medium text-gray-900 dark:text-white">{widget.title}</h4>
+              <span className="text-xs text-gray-500 dark:text-gray-400">{widget.config.periode || '6 mois'}</span>
             </div>
             <ResponsiveContainer width="100%" height="80%">
               <LineChart data={lineData}>
