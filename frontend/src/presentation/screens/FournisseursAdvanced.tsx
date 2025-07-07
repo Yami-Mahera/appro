@@ -154,6 +154,28 @@ const FournisseursAdvanced: React.FC = () => {
       setSortField(field);
       setSortOrder("asc");
     }
+    setCurrentPage(1); // Reset to first page when sorting
+  };
+
+  // Pagination handlers
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+  };
+
+  const handleItemsPerPageChange = (newItemsPerPage: number) => {
+    setItemsPerPage(newItemsPerPage);
+    setCurrentPage(1); // Reset to first page when changing items per page
+  };
+
+  // Reset to first page when filters change
+  const handleFiltersChange = (newFilters: typeof filters) => {
+    setFilters(newFilters);
+    setCurrentPage(1);
+  };
+
+  const handleSearchChange = (newSearchTerm: string) => {
+    setSearchTerm(newSearchTerm);
+    setCurrentPage(1);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
