@@ -98,7 +98,7 @@ const WidgetConfigModal: React.FC<WidgetConfigModalProps> = ({
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700">Format d'affichage</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Format d'affichage</label>
               <select
                 name="displayFormat"
                 value={config.displayFormat || 'percentage'}
