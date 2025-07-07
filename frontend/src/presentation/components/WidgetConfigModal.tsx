@@ -59,7 +59,7 @@ const WidgetConfigModal: React.FC<WidgetConfigModalProps> = ({
         return (
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700">Métrique KPI</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Métrique KPI</label>
               <select
                 name="kpiType"
                 value={config.kpiType || ''}
