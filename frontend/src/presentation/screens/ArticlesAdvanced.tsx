@@ -402,7 +402,7 @@ const ArticlesAdvanced: React.FC = () => {
                 id="stockBas"
                 checked={filters.stock_bas}
                 onChange={(e) =>
-                  setFilters({ ...filters, stock_bas: e.target.checked })
+                  handleFiltersChange({ ...filters, stock_bas: e.target.checked })
                 }
                 className="mr-2"
               />
