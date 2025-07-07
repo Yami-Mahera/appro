@@ -356,9 +356,9 @@ const Dashboard: React.FC = () => {
           <StockEvolutionChart className="mt-6" />
 
           {/* Recent Activity */}
-          <div className="bg-white shadow rounded-lg">
+          <div className="bg-white dark:bg-gray-800 shadow rounded-lg">
             <div className="px-4 py-5 sm:p-6">
-              <h3 className="text-lg leading-6 font-medium text-gray-900 mb-4">
+              <h3 className="text-lg leading-6 font-medium text-gray-900 dark:text-white mb-4">
                 Activité récente
               </h3>
               <div className="flow-root">
