@@ -247,8 +247,8 @@ const Reporting: React.FC = () => {
 
       {/* Print Header - Show only on print */}
       <div className="hidden print:block text-center border-b pb-4 mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">Rapport {REPORT_TYPES.find(t => t.key === activeReport)?.label}</h1>
-        <p className="text-gray-600">
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Rapport {REPORT_TYPES.find(t => t.key === activeReport)?.label}</h1>
+        <p className="text-gray-600 dark:text-gray-400">
           Généré le {new Date().toLocaleDateString('fr-FR')} à {new Date().toLocaleTimeString('fr-FR')}
         </p>
         {(dateRange.date_from || dateRange.date_to) && (
