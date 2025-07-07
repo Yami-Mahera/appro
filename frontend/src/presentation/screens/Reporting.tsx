@@ -225,7 +225,7 @@ const Reporting: React.FC = () => {
                 onChange={(e) => setDateRange({ ...dateRange, date_from: e.target.value })}
                 className="px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
               />
-              <span className="text-gray-500 self-center">à</span>
+              <span className="text-gray-500 dark:text-gray-400 self-center">à</span>
               <input
                 type="date"
                 value={dateRange.date_to}
