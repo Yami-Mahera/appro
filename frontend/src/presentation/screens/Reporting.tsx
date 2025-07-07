@@ -448,7 +448,7 @@ const Reporting: React.FC = () => {
             <div className="bg-white rounded-lg shadow-sm overflow-hidden">
               <div className="p-6 border-b">
                 <h2 className="text-xl font-bold">Rapport des commandes</h2>
-                <p className="text-gray-600">{reportData.commandes.length} commande(s) trouvée(s)</p>
+                <p className="text-gray-600 dark:text-gray-400">{reportData.commandes.length} commande(s) trouvée(s)</p>
               </div>
               <div className="overflow-x-auto">
                 <table className="min-w-full divide-y divide-gray-200">
