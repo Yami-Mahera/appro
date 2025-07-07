@@ -283,21 +283,22 @@ const ArticlesAdvanced: React.FC = () => {
       )}
 
       {/* Search and Filters */}
-      <div className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-sm space-y-4">
-        <div className="flex flex-wrap gap-4 items-center">
-          <div className="flex-1 min-w-64 relative">
+      <div className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-sm">
+        <div className="flex flex-col md:flex-row gap-4 items-center">
+          <div className="flex-1 relative">
             <MagnifyingGlassIcon className="w-5 h-5 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
             <input
               type="text"
               placeholder="Rechercher par nom, référence, famille, description..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+              className="w-full pl-10 pr-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400"
             />
           </div>
+
           <button
             onClick={() => setShowFilters(!showFilters)}
-            className="flex items-center space-x-2 px-3 py-2 border border-gray-300 rounded-md hover:bg-gray-50"
+            className="flex items-center space-x-2 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-50 dark:hover:bg-gray-700 bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300"
           >
             <AdjustmentsHorizontalIcon className="w-5 h-5" />
             <span>Filtres</span>
@@ -305,9 +306,9 @@ const ArticlesAdvanced: React.FC = () => {
         </div>
 
         {showFilters && (
-          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 pt-4 border-t">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4 pt-4 border-t border-gray-200 dark:border-gray-700">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 Famille
               </label>
               <input
@@ -316,12 +317,12 @@ const ArticlesAdvanced: React.FC = () => {
                 onChange={(e) =>
                   setFilters({ ...filters, famille: e.target.value })
                 }
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                 placeholder="Filtrer par famille"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 Fournisseur
               </label>
               <select
@@ -329,7 +330,7 @@ const ArticlesAdvanced: React.FC = () => {
                 onChange={(e) =>
                   setFilters({ ...filters, fournisseur_id: e.target.value })
                 }
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
               >
                 <option value="">Tous les fournisseurs</option>
                 {fournisseurs.map((fournisseur) => (
@@ -349,12 +350,12 @@ const ArticlesAdvanced: React.FC = () => {
                 }
                 className="mr-2"
               />
-              <label htmlFor="stockBas" className="text-sm text-gray-700">
+              <label htmlFor="stockBas" className="text-sm text-gray-700 dark:text-gray-300">
                 Stock bas uniquement
               </label>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 Statut
               </label>
               <select
@@ -372,7 +373,7 @@ const ArticlesAdvanced: React.FC = () => {
                         : e.target.value === "true",
                   })
                 }
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
               >
                 <option value="all">Tous</option>
                 <option value="true">Actifs</option>
