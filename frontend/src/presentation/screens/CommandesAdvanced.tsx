@@ -313,7 +313,7 @@ const CommandesAdvanced: React.FC = () => {
       )}
 
       {/* Search and Filters */}
-      <div className="bg-white p-4 rounded-lg shadow-sm space-y-4">
+      <div className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-sm space-y-4">
         <div className="flex flex-wrap gap-4 items-center">
           <div className="flex-1 min-w-64 relative">
             <MagnifyingGlassIcon className="w-5 h-5 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
