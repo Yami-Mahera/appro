@@ -219,7 +219,7 @@ backend:
         agent: "testing"
         comment: "Tests supplémentaires de l'API dashboard stats suite à la modification du composant WidgetPreview.tsx. L'API /api/dashboard/stats fonctionne correctement et retourne toutes les statistiques attendues. La valeur 'commandes_en_cours' est bien à 0 car il n'existe pas d'endpoint pour mettre à jour le statut d'une commande. Le composant WidgetPreview.tsx a été correctement modifié pour utiliser les vraies données de l'API comme WidgetDisplay.tsx, et les données de fallback ont été harmonisées (commandes_en_cours = 0)."
         
-  - task: "APIs améliorées avec tri et recherche"
+  - task: "APIs Pagination Support"
     implemented: true
     working: true
     file: "/app/backend/server.py"
@@ -229,10 +229,10 @@ backend:
     status_history:
       - working: "NA"
         agent: "main"
-        comment: "Implémenté les fonctionnalités de recherche, tri et filtres pour les endpoints GET /api/fournisseurs, /api/articles et /api/commandes"
+        comment: "Implémenté la pagination pour les endpoints GET /api/articles et GET /api/fournisseurs avec paramètres limit et skip"
       - working: true
         agent: "testing"
-        comment: "Les APIs améliorées avec tri et recherche fonctionnent parfaitement. Les paramètres de recherche (search), tri (sort_by, sort_order) et filtres (ville, famille, status) sont correctement implémentés pour les fournisseurs, articles et commandes. Les résultats sont filtrés et triés comme attendu."
+        comment: "Les APIs de pagination fonctionnent correctement. Tests réussis pour GET /api/articles?limit=5&skip=0, GET /api/articles?limit=10&skip=5, GET /api/articles?search=test&limit=5&skip=0, GET /api/fournisseurs?limit=5&skip=0, GET /api/fournisseurs?limit=10&skip=5, et GET /api/fournisseurs?search=test&limit=5&skip=0. Les paramètres limit et skip fonctionnent comme prévu, et la recherche fonctionne correctement avec la pagination. Cependant, les APIs ne retournent pas d'information sur le nombre total d'éléments, seulement un tableau d'éléments. Cela pourrait rendre plus difficile l'implémentation de la pagination côté frontend."
         
   - task: "Nouvelles APIs de gestion avancée des stocks"
     implemented: true
