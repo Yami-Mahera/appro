@@ -249,39 +249,39 @@ const TableauProjectionCouverture: React.FC<TableauProjectionCouvertureProps> = 
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">
                       {projection.semaine}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
                       <div className="flex flex-col">
                         <span>Du {projection.dateDebut}</span>
                         <span>Au {projection.dateFin}</span>
                       </div>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
                       {projection.stockDebut}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                      <span className={`font-medium ${projection.stockFin < projection.cms ? 'text-red-600' : 'text-gray-900'}`}>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
+                      <span className={`font-medium ${projection.stockFin < projection.cms ? 'text-red-600 dark:text-red-400' : 'text-gray-900 dark:text-white'}`}>
                         {projection.stockFin}
                       </span>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
-                      <span className={`px-2 py-1 rounded ${projection.qmPrevisionnelle > 0 ? 'bg-blue-100 text-blue-800' : 'bg-gray-100 text-gray-800'}`}>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
+                      <span className={`px-2 py-1 rounded ${projection.qmPrevisionnelle > 0 ? 'bg-blue-100 dark:bg-blue-900/30 text-blue-800 dark:text-blue-300' : 'bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-300'}`}>
                         {projection.qmPrevisionnelle}
                       </span>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
                       <div className="flex flex-col">
                         <span>Prévue: {projection.consommationPrevue}</span>
                         {projection.consommationReelle !== undefined && (
-                          <span className="text-xs text-gray-500">
+                          <span className="text-xs text-gray-500 dark:text-gray-400">
                             Réelle: {projection.consommationReelle}
                           </span>
                         )}
                       </div>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
                       <div className="flex flex-col text-xs">
                         <span>Actuelle: {projection.couvertureActuelle.toFixed(1)}</span>
-                        <span className="text-gray-500">CMS: {projection.cms.toFixed(1)}</span>
+                        <span className="text-gray-500 dark:text-gray-400">CMS: {projection.cms.toFixed(1)}</span>
                       </div>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
@@ -290,10 +290,10 @@ const TableauProjectionCouverture: React.FC<TableauProjectionCouvertureProps> = 
                          projection.status === 'attention' ? 'Attention' : 'Normal'}
                       </span>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
                       <button
                         onClick={() => toggleRowExpansion(projection.semaine)}
-                        className="text-blue-600 hover:text-blue-900"
+                        className="text-blue-600 dark:text-blue-400 hover:text-blue-900 dark:hover:text-blue-300"
                       >
                         {expandedRows.has(projection.semaine) ? (
                           <ChevronUpIcon className="h-4 w-4" />
