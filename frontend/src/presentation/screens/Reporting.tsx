@@ -272,40 +272,40 @@ const Reporting: React.FC = () => {
               <h2 className="text-xl font-bold mb-6 text-gray-900 dark:text-white">Rapport de synthèse</h2>
               
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-                <div className="bg-blue-50 p-4 rounded-lg">
-                  <h3 className="text-lg font-semibold text-blue-900 mb-2">Fournisseurs</h3>
-                  <p className="text-3xl font-bold text-blue-600">{reportData.synthese.total_fournisseurs}</p>
-                  <p className="text-sm text-blue-700">Total actifs</p>
+                <div className="bg-blue-50 dark:bg-blue-900/20 p-4 rounded-lg">
+                  <h3 className="text-lg font-semibold text-blue-900 dark:text-blue-100 mb-2">Fournisseurs</h3>
+                  <p className="text-3xl font-bold text-blue-600 dark:text-blue-400">{reportData.synthese.total_fournisseurs}</p>
+                  <p className="text-sm text-blue-700 dark:text-blue-300">Total actifs</p>
                 </div>
                 
-                <div className="bg-green-50 p-4 rounded-lg">
-                  <h3 className="text-lg font-semibold text-green-900 mb-2">Articles</h3>
-                  <p className="text-3xl font-bold text-green-600">{reportData.synthese.total_articles}</p>
-                  <p className="text-sm text-green-700">Total en stock</p>
+                <div className="bg-green-50 dark:bg-green-900/20 p-4 rounded-lg">
+                  <h3 className="text-lg font-semibold text-green-900 dark:text-green-100 mb-2">Articles</h3>
+                  <p className="text-3xl font-bold text-green-600 dark:text-green-400">{reportData.synthese.total_articles}</p>
+                  <p className="text-sm text-green-700 dark:text-green-300">Total en stock</p>
                 </div>
                 
-                <div className="bg-purple-50 p-4 rounded-lg">
-                  <h3 className="text-lg font-semibold text-purple-900 mb-2">Commandes</h3>
-                  <p className="text-3xl font-bold text-purple-600">{reportData.synthese.total_commandes}</p>
-                  <p className="text-sm text-purple-700">Total créées</p>
+                <div className="bg-purple-50 dark:bg-purple-900/20 p-4 rounded-lg">
+                  <h3 className="text-lg font-semibold text-purple-900 dark:text-purple-100 mb-2">Commandes</h3>
+                  <p className="text-3xl font-bold text-purple-600 dark:text-purple-400">{reportData.synthese.total_commandes}</p>
+                  <p className="text-sm text-purple-700 dark:text-purple-300">Total créées</p>
                 </div>
                 
-                <div className="bg-yellow-50 p-4 rounded-lg">
-                  <h3 className="text-lg font-semibold text-yellow-900 mb-2">Stock bas</h3>
-                  <p className="text-3xl font-bold text-yellow-600">{reportData.synthese.articles_stock_bas}</p>
-                  <p className="text-sm text-yellow-700">Articles en alerte</p>
+                <div className="bg-yellow-50 dark:bg-yellow-900/20 p-4 rounded-lg">
+                  <h3 className="text-lg font-semibold text-yellow-900 dark:text-yellow-100 mb-2">Stock bas</h3>
+                  <p className="text-3xl font-bold text-yellow-600 dark:text-yellow-400">{reportData.synthese.articles_stock_bas}</p>
+                  <p className="text-sm text-yellow-700 dark:text-yellow-300">Articles en alerte</p>
                 </div>
                 
-                <div className="bg-indigo-50 p-4 rounded-lg">
-                  <h3 className="text-lg font-semibold text-indigo-900 mb-2">Valeur stock</h3>
-                  <p className="text-3xl font-bold text-indigo-600">{reportData.synthese.valeur_totale_stock?.toFixed(2) || '0'}€</p>
-                  <p className="text-sm text-indigo-700">Total inventaire</p>
+                <div className="bg-indigo-50 dark:bg-indigo-900/20 p-4 rounded-lg">
+                  <h3 className="text-lg font-semibold text-indigo-900 dark:text-indigo-100 mb-2">Valeur stock</h3>
+                  <p className="text-3xl font-bold text-indigo-600 dark:text-indigo-400">{reportData.synthese.valeur_totale_stock?.toFixed(2) || '0'}€</p>
+                  <p className="text-sm text-indigo-700 dark:text-indigo-300">Total inventaire</p>
                 </div>
                 
-                <div className="bg-pink-50 p-4 rounded-lg">
-                  <h3 className="text-lg font-semibold text-pink-900 mb-2">CA Commandes</h3>
-                  <p className="text-3xl font-bold text-pink-600">{reportData.synthese.valeur_totale_commandes?.toFixed(2) || '0'}€</p>
-                  <p className="text-sm text-pink-700">Chiffre d'affaires</p>
+                <div className="bg-pink-50 dark:bg-pink-900/20 p-4 rounded-lg">
+                  <h3 className="text-lg font-semibold text-pink-900 dark:text-pink-100 mb-2">CA Commandes</h3>
+                  <p className="text-3xl font-bold text-pink-600 dark:text-pink-400">{reportData.synthese.valeur_totale_commandes?.toFixed(2) || '0'}€</p>
+                  <p className="text-sm text-pink-700 dark:text-pink-300">Chiffre d'affaires</p>
                 </div>
               </div>
 
