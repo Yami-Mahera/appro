@@ -17,8 +17,8 @@ export const Button: React.FC<ButtonProps> = ({
   
   const variantClasses = {
     default: 'bg-blue-600 text-white hover:bg-blue-700 focus:ring-blue-500',
-    outline: 'border border-gray-300 bg-white text-gray-700 hover:bg-gray-50 focus:ring-blue-500',
-    ghost: 'text-gray-700 hover:bg-gray-100 focus:ring-blue-500',
+    outline: 'border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 focus:ring-blue-500',
+    ghost: 'text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 focus:ring-blue-500',
     destructive: 'bg-red-600 text-white hover:bg-red-700 focus:ring-red-500'
   };
   
