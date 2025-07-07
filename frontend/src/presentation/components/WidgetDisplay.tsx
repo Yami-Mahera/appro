@@ -301,17 +301,17 @@ const WidgetDisplay: React.FC<WidgetDisplayProps> = ({ widget, refreshTrigger })
                 <IconComponent className="h-6 w-6 text-white" />
               </div>
               <div className="flex-1">
-                <p className="text-sm font-medium text-gray-500">{widget.title}</p>
+                <p className="text-sm font-medium text-gray-500 dark:text-gray-400">{widget.title}</p>
                 <div className="flex items-baseline">
-                  <p className="text-2xl font-bold text-gray-900">{displayValue}</p>
+                  <p className="text-2xl font-bold text-gray-900 dark:text-white">{displayValue}</p>
                   {widget.config.target && (
-                    <span className="ml-2 text-xs text-gray-400">
+                    <span className="ml-2 text-xs text-gray-400 dark:text-gray-500">
                       / {widget.config.target}{widget.config.displayFormat === 'percentage' ? '%' : ''}
                     </span>
                   )}
                 </div>
                 {/* Simulation d'une tendance si pas de vraie donnée */}
-                <div className="text-xs text-green-500 mt-1">↑ +2.3% vs précédent</div>
+                <div className="text-xs text-green-500 dark:text-green-400 mt-1">↑ +2.3% vs précédent</div>
               </div>
             </div>
           </div>
