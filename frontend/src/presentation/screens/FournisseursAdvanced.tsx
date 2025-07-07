@@ -99,6 +99,8 @@ const FournisseursAdvanced: React.FC = () => {
   const loadFournisseurs = async () => {
     try {
       setLoading(true);
+      const skip = (currentPage - 1) * itemsPerPage;
+      
       const params = {
         search: searchTerm || undefined,
         sort_by: sortField,
@@ -106,10 +108,35 @@ const FournisseursAdvanced: React.FC = () => {
         ville: filters.ville || undefined,
         pays: filters.pays || undefined,
         active: filters.active,
+        limit: itemsPerPage,
+        skip: skip,
       };
 
-      const data = await ApiService.getFournisseurs(params);
-      setFournisseurs(data);
+      const response = await ApiService.getFournisseurs(params);
+      
+      // Handle response - it might return fournisseurs array directly or a response object
+      let fournisseursData = response;
+      let total = response.length;
+      
+      // If the API returns a paginated response with metadata
+      if (response && typeof response === 'object' && !Array.isArray(response)) {
+        fournisseursData = response.fournisseurs || response.data || response;
+        total = response.total || response.count || fournisseursData.length;
+      }
+      
+      // If we got fewer items than requested and it's the first page, use the actual count
+      if (currentPage === 1 && fournisseursData.length < itemsPerPage) {
+        total = fournisseursData.length;
+      }
+      
+      // Estimate total if not provided
+      if (!total || total < skip + fournisseursData.length) {
+        total = skip + fournisseursData.length + (fournisseursData.length === itemsPerPage ? itemsPerPage : 0);
+      }
+      
+      setFournisseurs(fournisseursData);
+      setTotalItems(total);
+      setTotalPages(Math.ceil(total / itemsPerPage));
     } catch (err: any) {
       setError(
         err.response?.data?.detail ||
