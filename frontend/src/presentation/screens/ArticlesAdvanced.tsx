@@ -544,12 +544,24 @@ const ArticlesAdvanced: React.FC = () => {
           </table>
         </div>
 
-        {articles.length === 0 && (
+        {articles.length === 0 && !loading && (
           <div className="text-center py-8">
             <p className="text-gray-500 dark:text-gray-400">Aucun article trouvé</p>
           </div>
         )}
       </div>
+
+      {/* Pagination */}
+      {totalItems > 0 && (
+        <Pagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          totalItems={totalItems}
+          itemsPerPage={itemsPerPage}
+          onPageChange={handlePageChange}
+          onItemsPerPageChange={handleItemsPerPageChange}
+        />
+      )}
 
       {/* Edit/Add Modal */}
       {showModal && (
