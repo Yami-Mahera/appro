@@ -268,8 +268,8 @@ const Reporting: React.FC = () => {
         <>
           {/* Synthese Report */}
           {activeReport === 'synthese' && reportData.synthese && (
-            <div className="bg-white rounded-lg shadow-sm p-6">
-              <h2 className="text-xl font-bold mb-6">Rapport de synthèse</h2>
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm p-6">
+              <h2 className="text-xl font-bold mb-6 text-gray-900 dark:text-white">Rapport de synthèse</h2>
               
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
                 <div className="bg-blue-50 p-4 rounded-lg">
