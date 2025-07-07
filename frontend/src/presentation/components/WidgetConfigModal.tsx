@@ -416,7 +416,7 @@ const WidgetConfigModal: React.FC<WidgetConfigModalProps> = ({
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700">Seuils d'alerte</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Seuils d'alerte</label>
               <div className="grid grid-cols-2 gap-2">
                 <input
                   type="number"
@@ -424,7 +424,7 @@ const WidgetConfigModal: React.FC<WidgetConfigModalProps> = ({
                   value={config.warningThreshold || 70}
                   onChange={handleInputChange}
                   placeholder="Seuil Warning"
-                  className="block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                  className="block w-full border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                 />
                 <input
                   type="number"
@@ -432,7 +432,7 @@ const WidgetConfigModal: React.FC<WidgetConfigModalProps> = ({
                   value={config.criticalThreshold || 90}
                   onChange={handleInputChange}
                   placeholder="Seuil Critique"
-                  className="block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                  className="block w-full border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                 />
               </div>
             </div>
