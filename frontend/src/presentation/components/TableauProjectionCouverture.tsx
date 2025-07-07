@@ -132,15 +132,15 @@ const TableauProjectionCouverture: React.FC<TableauProjectionCouvertureProps> = 
   const selectedArticle = articles.find(a => a.id === selectedArticleId);
 
   return (
-    <div className={`bg-white rounded-lg shadow-sm ${className}`}>
+    <div className={`bg-white dark:bg-gray-800 rounded-lg shadow-sm ${className}`}>
       {/* En-tête */}
-      <div className="px-6 py-4 border-b border-gray-200">
+      <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
         <div className="flex items-center justify-between">
           <div>
-            <h2 className="text-xl font-semibold text-gray-900">
+            <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
               Tableau de projection de la couverture de stock
             </h2>
-            <p className="text-sm text-gray-600 mt-1">
+            <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
               Prévisions et calculs sophistiqués selon les modalités CMS/CMC/QM
             </p>
           </div>
@@ -148,11 +148,11 @@ const TableauProjectionCouverture: React.FC<TableauProjectionCouvertureProps> = 
           {/* Contrôles */}
           <div className="flex space-x-4">
             <div className="flex flex-col">
-              <label className="text-sm font-medium text-gray-700 mb-1">Article</label>
+              <label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Article</label>
               <select
                 value={selectedArticleId}
                 onChange={(e) => setSelectedArticleId(e.target.value)}
-                className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                className="px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
               >
                 <option value="">Sélectionner un article</option>
                 {articles.map((article) => (
@@ -164,11 +164,11 @@ const TableauProjectionCouverture: React.FC<TableauProjectionCouvertureProps> = 
             </div>
             
             <div className="flex flex-col">
-              <label className="text-sm font-medium text-gray-700 mb-1">Période</label>
+              <label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Période</label>
               <select
                 value={timeRange}
                 onChange={(e) => setTimeRange(Number(e.target.value))}
-                className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                className="px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
               >
                 <option value={13}>13 semaines</option>
                 <option value={26}>26 semaines</option>
@@ -180,23 +180,23 @@ const TableauProjectionCouverture: React.FC<TableauProjectionCouvertureProps> = 
 
         {/* Informations article sélectionné */}
         {selectedArticle && (
-          <div className="mt-4 p-4 bg-gray-50 rounded-lg">
+          <div className="mt-4 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4 text-sm">
               <div>
-                <span className="font-medium text-gray-700">Référence:</span>
-                <span className="ml-2 text-gray-900">{selectedArticle.reference}</span>
+                <span className="font-medium text-gray-700 dark:text-gray-300">Référence:</span>
+                <span className="ml-2 text-gray-900 dark:text-white">{selectedArticle.reference}</span>
               </div>
               <div>
-                <span className="font-medium text-gray-700">Stock actuel:</span>
-                <span className="ml-2 text-gray-900">{selectedArticle.stock_actuel}</span>
+                <span className="font-medium text-gray-700 dark:text-gray-300">Stock actuel:</span>
+                <span className="ml-2 text-gray-900 dark:text-white">{selectedArticle.stock_actuel}</span>
               </div>
               <div>
-                <span className="font-medium text-gray-700">Seuil minimum:</span>
-                <span className="ml-2 text-gray-900">{selectedArticle.seuil_min}</span>
+                <span className="font-medium text-gray-700 dark:text-gray-300">Seuil minimum:</span>
+                <span className="ml-2 text-gray-900 dark:text-white">{selectedArticle.seuil_min}</span>
               </div>
               <div>
-                <span className="font-medium text-gray-700">Prix unitaire:</span>
-                <span className="ml-2 text-gray-900">{selectedArticle.prix_unitaire}€</span>
+                <span className="font-medium text-gray-700 dark:text-gray-300">Prix unitaire:</span>
+                <span className="ml-2 text-gray-900 dark:text-white">{selectedArticle.prix_unitaire}€</span>
               </div>
             </div>
           </div>
