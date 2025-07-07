@@ -326,8 +326,8 @@ const Dashboard: React.FC = () => {
             </div>
 
             {/* Pie Chart */}
-            <div className="bg-white p-6 rounded-lg shadow">
-              <h3 className="text-lg font-medium text-gray-900 mb-4">
+            <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow">
+              <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">
                 Répartition par catégorie
               </h3>
               <ResponsiveContainer width="100%" height={300}>
