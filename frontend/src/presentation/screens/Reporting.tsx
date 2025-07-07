@@ -158,7 +158,7 @@ const Reporting: React.FC = () => {
       {/* Header - Hide on print */}
       <div className="print:hidden">
         <div className="flex justify-between items-center">
-          <h1 className="text-2xl font-bold text-gray-900">Rapports</h1>
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Rapports</h1>
           <div className="flex space-x-2">
             <button
               onClick={exportToPDF}
