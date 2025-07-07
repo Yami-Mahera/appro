@@ -251,11 +251,11 @@ const WidgetPreview: React.FC<WidgetPreviewProps> = ({ widget }) => {
 
   if (loading) {
     return (
-      <div className="h-full flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg">
+      <div className="h-full flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-900 dark:to-indigo-900 rounded-lg">
         <div className="text-center">
           <div className="animate-spin rounded-full h-8 w-8 border-2 border-blue-500 border-t-transparent mx-auto mb-2"></div>
-          <p className="text-sm text-blue-600 font-medium">{widget.title}</p>
-          <p className="text-xs text-blue-400">Chargement...</p>
+          <p className="text-sm text-blue-600 dark:text-blue-400 font-medium">{widget.title}</p>
+          <p className="text-xs text-blue-400 dark:text-blue-500">Chargement...</p>
         </div>
       </div>
     );
