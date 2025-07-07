@@ -406,7 +406,7 @@ const WidgetConfigModal: React.FC<WidgetConfigModalProps> = ({
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700">Valeur maximale</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Valeur maximale</label>
               <input
                 type="number"
                 name="maxValue"
