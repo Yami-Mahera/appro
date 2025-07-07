@@ -402,32 +402,32 @@ const WidgetPreview: React.FC<WidgetPreviewProps> = ({ widget }) => {
         return (
           <div className="h-full">
             <div className="flex justify-between items-center mb-2">
-              <h4 className="text-sm font-medium text-gray-900">{widget.title}</h4>
-              <span className="text-xs text-gray-500">{rowCount} lignes</span>
+              <h4 className="text-sm font-medium text-gray-900 dark:text-white">{widget.title}</h4>
+              <span className="text-xs text-gray-500 dark:text-gray-400">{rowCount} lignes</span>
             </div>
             <div className="overflow-hidden">
-              <table className="min-w-full divide-y divide-gray-200">
-                <thead className="bg-gray-50">
+              <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                <thead className="bg-gray-50 dark:bg-gray-800">
                   <tr>
-                    <th className="px-2 py-1 text-left text-xs font-medium text-gray-500 uppercase">Nom</th>
-                    <th className="px-2 py-1 text-left text-xs font-medium text-gray-500 uppercase">Qté</th>
-                    <th className="px-2 py-1 text-left text-xs font-medium text-gray-500 uppercase">Statut</th>
+                    <th className="px-2 py-1 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Nom</th>
+                    <th className="px-2 py-1 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Qté</th>
+                    <th className="px-2 py-1 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Statut</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-gray-200">
+                <tbody className="divide-y divide-gray-200 dark:divide-gray-700 bg-white dark:bg-gray-900">
                   {tableData.slice(0, Math.min(rowCount, 5)).map((item: any, index: number) => (
                     <tr key={index}>
-                      <td className="px-2 py-1 text-xs text-gray-900 truncate">
+                      <td className="px-2 py-1 text-xs text-gray-900 dark:text-gray-100 truncate">
                         {item.nom || item.reference || item.numero_commande || `Item ${index + 1}`}
                       </td>
-                      <td className="px-2 py-1 text-xs text-gray-900">
+                      <td className="px-2 py-1 text-xs text-gray-900 dark:text-gray-100">
                         {item.valeur || item.stock_actuel || item.quantite || 'N/A'}
                       </td>
                       <td className="px-2 py-1 text-xs">
                         <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                          (item.statut || item.status) === 'En stock' || (item.statut || item.status) === 'en_cours' ? 'bg-green-100 text-green-800' :
-                          (item.statut || item.status) === 'Stock bas' || (item.statut || item.status) === 'en_attente' ? 'bg-yellow-100 text-yellow-800' :
-                          'bg-red-100 text-red-800'
+                          (item.statut || item.status) === 'En stock' || (item.statut || item.status) === 'en_cours' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300' :
+                          (item.statut || item.status) === 'Stock bas' || (item.statut || item.status) === 'en_attente' ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300' :
+                          'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300'
                         }`}>
                           {item.statut || item.status || 'N/A'}
                         </span>
