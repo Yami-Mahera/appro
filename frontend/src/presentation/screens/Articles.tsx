@@ -223,7 +223,7 @@ const Articles: React.FC = () => {
               type="checkbox"
               id="stockBas"
               checked={showStockBas}
-              onChange={(e) => setShowStockBas(e.target.checked)}
+              onChange={(e) => handleStockBasChange(e.target.checked)}
               className="mr-2"
             />
             <label htmlFor="stockBas" className="text-sm text-gray-700 dark:text-gray-300">
