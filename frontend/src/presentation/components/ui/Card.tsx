@@ -33,7 +33,7 @@ interface CardTitleProps {
 
 export const CardTitle: React.FC<CardTitleProps> = ({ children, className = '' }) => {
   return (
-    <h3 className={`text-lg font-medium text-gray-900 ${className}`}>
+    <h3 className={`text-lg font-medium text-gray-900 dark:text-white ${className}`}>
       {children}
     </h3>
   );
