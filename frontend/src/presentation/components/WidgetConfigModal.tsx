@@ -237,7 +237,7 @@ const WidgetConfigModal: React.FC<WidgetConfigModalProps> = ({
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700">Schéma de couleurs</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Schéma de couleurs</label>
               <select
                 name="colorScheme"
                 value={config.colorScheme || 'blue'}
