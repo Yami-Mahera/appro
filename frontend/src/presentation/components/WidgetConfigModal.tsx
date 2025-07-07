@@ -112,7 +112,7 @@ const WidgetConfigModal: React.FC<WidgetConfigModalProps> = ({
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700">Objectif/Seuil</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Objectif/Seuil</label>
               <input
                 type="number"
                 name="target"
