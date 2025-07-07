@@ -458,7 +458,7 @@ const WidgetPreview: React.FC<WidgetPreviewProps> = ({ widget }) => {
         
         return (
           <div className="h-full flex flex-col justify-center items-center">
-            <h4 className="text-sm font-medium text-gray-900 mb-4">{widget.title}</h4>
+            <h4 className="text-sm font-medium text-gray-900 dark:text-white mb-4">{widget.title}</h4>
             <div className="relative">
               <svg width="120" height="80" viewBox="0 0 120 80">
                 {/* Background arc */}
@@ -484,7 +484,7 @@ const WidgetPreview: React.FC<WidgetPreviewProps> = ({ widget }) => {
                 <span className={`text-xl font-bold ${getGaugeColor()}`}>
                   {currentValue}
                 </span>
-                <span className="text-xs text-gray-500">
+                <span className="text-xs text-gray-500 dark:text-gray-400">
                   {minVal} - {maxVal}
                 </span>
               </div>
@@ -492,15 +492,15 @@ const WidgetPreview: React.FC<WidgetPreviewProps> = ({ widget }) => {
             <div className="flex space-x-4 mt-2 text-xs">
               <div className="flex items-center">
                 <div className="w-2 h-2 bg-green-500 rounded-full mr-1"></div>
-                <span>&lt;{warningThreshold}</span>
+                <span className="text-gray-700 dark:text-gray-300">&lt;{warningThreshold}</span>
               </div>
               <div className="flex items-center">
                 <div className="w-2 h-2 bg-yellow-500 rounded-full mr-1"></div>
-                <span>{warningThreshold}-{criticalThreshold}</span>
+                <span className="text-gray-700 dark:text-gray-300">{warningThreshold}-{criticalThreshold}</span>
               </div>
               <div className="flex items-center">
                 <div className="w-2 h-2 bg-red-500 rounded-full mr-1"></div>
-                <span>&gt;{criticalThreshold}</span>
+                <span className="text-gray-700 dark:text-gray-300">&gt;{criticalThreshold}</span>
               </div>
             </div>
           </div>
