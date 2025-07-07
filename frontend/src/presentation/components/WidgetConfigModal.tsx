@@ -197,7 +197,7 @@ const WidgetConfigModal: React.FC<WidgetConfigModalProps> = ({
         return (
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700">Source de données</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Source de données</label>
               <select
                 name="dataSource"
                 value={config.dataSource || ''}
