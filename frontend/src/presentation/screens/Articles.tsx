@@ -142,10 +142,10 @@ const Articles: React.FC = () => {
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <h1 className="text-2xl font-bold text-gray-900">Articles</h1>
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Articles</h1>
         <button
           onClick={handleAdd}
-          className="bg-blue-600 text-white px-4 py-2 rounded-lg flex items-center space-x-2 hover:bg-blue-700"
+          className="bg-blue-600 text-white px-4 py-2 rounded-lg flex items-center space-x-2 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-800"
         >
           <PlusIcon className="w-5 h-5" />
           <span>Ajouter un article</span>
@@ -153,13 +153,13 @@ const Articles: React.FC = () => {
       </div>
 
       {error && (
-        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
+        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded dark:bg-red-900 dark:border-red-700 dark:text-red-300">
           {error}
         </div>
       )}
 
       {/* Filters */}
-      <div className="bg-white p-4 rounded-lg shadow-sm">
+      <div className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-sm">
         <div className="flex flex-wrap gap-4 items-center">
           <div className="flex-1 min-w-64">
             <input
@@ -167,7 +167,7 @@ const Articles: React.FC = () => {
               placeholder="Rechercher par nom, famille ou fournisseur..."
               value={filter}
               onChange={(e) => setFilter(e.target.value)}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400"
             />
           </div>
           <div className="flex items-center">
@@ -178,7 +178,7 @@ const Articles: React.FC = () => {
               onChange={(e) => setShowStockBas(e.target.checked)}
               className="mr-2"
             />
-            <label htmlFor="stockBas" className="text-sm text-gray-700">
+            <label htmlFor="stockBas" className="text-sm text-gray-700 dark:text-gray-300">
               Stock bas uniquement
             </label>
           </div>
