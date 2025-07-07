@@ -119,6 +119,8 @@ const ArticlesAdvanced: React.FC = () => {
   const loadArticles = async () => {
     try {
       setLoading(true);
+      const skip = (currentPage - 1) * itemsPerPage;
+      
       const params = {
         search: searchTerm || undefined,
         sort_by: sortField,
@@ -127,10 +129,35 @@ const ArticlesAdvanced: React.FC = () => {
         fournisseur_id: filters.fournisseur_id || undefined,
         stock_bas: filters.stock_bas || undefined,
         active: filters.active,
+        limit: itemsPerPage,
+        skip: skip,
       };
 
-      const data = await ApiService.getArticles(params);
-      setArticles(data);
+      const response = await ApiService.getArticles(params);
+      
+      // Handle response - it might return articles array directly or a response object
+      let articlesData = response;
+      let total = response.length;
+      
+      // If the API returns a paginated response with metadata
+      if (response && typeof response === 'object' && !Array.isArray(response)) {
+        articlesData = response.articles || response.data || response;
+        total = response.total || response.count || articlesData.length;
+      }
+      
+      // If we got fewer items than requested and it's the first page, use the actual count
+      if (currentPage === 1 && articlesData.length < itemsPerPage) {
+        total = articlesData.length;
+      }
+      
+      // Estimate total if not provided
+      if (!total || total < skip + articlesData.length) {
+        total = skip + articlesData.length + (articlesData.length === itemsPerPage ? itemsPerPage : 0);
+      }
+      
+      setArticles(articlesData);
+      setTotalItems(total);
+      setTotalPages(Math.ceil(total / itemsPerPage));
     } catch (err: any) {
       setError(
         err.response?.data?.detail || "Erreur lors du chargement des articles"
