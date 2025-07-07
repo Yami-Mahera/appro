@@ -1390,6 +1390,251 @@ def test_dashboard_stats_detailed():
         test_results["dashboard"]["stats"]["message"] = message
         return False
 
+def test_pagination_apis():
+    print_header("TESTING PAGINATION SUPPORT IN ARTICLES AND FOURNISSEURS APIS")
+    
+    # First, authenticate to get a token
+    print("Authenticating to get access token...")
+    admin_token = test_auth_login(ADMIN_USER)
+    
+    if not admin_token:
+        print("❌ Authentication failed. Cannot proceed with pagination tests.")
+        print("Trying to register a new admin user...")
+        
+        # Try to register a new admin user
+        admin_registered = test_auth_register(ADMIN_USER)
+        if admin_registered:
+            admin_token = test_auth_login(ADMIN_USER)
+        else:
+            print("❌ Failed to register admin user. Cannot proceed with pagination tests.")
+            return False
+    
+    print("✅ Authentication successful. Proceeding with pagination tests.")
+    
+    # Create test data if needed
+    print("\n--- Checking if we need to create test data ---")
+    success, message, fournisseurs_data = make_request("get", "/fournisseurs", token=admin_token, expected_status=200)
+    
+    if not success or (success and len(fournisseurs_data) < 10):
+        print("Creating additional test suppliers for pagination testing...")
+        for i in range(15):  # Create 15 suppliers to ensure we have enough for pagination
+            supplier_data = {
+                "nom": f"Pagination Test Supplier {i+1}",
+                "code_fournisseur": f"PTS-{uuid.uuid4().hex[:6]}",
+                "adresse": f"{i+1} Rue de Test",
+                "ville": "Paris",
+                "code_postal": "75001",
+                "pays": "France",
+                "telephone": f"+331234{i:05d}",
+                "email": f"test{i+1}@pagination-test.com",
+                "site_web": f"https://www.pagination-test-{i+1}.com",
+                "conditions_paiement": "30 jours",
+                "delai_livraison_moyen": i+1
+            }
+            make_request("post", "/fournisseurs", supplier_data, token=admin_token, expected_status=200)
+    
+    success, message, articles_data = make_request("get", "/articles", token=admin_token, expected_status=200)
+    
+    if not success or (success and len(articles_data) < 10):
+        print("Creating additional test articles for pagination testing...")
+        # First get supplier IDs
+        success, message, fournisseurs = make_request("get", "/fournisseurs", token=admin_token, expected_status=200)
+        if success and len(fournisseurs) > 0:
+            supplier_id = fournisseurs[0]["id"]
+            for i in range(15):  # Create 15 articles to ensure we have enough for pagination
+                article_data = {
+                    "reference": f"PAG-{uuid.uuid4().hex[:6]}",
+                    "nom": f"Pagination Test Article {i+1}",
+                    "description": f"Test article for pagination {i+1}",
+                    "famille": "Test",
+                    "fournisseur_id": supplier_id,
+                    "prix_unitaire": 10.99 + i,
+                    "unite": "pièce",
+                    "seuil_min": 5,
+                    "seuil_max": 50,
+                    "stock_actuel": 10 + i,
+                    "duree_vie": 365,
+                    "emplacement_stockage": f"Étagère T{i+1}"
+                }
+                make_request("post", "/articles", article_data, token=admin_token, expected_status=200)
+    
+    # Test 1: GET /api/articles with pagination parameters (limit=5, skip=0)
+    print("\n--- Test 1: GET /api/articles?limit=5&skip=0 ---")
+    success, message, data = make_request("get", "/articles?limit=5&skip=0", token=admin_token, expected_status=200)
+    
+    if success and isinstance(data, list):
+        print(f"✅ Successfully retrieved articles with limit=5, skip=0")
+        print(f"   Response contains {len(data)} articles")
+        
+        if len(data) == 5:
+            print("✅ Correct number of articles returned (5)")
+        else:
+            print(f"❌ Incorrect number of articles returned: {len(data)} (expected 5)")
+        
+        # Store first article for comparison with next page
+        first_page_articles = data
+    else:
+        print(f"❌ Failed to retrieve articles with limit=5, skip=0")
+        print(f"   Error: {message}")
+        return False
+    
+    # Test 2: GET /api/articles with pagination parameters (limit=10, skip=5)
+    print("\n--- Test 2: GET /api/articles?limit=10&skip=5 ---")
+    success, message, data = make_request("get", "/articles?limit=10&skip=5", token=admin_token, expected_status=200)
+    
+    if success and isinstance(data, list):
+        print(f"✅ Successfully retrieved articles with limit=10, skip=5")
+        print(f"   Response contains {len(data)} articles")
+        
+        if len(data) <= 10:
+            print(f"✅ Correct number of articles returned ({len(data)} <= 10)")
+        else:
+            print(f"❌ Incorrect number of articles returned: {len(data)} (expected <= 10)")
+        
+        # Check if articles are different from first page
+        if first_page_articles and len(data) > 0:
+            first_page_ids = [article["id"] for article in first_page_articles]
+            second_page_ids = [article["id"] for article in data]
+            
+            overlap = set(first_page_ids).intersection(set(second_page_ids))
+            if not overlap:
+                print("✅ No overlap between first and second page - pagination working correctly")
+            else:
+                print(f"❌ Found {len(overlap)} overlapping articles between pages - pagination may not be working correctly")
+    else:
+        print(f"❌ Failed to retrieve articles with limit=10, skip=5")
+        print(f"   Error: {message}")
+        return False
+    
+    # Test 3: GET /api/articles with search and pagination
+    print("\n--- Test 3: GET /api/articles?search=test&limit=5&skip=0 ---")
+    success, message, data = make_request("get", "/articles?search=test&limit=5&skip=0", token=admin_token, expected_status=200)
+    
+    if success and isinstance(data, list):
+        print(f"✅ Successfully retrieved articles with search=test, limit=5, skip=0")
+        print(f"   Response contains {len(data)} articles")
+        
+        if len(data) <= 5:
+            print(f"✅ Correct number of articles returned ({len(data)} <= 5)")
+        else:
+            print(f"❌ Incorrect number of articles returned: {len(data)} (expected <= 5)")
+        
+        # Check if search worked
+        search_term_found = any("test" in article["nom"].lower() or 
+                               (article.get("description") and "test" in article["description"].lower()) or
+                               (article.get("reference") and "test" in article["reference"].lower())
+                               for article in data)
+        
+        if search_term_found or len(data) == 0:
+            print("✅ Search functionality working correctly with pagination")
+        else:
+            print("❌ Search may not be working correctly with pagination")
+    else:
+        print(f"❌ Failed to retrieve articles with search and pagination")
+        print(f"   Error: {message}")
+        return False
+    
+    # Test 4: GET /api/fournisseurs with pagination parameters (limit=5, skip=0)
+    print("\n--- Test 4: GET /api/fournisseurs?limit=5&skip=0 ---")
+    success, message, data = make_request("get", "/fournisseurs?limit=5&skip=0", token=admin_token, expected_status=200)
+    
+    if success and isinstance(data, list):
+        print(f"✅ Successfully retrieved suppliers with limit=5, skip=0")
+        print(f"   Response contains {len(data)} suppliers")
+        
+        if len(data) == 5:
+            print("✅ Correct number of suppliers returned (5)")
+        else:
+            print(f"❌ Incorrect number of suppliers returned: {len(data)} (expected 5)")
+        
+        # Store first page suppliers for comparison
+        first_page_suppliers = data
+    else:
+        print(f"❌ Failed to retrieve suppliers with limit=5, skip=0")
+        print(f"   Error: {message}")
+        return False
+    
+    # Test 5: GET /api/fournisseurs with pagination parameters (limit=10, skip=5)
+    print("\n--- Test 5: GET /api/fournisseurs?limit=10&skip=5 ---")
+    success, message, data = make_request("get", "/fournisseurs?limit=10&skip=5", token=admin_token, expected_status=200)
+    
+    if success and isinstance(data, list):
+        print(f"✅ Successfully retrieved suppliers with limit=10, skip=5")
+        print(f"   Response contains {len(data)} suppliers")
+        
+        if len(data) <= 10:
+            print(f"✅ Correct number of suppliers returned ({len(data)} <= 10)")
+        else:
+            print(f"❌ Incorrect number of suppliers returned: {len(data)} (expected <= 10)")
+        
+        # Check if suppliers are different from first page
+        if first_page_suppliers and len(data) > 0:
+            first_page_ids = [supplier["id"] for supplier in first_page_suppliers]
+            second_page_ids = [supplier["id"] for supplier in data]
+            
+            overlap = set(first_page_ids).intersection(set(second_page_ids))
+            if not overlap:
+                print("✅ No overlap between first and second page - pagination working correctly")
+            else:
+                print(f"❌ Found {len(overlap)} overlapping suppliers between pages - pagination may not be working correctly")
+    else:
+        print(f"❌ Failed to retrieve suppliers with limit=10, skip=5")
+        print(f"   Error: {message}")
+        return False
+    
+    # Test 6: GET /api/fournisseurs with search and pagination
+    print("\n--- Test 6: GET /api/fournisseurs?search=test&limit=5&skip=0 ---")
+    success, message, data = make_request("get", "/fournisseurs?search=test&limit=5&skip=0", token=admin_token, expected_status=200)
+    
+    if success and isinstance(data, list):
+        print(f"✅ Successfully retrieved suppliers with search=test, limit=5, skip=0")
+        print(f"   Response contains {len(data)} suppliers")
+        
+        if len(data) <= 5:
+            print(f"✅ Correct number of suppliers returned ({len(data)} <= 5)")
+        else:
+            print(f"❌ Incorrect number of suppliers returned: {len(data)} (expected <= 5)")
+        
+        # Check if search worked
+        search_term_found = any("test" in supplier["nom"].lower() or 
+                               (supplier.get("code_fournisseur") and "test" in supplier["code_fournisseur"].lower())
+                               for supplier in data)
+        
+        if search_term_found or len(data) == 0:
+            print("✅ Search functionality working correctly with pagination")
+        else:
+            print("❌ Search may not be working correctly with pagination")
+    else:
+        print(f"❌ Failed to retrieve suppliers with search and pagination")
+        print(f"   Error: {message}")
+        return False
+    
+    # Check if the APIs return total count
+    print("\n--- Checking if APIs return total count information ---")
+    
+    # For articles
+    success, message, data = make_request("get", "/articles?limit=1&skip=0", token=admin_token, expected_status=200)
+    if success:
+        if isinstance(data, dict) and "total" in data and "items" in data:
+            print("✅ Articles API returns total count information")
+            print(f"   Total articles: {data['total']}, Items returned: {len(data['items'])}")
+        else:
+            print("❌ Articles API does not return total count information")
+            print("   API returns only an array of items without total count")
+    
+    # For suppliers
+    success, message, data = make_request("get", "/fournisseurs?limit=1&skip=0", token=admin_token, expected_status=200)
+    if success:
+        if isinstance(data, dict) and "total" in data and "items" in data:
+            print("✅ Suppliers API returns total count information")
+            print(f"   Total suppliers: {data['total']}, Items returned: {len(data['items'])}")
+        else:
+            print("❌ Suppliers API does not return total count information")
+            print("   API returns only an array of items without total count")
+    
+    print("\n--- PAGINATION TESTS COMPLETED ---")
+    return True
+
 if __name__ == "__main__":
-    # Test dashboard stats API
-    test_dashboard_stats_detailed()
+    # Test pagination APIs
+    test_pagination_apis()
