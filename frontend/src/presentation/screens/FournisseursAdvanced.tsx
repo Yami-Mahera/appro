@@ -10,6 +10,7 @@ import {
 } from "@heroicons/react/24/outline";
 import ApiService from "../../services/api";
 import { debounce } from "lodash";
+import Pagination from "../components/Pagination";
 
 interface Contact {
   nom: string;
