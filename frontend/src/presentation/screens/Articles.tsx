@@ -126,6 +126,8 @@ const Articles: React.FC = () => {
         nom: '', description: '', prix_unitaire: '', stock_actuel: '', 
         stock_minimum: '', unite: '', famille: '', fournisseur_id: ''
       });
+      // Reset to first page after adding/editing
+      setCurrentPage(1);
       loadData();
     } catch (err: any) {
       setError(err.response?.data?.detail || 'Erreur lors de la sauvegarde');
@@ -154,6 +156,25 @@ const Articles: React.FC = () => {
       stock_minimum: '', unite: '', famille: '', fournisseur_id: ''
     });
     setShowModal(true);
+  };
+
+  const handleFilterChange = (newFilter: string) => {
+    setFilter(newFilter);
+    setCurrentPage(1); // Reset to first page when filtering
+  };
+
+  const handleStockBasChange = (checked: boolean) => {
+    setShowStockBas(checked);
+    setCurrentPage(1); // Reset to first page when filtering
+  };
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+  };
+
+  const handleItemsPerPageChange = (newItemsPerPage: number) => {
+    setItemsPerPage(newItemsPerPage);
+    setCurrentPage(1); // Reset to first page when changing items per page
   };
 
   const filteredArticles = articles.filter(article => {
