@@ -425,7 +425,7 @@ const Dashboard: React.FC = () => {
       {activeTab === 'kpi' && (
         <div className="space-y-6">
           <div className="flex items-center justify-between">
-            <h2 className="text-xl font-bold text-gray-900">
+            <h2 className="text-xl font-bold text-gray-900 dark:text-white">
               Tableaux de bord personnalisés
             </h2>
             <button
