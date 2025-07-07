@@ -510,10 +510,10 @@ const WidgetPreview: React.FC<WidgetPreviewProps> = ({ widget }) => {
         return (
           <div className="h-full flex items-center justify-center text-center">
             <div>
-              <ChartBarIcon className="h-8 w-8 text-gray-400 mx-auto mb-2" />
-              <h4 className="text-sm font-medium text-gray-900">{widget.title}</h4>
-              <p className="text-xs text-gray-500 mt-1">Type: {widget.type}</p>
-              <p className="text-xs text-blue-500 mt-1">Configuration disponible</p>
+              <ChartBarIcon className="h-8 w-8 text-gray-400 dark:text-gray-500 mx-auto mb-2" />
+              <h4 className="text-sm font-medium text-gray-900 dark:text-white">{widget.title}</h4>
+              <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Type: {widget.type}</p>
+              <p className="text-xs text-blue-500 dark:text-blue-400 mt-1">Configuration disponible</p>
             </div>
           </div>
         );
