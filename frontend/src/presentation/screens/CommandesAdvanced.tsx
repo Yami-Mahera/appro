@@ -407,7 +407,7 @@ const CommandesAdvanced: React.FC = () => {
                 </th>
               </tr>
             </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
+            <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
               {commandes.map((commande) => (
                 <tr key={commande.id} className="hover:bg-gray-50">
                   <td className="px-6 py-4 whitespace-nowrap">
