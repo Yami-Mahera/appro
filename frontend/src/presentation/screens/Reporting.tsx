@@ -312,12 +312,12 @@ const Reporting: React.FC = () => {
               {/* Commandes par statut */}
               {reportData.synthese.commandes_par_statut && reportData.synthese.commandes_par_statut.length > 0 && (
                 <div>
-                  <h3 className="text-lg font-semibold mb-4">Répartition des commandes par statut</h3>
+                  <h3 className="text-lg font-semibold mb-4 text-gray-900 dark:text-white">Répartition des commandes par statut</h3>
                   <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                     {reportData.synthese.commandes_par_statut.map((item: any, index: number) => (
-                      <div key={index} className="bg-gray-50 p-3 rounded">
-                        <p className="font-medium capitalize">{item._id}</p>
-                        <p className="text-2xl font-bold text-gray-700">{item.count}</p>
+                      <div key={index} className="bg-gray-50 dark:bg-gray-700 p-3 rounded">
+                        <p className="font-medium capitalize text-gray-900 dark:text-white">{item._id}</p>
+                        <p className="text-2xl font-bold text-gray-700 dark:text-gray-200">{item.count}</p>
                       </div>
                     ))}
                   </div>
