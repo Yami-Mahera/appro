@@ -177,17 +177,7 @@ const Articles: React.FC = () => {
     setCurrentPage(1); // Reset to first page when changing items per page
   };
 
-  const filteredArticles = articles.filter(article => {
-    const matchesFilter = article.nom.toLowerCase().includes(filter.toLowerCase()) ||
-                         article.famille.toLowerCase().includes(filter.toLowerCase()) ||
-                         (article.fournisseur_nom && article.fournisseur_nom.toLowerCase().includes(filter.toLowerCase()));
-    
-    if (showStockBas) {
-      return matchesFilter && article.stock_actuel <= article.stock_minimum;
-    }
-    
-    return matchesFilter;
-  });
+
 
   if (loading) {
     return (
