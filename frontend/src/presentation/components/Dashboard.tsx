@@ -490,12 +490,12 @@ const Dashboard: React.FC = () => {
                   </div>
                   
                   {dashboard.description && (
-                    <p className="text-sm text-gray-600 mb-4">
+                    <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
                       {dashboard.description}
                     </p>
                   )}
                   
-                  <div className="flex items-center justify-between text-sm text-gray-500">
+                  <div className="flex items-center justify-between text-sm text-gray-500 dark:text-gray-400">
                     <span>{dashboard.widgets.length} widgets</span>
                     <span>
                       {dashboard.partage && (
