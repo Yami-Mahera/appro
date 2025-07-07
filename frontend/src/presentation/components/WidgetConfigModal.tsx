@@ -437,7 +437,7 @@ const WidgetConfigModal: React.FC<WidgetConfigModalProps> = ({
               </div>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700">Couleurs des zones</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Couleurs des zones</label>
               <select
                 name="colorZones"
                 value={config.colorZones || 'traffic_light'}
