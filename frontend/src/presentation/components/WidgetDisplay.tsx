@@ -276,11 +276,11 @@ const WidgetDisplay: React.FC<WidgetDisplayProps> = ({ widget, refreshTrigger })
 
   if (error) {
     return (
-      <div className="h-full flex items-center justify-center bg-gradient-to-br from-yellow-50 to-orange-50 rounded-lg">
+      <div className="h-full flex items-center justify-center bg-gradient-to-br from-yellow-50 to-orange-50 dark:from-yellow-900 dark:to-orange-900 rounded-lg">
         <div className="text-center">
           <ExclamationTriangleIcon className="h-8 w-8 text-orange-500 mx-auto mb-2" />
-          <p className="text-sm font-medium text-orange-700">{widget.title}</p>
-          <p className="text-xs text-orange-500">Données de démonstration</p>
+          <p className="text-sm font-medium text-orange-700 dark:text-orange-300">{widget.title}</p>
+          <p className="text-xs text-orange-500 dark:text-orange-400">Données de démonstration</p>
         </div>
       </div>
     );
