@@ -31,6 +31,13 @@ const Articles: React.FC = () => {
   const [editingArticle, setEditingArticle] = useState<Article | null>(null);
   const [filter, setFilter] = useState('');
   const [showStockBas, setShowStockBas] = useState(false);
+  
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
+  const [totalItems, setTotalItems] = useState(0);
+  const [totalPages, setTotalPages] = useState(1);
+  
   const [formData, setFormData] = useState({
     nom: '',
     description: '',
