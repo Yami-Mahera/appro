@@ -191,7 +191,7 @@ const Reporting: React.FC = () => {
         )}
 
         {/* Report Type Selection */}
-        <div className="bg-white p-4 rounded-lg shadow-sm">
+        <div className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-sm">
           <div className="flex flex-wrap gap-2 mb-4">
             {REPORT_TYPES.map((type) => {
               const IconComponent = type.icon;
