@@ -146,8 +146,8 @@ export const SelectItem: React.FC<SelectItemProps> = ({
     <div
       onClick={() => onSelect?.(value)}
       className={`
-        px-3 py-2 cursor-pointer hover:bg-gray-100 text-sm
-        ${isSelected ? 'bg-blue-50 text-blue-600' : 'text-gray-900'}
+        px-3 py-2 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 text-sm
+        ${isSelected ? 'bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400' : 'text-gray-900 dark:text-white'}
         ${className}
       `}
     >
