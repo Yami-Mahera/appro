@@ -365,16 +365,16 @@ const Dashboard: React.FC = () => {
                 <ul className="-mb-8">
                   <li className="relative pb-8">
                     <div className="relative flex space-x-3">
-                      <div className="h-8 w-8 rounded-full bg-green-500 flex items-center justify-center ring-8 ring-white">
+                      <div className="h-8 w-8 rounded-full bg-green-500 flex items-center justify-center ring-8 ring-white dark:ring-gray-800">
                         <DocumentTextIcon className="h-5 w-5 text-white" />
                       </div>
                       <div className="min-w-0 flex-1 pt-1.5 flex justify-between space-x-4">
                         <div>
-                          <p className="text-sm text-gray-500">
-                            Nouvelle commande créée <span className="font-medium text-gray-900">CMD-20250101-001</span>
+                          <p className="text-sm text-gray-500 dark:text-gray-400">
+                            Nouvelle commande créée <span className="font-medium text-gray-900 dark:text-white">CMD-20250101-001</span>
                           </p>
                         </div>
-                        <div className="text-right text-sm whitespace-nowrap text-gray-500">
+                        <div className="text-right text-sm whitespace-nowrap text-gray-500 dark:text-gray-400">
                           Il y a 2h
                         </div>
                       </div>
