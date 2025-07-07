@@ -383,10 +383,10 @@ const Reporting: React.FC = () => {
 
           {/* Articles Report */}
           {activeReport === 'articles' && reportData.articles && (
-            <div className="bg-white rounded-lg shadow-sm overflow-hidden">
-              <div className="p-6 border-b">
-                <h2 className="text-xl font-bold">Rapport des articles</h2>
-                <p className="text-gray-600">{reportData.articles.length} article(s) trouvé(s)</p>
+            <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm overflow-hidden">
+              <div className="p-6 border-b border-gray-200 dark:border-gray-700">
+                <h2 className="text-xl font-bold text-gray-900 dark:text-white">Rapport des articles</h2>
+                <p className="text-gray-600 dark:text-gray-400">{reportData.articles.length} article(s) trouvé(s)</p>
               </div>
               <div className="overflow-x-auto">
                 <table className="min-w-full divide-y divide-gray-200">
