@@ -202,7 +202,7 @@ const Reporting: React.FC = () => {
                   className={`flex items-center space-x-2 px-4 py-2 rounded-lg ${
                     activeReport === type.key
                       ? 'bg-blue-600 text-white'
-                      : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                      : 'bg-gray-100 dark:bg-gray-700 text-gray-700 dark:text-gray-200 hover:bg-gray-200 dark:hover:bg-gray-600'
                   }`}
                 >
                   <IconComponent className="w-5 h-5" />
