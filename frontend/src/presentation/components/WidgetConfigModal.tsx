@@ -225,7 +225,7 @@ const WidgetConfigModal: React.FC<WidgetConfigModalProps> = ({
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700">Nombre maximum d'éléments</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Nombre maximum d'éléments</label>
               <input
                 type="number"
                 name="maxItems"
