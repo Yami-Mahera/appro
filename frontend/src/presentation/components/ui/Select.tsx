@@ -119,7 +119,7 @@ export const SelectContent: React.FC<SelectContentProps> = ({
 }) => {
   return (
     <div className={`
-      absolute z-50 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg max-h-60 
+      absolute z-50 w-full mt-1 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md shadow-lg max-h-60 
       overflow-auto ${className}
     `}>
       {React.Children.map(children, (child) => {
