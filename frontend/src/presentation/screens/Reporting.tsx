@@ -215,8 +215,8 @@ const Reporting: React.FC = () => {
           {/* Date Range Filter */}
           <div className="flex flex-wrap gap-4 items-center">
             <div className="flex items-center space-x-2">
-              <CalendarDaysIcon className="w-5 h-5 text-gray-400" />
-              <span className="text-sm font-medium text-gray-700">Période:</span>
+              <CalendarDaysIcon className="w-5 h-5 text-gray-400 dark:text-gray-500" />
+              <span className="text-sm font-medium text-gray-700 dark:text-gray-200">Période:</span>
             </div>
             <div className="flex space-x-2">
               <input
