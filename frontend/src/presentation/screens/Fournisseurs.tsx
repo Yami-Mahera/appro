@@ -91,10 +91,10 @@ const Fournisseurs: React.FC = () => {
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <h1 className="text-2xl font-bold text-gray-900">Fournisseurs</h1>
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Fournisseurs</h1>
         <button
           onClick={handleAdd}
-          className="bg-blue-600 text-white px-4 py-2 rounded-lg flex items-center space-x-2 hover:bg-blue-700"
+          className="bg-blue-600 text-white px-4 py-2 rounded-lg flex items-center space-x-2 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-800"
         >
           <PlusIcon className="w-5 h-5" />
           <span>Ajouter un fournisseur</span>
@@ -102,51 +102,51 @@ const Fournisseurs: React.FC = () => {
       </div>
 
       {error && (
-        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
+        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded dark:bg-red-900 dark:border-red-700 dark:text-red-300">
           {error}
         </div>
       )}
 
-      <div className="bg-white shadow-sm rounded-lg overflow-hidden">
-        <table className="min-w-full divide-y divide-gray-200">
-          <thead className="bg-gray-50">
+      <div className="bg-white dark:bg-gray-800 shadow-sm rounded-lg overflow-hidden">
+        <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+          <thead className="bg-gray-50 dark:bg-gray-700">
             <tr>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                 Nom
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                 Contact
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                 Email
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                 Téléphone
               </th>
-              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+              <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                 Actions
               </th>
             </tr>
           </thead>
-          <tbody className="bg-white divide-y divide-gray-200">
+          <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
             {fournisseurs.map((fournisseur) => (
-              <tr key={fournisseur.id}>
+              <tr key={fournisseur.id} className="hover:bg-gray-50 dark:hover:bg-gray-700">
                 <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="text-sm font-medium text-gray-900">{fournisseur.nom}</div>
+                  <div className="text-sm font-medium text-gray-900 dark:text-gray-100">{fournisseur.nom}</div>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="text-sm text-gray-900">{fournisseur.contact}</div>
+                  <div className="text-sm text-gray-900 dark:text-gray-100">{fournisseur.contact}</div>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="text-sm text-gray-900">{fournisseur.email}</div>
+                  <div className="text-sm text-gray-900 dark:text-gray-100">{fournisseur.email}</div>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
-                  <div className="text-sm text-gray-900">{fournisseur.telephone}</div>
+                  <div className="text-sm text-gray-900 dark:text-gray-100">{fournisseur.telephone}</div>
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                   <button
                     onClick={() => handleEdit(fournisseur)}
-                    className="text-blue-600 hover:text-blue-900 flex items-center space-x-1"
+                    className="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300 flex items-center space-x-1"
                   >
                     <PencilIcon className="w-4 h-4" />
                     <span>Modifier</span>
@@ -159,7 +159,7 @@ const Fournisseurs: React.FC = () => {
         
         {fournisseurs.length === 0 && (
           <div className="text-center py-8">
-            <p className="text-gray-500">Aucun fournisseur trouvé</p>
+            <p className="text-gray-500 dark:text-gray-400">Aucun fournisseur trouvé</p>
           </div>
         )}
       </div>
