@@ -39,13 +39,42 @@ const Fournisseurs: React.FC = () => {
 
   useEffect(() => {
     loadFournisseurs();
-  }, []);
+  }, [currentPage, itemsPerPage, filter]);
 
   const loadFournisseurs = async () => {
     try {
       setLoading(true);
-      const data = await ApiService.getFournisseurs();
-      setFournisseurs(data);
+      const skip = (currentPage - 1) * itemsPerPage;
+      
+      const response = await ApiService.getFournisseurs({
+        search: filter || undefined,
+        limit: itemsPerPage,
+        skip: skip
+      });
+      
+      // Handle response - it might return fournisseurs array directly or a response object
+      let fournisseursData = response;
+      let total = response.length;
+      
+      // If the API returns a paginated response with metadata
+      if (response && typeof response === 'object' && !Array.isArray(response)) {
+        fournisseursData = response.fournisseurs || response.data || response;
+        total = response.total || response.count || fournisseursData.length;
+      }
+      
+      // If we got fewer items than requested and it's the first page, use the actual count
+      if (currentPage === 1 && fournisseursData.length < itemsPerPage) {
+        total = fournisseursData.length;
+      }
+      
+      // Estimate total if not provided
+      if (!total || total < skip + fournisseursData.length) {
+        total = skip + fournisseursData.length + (fournisseursData.length === itemsPerPage ? itemsPerPage : 0);
+      }
+      
+      setFournisseurs(fournisseursData);
+      setTotalItems(total);
+      setTotalPages(Math.ceil(total / itemsPerPage));
     } catch (err: any) {
       setError(err.response?.data?.detail || 'Erreur lors du chargement des fournisseurs');
     } finally {
