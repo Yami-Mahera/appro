@@ -382,16 +382,16 @@ const Dashboard: React.FC = () => {
                   </li>
                   <li className="relative pb-8">
                     <div className="relative flex space-x-3">
-                      <div className="h-8 w-8 rounded-full bg-blue-500 flex items-center justify-center ring-8 ring-white">
+                      <div className="h-8 w-8 rounded-full bg-blue-500 flex items-center justify-center ring-8 ring-white dark:ring-gray-800">
                         <CubeIcon className="h-5 w-5 text-white" />
                       </div>
                       <div className="min-w-0 flex-1 pt-1.5 flex justify-between space-x-4">
                         <div>
-                          <p className="text-sm text-gray-500">
-                            Stock mis à jour pour <span className="font-medium text-gray-900">Article A123</span>
+                          <p className="text-sm text-gray-500 dark:text-gray-400">
+                            Stock mis à jour pour <span className="font-medium text-gray-900 dark:text-white">Article A123</span>
                           </p>
                         </div>
-                        <div className="text-right text-sm whitespace-nowrap text-gray-500">
+                        <div className="text-right text-sm whitespace-nowrap text-gray-500 dark:text-gray-400">
                           Il y a 4h
                         </div>
                       </div>
