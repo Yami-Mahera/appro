@@ -252,7 +252,7 @@ const Reporting: React.FC = () => {
           Généré le {new Date().toLocaleDateString('fr-FR')} à {new Date().toLocaleTimeString('fr-FR')}
         </p>
         {(dateRange.date_from || dateRange.date_to) && (
-          <p className="text-gray-600">
+          <p className="text-gray-600 dark:text-gray-400">
             Période: {dateRange.date_from ? new Date(dateRange.date_from).toLocaleDateString('fr-FR') : '...'} - {dateRange.date_to ? new Date(dateRange.date_to).toLocaleDateString('fr-FR') : '...'}
           </p>
         )}
