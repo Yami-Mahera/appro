@@ -105,7 +105,7 @@ export const SelectTrigger: React.FC<SelectTriggerProps> = ({
 
 export const SelectValue: React.FC<SelectValueProps> = ({ placeholder, className = '' }) => {
   return (
-    <span className={`text-gray-900 ${className}`}>
+    <span className={`text-gray-900 dark:text-white ${className}`}>
       {placeholder}
     </span>
   );
