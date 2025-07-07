@@ -421,7 +421,7 @@ const ArticlesAdvanced: React.FC = () => {
                     : filters.active.toString()
                 }
                 onChange={(e) =>
-                  setFilters({
+                  handleFiltersChange({
                     ...filters,
                     active:
                       e.target.value === "all"
