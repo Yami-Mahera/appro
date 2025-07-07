@@ -236,7 +236,7 @@ const Reporting: React.FC = () => {
             {(dateRange.date_from || dateRange.date_to) && (
               <button
                 onClick={resetDateRange}
-                className="text-blue-600 hover:text-blue-800 text-sm"
+                className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 text-sm"
               >
                 Réinitialiser
               </button>
