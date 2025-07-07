@@ -82,7 +82,7 @@ const WidgetConfigModal: React.FC<WidgetConfigModalProps> = ({
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700">Couleur</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Couleur</label>
               <select
                 name="color"
                 value={config.color || 'blue'}
