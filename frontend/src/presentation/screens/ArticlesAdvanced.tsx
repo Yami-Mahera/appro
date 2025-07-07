@@ -102,7 +102,7 @@ const ArticlesAdvanced: React.FC = () => {
 
     // Nettoyage pour éviter des appels en cascade
     return () => debouncedLoad.cancel();
-  }, [searchTerm, sortField, sortOrder, filters]);
+  }, [searchTerm, sortField, sortOrder, filters, currentPage, itemsPerPage]);
 
   const loadFournisseurs = async () => {
     try {
