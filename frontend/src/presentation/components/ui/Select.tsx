@@ -89,9 +89,9 @@ export const SelectTrigger: React.FC<SelectTriggerProps> = ({
       type="button"
       onClick={onClick}
       className={`
-        w-full px-3 py-2 text-left bg-white border border-gray-300 rounded-md shadow-sm 
+        w-full px-3 py-2 text-left bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm 
         focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
-        flex justify-between items-center
+        flex justify-between items-center text-gray-900 dark:text-white
         ${className}
       `}
     >
