@@ -93,6 +93,8 @@ const Fournisseurs: React.FC = () => {
       setShowModal(false);
       setEditingFournisseur(null);
       setFormData({ nom: '', email: '', telephone: '', adresse: '', contact: '', notes: '' });
+      // Reset to first page after adding/editing
+      setCurrentPage(1);
       loadFournisseurs();
     } catch (err: any) {
       setError(err.response?.data?.detail || 'Erreur lors de la sauvegarde');
@@ -116,6 +118,20 @@ const Fournisseurs: React.FC = () => {
     setEditingFournisseur(null);
     setFormData({ nom: '', email: '', telephone: '', adresse: '', contact: '', notes: '' });
     setShowModal(true);
+  };
+
+  const handleFilterChange = (newFilter: string) => {
+    setFilter(newFilter);
+    setCurrentPage(1); // Reset to first page when filtering
+  };
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+  };
+
+  const handleItemsPerPageChange = (newItemsPerPage: number) => {
+    setItemsPerPage(newItemsPerPage);
+    setCurrentPage(1); // Reset to first page when changing items per page
   };
 
   if (loading) {
