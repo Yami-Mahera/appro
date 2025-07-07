@@ -358,7 +358,7 @@ const WidgetPreview: React.FC<WidgetPreviewProps> = ({ widget }) => {
         const legendPos = widget.config.legendPosition || 'right';
         return (
           <div className="h-full">
-            <h4 className="text-sm font-medium text-gray-900 mb-2">{widget.title}</h4>
+            <h4 className="text-sm font-medium text-gray-900 dark:text-white mb-2">{widget.title}</h4>
             <div className="flex h-full">
               <ResponsiveContainer width="70%" height="90%">
                 <PieChart>
@@ -387,7 +387,7 @@ const WidgetPreview: React.FC<WidgetPreviewProps> = ({ widget }) => {
                         className="w-3 h-3 rounded-sm mr-2" 
                         style={{ backgroundColor: entry.color }}
                       ></div>
-                      <span className="truncate">{entry.name}</span>
+                      <span className="truncate text-gray-700 dark:text-gray-300">{entry.name}</span>
                     </div>
                   ))}
                 </div>
