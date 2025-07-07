@@ -387,22 +387,22 @@ const ArticlesAdvanced: React.FC = () => {
       {/* Table */}
       <div className="bg-white dark:bg-gray-800 shadow-sm rounded-lg overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
+          <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+            <thead className="bg-gray-50 dark:bg-gray-700">
               <tr>
                 <SortableHeader field="reference">Référence</SortableHeader>
                 <SortableHeader field="nom">Nom</SortableHeader>
                 <SortableHeader field="famille">Famille</SortableHeader>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                   Fournisseur
                 </th>
                 <SortableHeader field="prix_unitaire">Prix</SortableHeader>
                 <SortableHeader field="stock_actuel">Stock</SortableHeader>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                   Statut
                 </th>
                 <SortableHeader field="created_at">Créé le</SortableHeader>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                   Actions
                 </th>
               </tr>
@@ -411,19 +411,19 @@ const ArticlesAdvanced: React.FC = () => {
               {articles.map((article) => {
                 const stockStatus = getStockStatus(article);
                 return (
-                  <tr key={article.id} className="hover:bg-gray-50">
+                  <tr key={article.id} className="hover:bg-gray-50 dark:hover:bg-gray-700">
                     <td className="px-6 py-4 whitespace-nowrap">
-                      <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 text-gray-800">
+                      <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-gray-100 dark:bg-gray-700 text-gray-800 dark:text-gray-200">
                         {article.reference}
                       </span>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div>
-                        <div className="text-sm font-medium text-gray-900">
+                        <div className="text-sm font-medium text-gray-900 dark:text-gray-100">
                           {article.nom}
                         </div>
                         {article.description && (
-                          <div className="text-sm text-gray-500 max-w-xs truncate">
+                          <div className="text-sm text-gray-500 dark:text-gray-400 max-w-xs truncate">
                             {article.description}
                           </div>
                         )}
@@ -431,20 +431,20 @@ const ArticlesAdvanced: React.FC = () => {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       {article.famille && (
-                        <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
+                        <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200">
                           {article.famille}
                         </span>
                       )}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
                       {getFournisseurNom(article.fournisseur_id)}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
                       {article.prix_unitaire.toFixed(2)}€ / {article.unite}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center">
-                        <span className="text-sm text-gray-900">
+                        <span className="text-sm text-gray-900 dark:text-gray-100">
                           {article.stock_actuel} / {article.seuil_min} min
                         </span>
                         {article.stock_actuel <= article.seuil_min && (
@@ -460,21 +460,21 @@ const ArticlesAdvanced: React.FC = () => {
                           stockStatus.status.slice(1)}
                       </span>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
                       {new Date(article.created_at).toLocaleDateString("fr-FR")}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium">
                       <div className="flex space-x-2">
                         <button
                           onClick={() => handleView(article)}
-                          className="text-green-600 hover:text-green-900"
+                          className="text-green-600 hover:text-green-900 dark:text-green-400 dark:hover:text-green-300"
                           title="Voir les détails"
                         >
                           <EyeIcon className="w-4 h-4" />
                         </button>
                         <button
                           onClick={() => handleEdit(article)}
-                          className="text-blue-600 hover:text-blue-900"
+                          className="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300"
                           title="Modifier"
                         >
                           <PencilIcon className="w-4 h-4" />
@@ -490,7 +490,7 @@ const ArticlesAdvanced: React.FC = () => {
 
         {articles.length === 0 && (
           <div className="text-center py-8">
-            <p className="text-gray-500">Aucun article trouvé</p>
+            <p className="text-gray-500 dark:text-gray-400">Aucun article trouvé</p>
           </div>
         )}
       </div>
