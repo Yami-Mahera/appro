@@ -332,8 +332,8 @@ const WidgetDisplay: React.FC<WidgetDisplayProps> = ({ widget, refreshTrigger })
         return (
           <div className="h-full">
             <div className="flex justify-between items-center mb-2">
-              <h4 className="text-sm font-medium text-gray-900">{widget.title}</h4>
-              <span className="text-xs text-gray-500">
+              <h4 className="text-sm font-medium text-gray-900 dark:text-white">{widget.title}</h4>
+              <span className="text-xs text-gray-500 dark:text-gray-400">
                 {widget.config.orientation === 'horizontal' ? 'Horizontal' : 'Vertical'} - Top {widget.config.maxItems || 10}
               </span>
             </div>
