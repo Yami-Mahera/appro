@@ -282,7 +282,7 @@ const Dashboard: React.FC = () => {
           {/* Alert Cards */}
           <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
             {alertCards.map((card) => (
-              <div key={card.name} className="bg-white overflow-hidden shadow rounded-lg">
+              <div key={card.name} className="bg-white dark:bg-gray-800 overflow-hidden shadow rounded-lg">
                 <div className="p-5">
                   <div className="flex items-center">
                     <div className="flex-shrink-0">
@@ -292,10 +292,10 @@ const Dashboard: React.FC = () => {
                     </div>
                     <div className="ml-5 w-0 flex-1">
                       <dl>
-                        <dt className="text-sm font-medium text-gray-500 truncate">
+                        <dt className="text-sm font-medium text-gray-500 dark:text-gray-400 truncate">
                           {card.name}
                         </dt>
-                        <dd className="text-2xl font-bold text-gray-900">
+                        <dd className="text-2xl font-bold text-gray-900 dark:text-white">
                           {formatNumber(card.stat)}
                         </dd>
                       </dl>
