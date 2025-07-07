@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { PlusIcon, PencilIcon, ExclamationTriangleIcon } from '@heroicons/react/24/outline';
 import ApiService from '../../services/api';
+import Pagination from '../components/Pagination';
 
 interface Article {
   id: string;
