@@ -213,7 +213,7 @@ const WidgetConfigModal: React.FC<WidgetConfigModalProps> = ({
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700">Orientation</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Orientation</label>
               <select
                 name="orientation"
                 value={config.orientation || 'vertical'}
