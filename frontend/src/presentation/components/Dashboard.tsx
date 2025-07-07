@@ -459,9 +459,9 @@ const Dashboard: React.FC = () => {
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {customDashboards.map((dashboard) => (
-                <div key={dashboard.id} className="bg-white rounded-lg shadow p-6">
+                <div key={dashboard.id} className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
                   <div className="flex items-center justify-between mb-4">
-                    <h3 className="text-lg font-medium text-gray-900">
+                    <h3 className="text-lg font-medium text-gray-900 dark:text-white">
                       {dashboard.nom}
                     </h3>
                     <div className="flex space-x-2">
