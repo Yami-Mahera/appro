@@ -309,8 +309,8 @@ const Dashboard: React.FC = () => {
           {/* Charts */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* Bar Chart */}
-            <div className="bg-white p-6 rounded-lg shadow">
-              <h3 className="text-lg font-medium text-gray-900 mb-4">
+            <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow">
+              <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">
                 Évolution mensuelle
               </h3>
               <ResponsiveContainer width="100%" height={300}>
