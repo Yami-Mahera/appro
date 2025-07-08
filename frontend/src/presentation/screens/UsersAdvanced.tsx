@@ -96,30 +96,22 @@ const UsersAdvanced: React.FC = () => {
     confirmPassword: "",
   });
 
-  useEffect(() => {
-    const debouncedLoad = debounce(() => {
-      loadUsers();
-    }, 300); // délai de 300ms
-
-    debouncedLoad();
-
-    // Nettoyage pour éviter des appels en cascade
-    return () => debouncedLoad.cancel();
-  }, [searchTerm, sortField, sortOrder, filters]);
-
   const loadUsers = async () => {
     try {
       setLoading(true);
+      const skip = (currentPage - 1) * itemsPerPage;
       const params = {
         search: searchTerm || undefined,
         sort_by: sortField,
         sort_order: sortOrder,
         role: filters.role || undefined,
         active: filters.active,
+        limit: itemsPerPage,
+        skip: skip,
       };
 
       const data = await ApiService.getUsers(params);
-      setUsers(data);
+      setUsersData(data);
     } catch (err: any) {
       setError(
         err.response?.data?.detail ||
@@ -129,6 +121,20 @@ const UsersAdvanced: React.FC = () => {
       setLoading(false);
     }
   };
+
+  // Reset to first page when filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm, sortField, sortOrder, filters, itemsPerPage]);
+
+  useEffect(() => {
+    const debouncedLoad = debounce(() => {
+      loadUsers();
+    }, 300);
+
+    debouncedLoad();
+    return () => debouncedLoad.cancel();
+  }, [searchTerm, sortField, sortOrder, filters, currentPage, itemsPerPage]);
 
   const handleSort = (field: SortField) => {
     if (sortField === field) {
