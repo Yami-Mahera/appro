@@ -47,7 +47,7 @@ const TableauProjectionCouverture: React.FC<TableauProjectionCouvertureProps> = 
     if (selectedArticleId) {
       loadProjectionData();
     }
-  }, [selectedArticleId, timeRange]);
+  }, [selectedArticleId, timeRange, currentPage, itemsPerPage]);
 
   const loadArticles = async () => {
     try {
