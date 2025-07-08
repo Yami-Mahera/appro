@@ -811,42 +811,42 @@ const ArticlesAdvanced: React.FC = () => {
             <div className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <span className="text-sm font-medium text-gray-500">
+                  <span className="text-sm font-medium text-gray-500 dark:text-gray-400">
                     Référence:
                   </span>
-                  <p className="text-gray-900">{viewingArticle.reference}</p>
+                  <p className="text-gray-900 dark:text-gray-100">{viewingArticle.reference}</p>
                 </div>
                 <div>
-                  <span className="text-sm font-medium text-gray-500">
+                  <span className="text-sm font-medium text-gray-500 dark:text-gray-400">
                     Nom:
                   </span>
-                  <p className="text-gray-900">{viewingArticle.nom}</p>
+                  <p className="text-gray-900 dark:text-gray-100">{viewingArticle.nom}</p>
                 </div>
               </div>
 
               {viewingArticle.description && (
                 <div>
-                  <span className="text-sm font-medium text-gray-500">
+                  <span className="text-sm font-medium text-gray-500 dark:text-gray-400">
                     Description:
                   </span>
-                  <p className="text-gray-900">{viewingArticle.description}</p>
+                  <p className="text-gray-900 dark:text-gray-100">{viewingArticle.description}</p>
                 </div>
               )}
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <span className="text-sm font-medium text-gray-500">
+                  <span className="text-sm font-medium text-gray-500 dark:text-gray-400">
                     Famille:
                   </span>
-                  <p className="text-gray-900">
+                  <p className="text-gray-900 dark:text-gray-100">
                     {viewingArticle.famille || "Non renseignée"}
                   </p>
                 </div>
                 <div>
-                  <span className="text-sm font-medium text-gray-500">
+                  <span className="text-sm font-medium text-gray-500 dark:text-gray-400">
                     Fournisseur:
                   </span>
-                  <p className="text-gray-900">
+                  <p className="text-gray-900 dark:text-gray-100">
                     {getFournisseurNom(viewingArticle.fournisseur_id)}
                   </p>
                 </div>
@@ -854,10 +854,10 @@ const ArticlesAdvanced: React.FC = () => {
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <span className="text-sm font-medium text-gray-500">
+                  <span className="text-sm font-medium text-gray-500 dark:text-gray-400">
                     Prix unitaire:
                   </span>
-                  <p className="text-gray-900">
+                  <p className="text-gray-900 dark:text-gray-100">
                     {viewingArticle.prix_unitaire.toFixed(2)}€ /{" "}
                     {viewingArticle.unite}
                   </p>
