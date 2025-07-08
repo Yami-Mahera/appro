@@ -394,6 +394,24 @@ const TableauProjectionCouverture: React.FC<TableauProjectionCouvertureProps> = 
             <strong>CMS:</strong> Couverture Minimale Sécurité | <strong>CMC:</strong> Couverture Maximale Commande | <strong>QM:</strong> Quantité Maximale commande
           </div>
         </div>
+        
+        {projections.length === 0 && !loading && (
+          <div className="text-center py-8">
+            <p className="text-gray-500 dark:text-gray-400">Aucune projection trouvée. Sélectionnez un article pour voir les projections.</p>
+          </div>
+        )}
+        
+        {/* Pagination */}
+        {totalItems > itemsPerPage && (
+          <Pagination
+            currentPage={currentPage}
+            totalPages={totalPages}
+            totalItems={totalItems}
+            itemsPerPage={itemsPerPage}
+            onPageChange={handlePageChange}
+            onItemsPerPageChange={handleItemsPerPageChange}
+          />
+        )}
       </div>
     </div>
   );
