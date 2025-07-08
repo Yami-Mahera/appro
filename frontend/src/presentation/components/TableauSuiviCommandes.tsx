@@ -522,6 +522,18 @@ const TableauSuiviCommandes: React.FC = () => {
         )}
       </div>
 
+      {/* Pagination */}
+      {totalItems > itemsPerPage && (
+        <Pagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          totalItems={totalItems}
+          itemsPerPage={itemsPerPage}
+          onPageChange={handlePageChange}
+          onItemsPerPageChange={handleItemsPerPageChange}
+        />
+      )}
+
       {/* État vide */}
       {!loading && commandesFiltered.length === 0 && (
         <div className="px-6 py-12 text-center">
