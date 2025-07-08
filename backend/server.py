@@ -231,6 +231,14 @@ class CommandeCreate(BaseModel):
     date_embarquement_cible: Optional[datetime] = None
     notes: Optional[str] = None
 
+class CommandesResponse(BaseModel):
+    commandes: List[Commande]
+    total: int
+    limit: int
+    skip: int
+    has_next: bool
+    has_previous: bool
+
 # Alerte Models
 class Alerte(BaseModel):
     id: str = Field(default_factory=lambda: str(uuid.uuid4()))
