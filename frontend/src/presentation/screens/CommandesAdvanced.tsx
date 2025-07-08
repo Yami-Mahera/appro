@@ -154,11 +154,30 @@ const CommandesAdvanced: React.FC = () => {
         status: filters.status || undefined,
         fournisseur_id: filters.fournisseur_id || undefined,
         date_from: filters.date_from || undefined,
-        date_to: filters.date_to || undefined
+        date_to: filters.date_to || undefined,
+        limit: itemsPerPage,
+        skip: (currentPage - 1) * itemsPerPage
       };
       
-      const data = await ApiService.getCommandes(params);
-      setCommandes(data);
+      const response = await ApiService.getCommandes(params);
+      
+      // Check if response has pagination structure
+      if (response && typeof response === 'object' && 'commandes' in response) {
+        const commandesResponse = response as CommandesResponse;
+        setCommandes(commandesResponse.commandes);
+        setTotalItems(commandesResponse.total);
+        setTotalPages(Math.ceil(commandesResponse.total / itemsPerPage));
+        setHasNext(commandesResponse.has_next);
+        setHasPrevious(commandesResponse.has_previous);
+      } else {
+        // Fallback for simple array response
+        const commandesArray = Array.isArray(response) ? response : [];
+        setCommandes(commandesArray);
+        setTotalItems(commandesArray.length);
+        setTotalPages(1);
+        setHasNext(false);
+        setHasPrevious(false);
+      }
     } catch (err: any) {
       setError(err.response?.data?.detail || 'Erreur lors du chargement des commandes');
     } finally {
