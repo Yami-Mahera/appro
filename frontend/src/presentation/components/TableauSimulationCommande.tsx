@@ -372,6 +372,18 @@ const TableauSimulationCommande: React.FC = () => {
         )}
       </div>
 
+      {/* Pagination */}
+      {totalItems > itemsPerPage && (
+        <Pagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          totalItems={totalItems}
+          itemsPerPage={itemsPerPage}
+          onPageChange={handlePageChange}
+          onItemsPerPageChange={handleItemsPerPageChange}
+        />
+      )}
+
       {/* Tableau de simulation */}
       <div className="overflow-x-auto">
         {loading ? (
