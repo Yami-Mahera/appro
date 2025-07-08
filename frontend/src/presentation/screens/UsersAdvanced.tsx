@@ -498,7 +498,7 @@ const UsersAdvanced: React.FC = () => {
               </tr>
             </thead>
             <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
-              {usersData.users.map((user) => {
+              {usersData.users && usersData.users.map((user) => {
                 const roleBadge = getRoleBadge(user.role);
                 return (
                   <tr key={user.id} className="hover:bg-gray-50 dark:hover:bg-gray-700">
