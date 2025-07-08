@@ -1088,7 +1088,7 @@ async def create_article(
     await db.articles.insert_one(article.dict())
     return article
 
-@api_router.get("/articles", response_model=List[Article])
+@api_router.get("/articles")
 async def get_articles(
     search: Optional[str] = None,
     sort_by: Optional[str] = "nom",
@@ -1127,8 +1127,20 @@ async def get_articles(
     sort_direction = 1 if sort_order == "asc" else -1
     sort_criteria = [(sort_by, sort_direction)]
     
+    # Get total count for pagination
+    total_count = await db.articles.count_documents(query)
+    
+    # Get paginated results
     articles = await db.articles.find(query).sort(sort_criteria).skip(skip).limit(limit).to_list(limit)
-    return [Article(**a) for a in articles]
+    
+    return {
+        "articles": [Article(**a) for a in articles],
+        "total": total_count,
+        "limit": limit,
+        "skip": skip,
+        "has_next": (skip + limit) < total_count,
+        "has_previous": skip > 0
+    }
 
 @api_router.get("/articles/stock-bas")
 async def get_articles_stock_bas(
