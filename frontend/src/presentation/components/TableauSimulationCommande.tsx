@@ -78,10 +78,11 @@ const TableauSimulationCommande: React.FC = () => {
 
   const loadArticlesByFournisseur = async () => {
     try {
-      const data = await apiService.getArticles({ 
+      const response = await apiService.getArticles({ 
         fournisseur_id: selectedFournisseur,
         limit: 100 
       });
+      const data = response.articles || response;
       setArticles(data);
     } catch (error) {
       console.error('Erreur lors du chargement des articles:', error);
