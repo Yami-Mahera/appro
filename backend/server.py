@@ -1182,7 +1182,7 @@ async def create_commande(
     await db.commandes.insert_one(commande.dict())
     return commande
 
-@api_router.get("/commandes", response_model=List[Commande])
+@api_router.get("/commandes", response_model=CommandesResponse)
 async def get_commandes(
     search: Optional[str] = None,
     sort_by: Optional[str] = "created_at",
@@ -1191,7 +1191,7 @@ async def get_commandes(
     fournisseur_id: Optional[str] = None,
     date_from: Optional[str] = None,
     date_to: Optional[str] = None,
-    limit: Optional[int] = 1000,
+    limit: Optional[int] = 10,
     skip: Optional[int] = 0,
     current_user: User = Depends(get_current_user)
 ):
@@ -1224,8 +1224,24 @@ async def get_commandes(
     sort_direction = 1 if sort_order == "asc" else -1
     sort_criteria = [(sort_by, sort_direction)]
     
+    # Get total count
+    total = await db.commandes.count_documents(query)
+    
+    # Get paginated results
     commandes = await db.commandes.find(query).sort(sort_criteria).skip(skip).limit(limit).to_list(limit)
-    return [Commande(**c) for c in commandes]
+    
+    # Calculate pagination info
+    has_next = (skip + limit) < total
+    has_previous = skip > 0
+    
+    return CommandesResponse(
+        commandes=[Commande(**c) for c in commandes],
+        total=total,
+        limit=limit,
+        skip=skip,
+        has_next=has_next,
+        has_previous=has_previous
+    )
 
 # Alertes Routes
 @api_router.get("/alertes", response_model=List[Alerte])
