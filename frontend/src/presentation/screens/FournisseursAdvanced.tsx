@@ -311,10 +311,10 @@ const FournisseursAdvanced: React.FC = () => {
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <h1 className="text-2xl font-bold text-gray-900">Fournisseurs</h1>
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Fournisseurs</h1>
         <button
           onClick={handleAdd}
-          className="bg-blue-600 text-white px-4 py-2 rounded-lg flex items-center space-x-2 hover:bg-blue-700"
+          className="bg-blue-600 text-white px-4 py-2 rounded-lg flex items-center space-x-2 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-800"
         >
           <PlusIcon className="w-5 h-5" />
           <span>Ajouter un fournisseur</span>
@@ -322,7 +322,7 @@ const FournisseursAdvanced: React.FC = () => {
       </div>
 
       {error && (
-        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
+        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded dark:bg-red-900 dark:border-red-700 dark:text-red-300">
           {error}
         </div>
       )}
