@@ -262,6 +262,22 @@ const TableauSuiviCommandes: React.FC = () => {
     setShowModal(false);
   };
 
+  // Paginated data
+  const totalItems = commandesFiltered.length;
+  const totalPages = Math.ceil(totalItems / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const paginatedCommandes = commandesFiltered.slice(startIndex, endIndex);
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+  };
+
+  const handleItemsPerPageChange = (items: number) => {
+    setItemsPerPage(items);
+    setCurrentPage(1);
+  };
+
   return (
     <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm">
       {/* En-tête */}
