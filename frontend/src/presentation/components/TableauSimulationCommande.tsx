@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { PlusIcon, TrashIcon, CalculatorIcon, CheckCircleIcon, XCircleIcon } from '@heroicons/react/24/outline';
 import apiService from '../../services/api';
+import Pagination from './Pagination';
 
 interface LigneSimulation {
   id: string;
