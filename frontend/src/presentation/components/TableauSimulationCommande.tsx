@@ -358,28 +358,28 @@ const TableauSimulationCommande: React.FC = () => {
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
           </div>
         ) : (
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
+          <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+            <thead className="bg-gray-50 dark:bg-gray-700">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Article</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Référence</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Quantité</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Prix Unit.</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Stock</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">CMS/CMC/QM</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Validation</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Article</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Référence</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Quantité</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Prix Unit.</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Total</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Stock</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">CMS/CMC/QM</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Validation</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Actions</th>
               </tr>
             </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
+            <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
               {lignes.map((ligne) => (
-                <tr key={ligne.id} className={`hover:bg-gray-50 ${ligne.status === 'erreur' ? 'bg-red-50' : ligne.status === 'attention' ? 'bg-yellow-50' : ''}`}>
+                <tr key={ligne.id} className={`hover:bg-gray-50 dark:hover:bg-gray-700 ${ligne.status === 'erreur' ? 'bg-red-50 dark:bg-red-900/20' : ligne.status === 'attention' ? 'bg-yellow-50 dark:bg-yellow-900/20' : ''}`}>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <select
                       value={ligne.articleId}
                       onChange={(e) => mettreAJourLigne(ligne.id, 'articleId', e.target.value)}
-                      className="w-full px-2 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                      className="w-full px-2 py-1 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded text-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                     >
                       {articles.map((article) => (
                         <option key={article.id} value={article.id}>
@@ -388,7 +388,7 @@ const TableauSimulationCommande: React.FC = () => {
                       ))}
                     </select>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">
                     {ligne.reference}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
@@ -397,28 +397,28 @@ const TableauSimulationCommande: React.FC = () => {
                       min="1"
                       value={ligne.quantite}
                       onChange={(e) => mettreAJourLigne(ligne.id, 'quantite', parseInt(e.target.value) || 0)}
-                      className="w-20 px-2 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                      className="w-20 px-2 py-1 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded text-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                     />
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
                     {ligne.prixUnitaire.toFixed(2)}€
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">
                     {ligne.total.toFixed(2)}€
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
                     <div className="flex flex-col">
                       <span>Actuel: {ligne.stockActuel}</span>
-                      <span className="text-xs text-gray-500">
+                      <span className="text-xs text-gray-500 dark:text-gray-400">
                         Couv: {ligne.couvertureActuelle.toFixed(1)}
                       </span>
                     </div>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
                     <div className="flex flex-col space-y-1 text-xs">
                       <span>CMS: {ligne.cms.toFixed(1)}</span>
                       <span>CMC: {ligne.cmc.toFixed(1)}</span>
-                      <span className="font-medium text-blue-600">QM: {ligne.qm.toFixed(0)}</span>
+                      <span className="font-medium text-blue-600 dark:text-blue-400">QM: {ligne.qm.toFixed(0)}</span>
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
@@ -431,7 +431,7 @@ const TableauSimulationCommande: React.FC = () => {
                       </div>
                     </div>
                     {ligne.recommandations.length > 0 && (
-                      <div className="mt-1 text-xs text-gray-600">
+                      <div className="mt-1 text-xs text-gray-600 dark:text-gray-400">
                         {ligne.recommandations.slice(0, 1).map((rec, idx) => (
                           <div key={idx}>{rec}</div>
                         ))}
@@ -441,7 +441,7 @@ const TableauSimulationCommande: React.FC = () => {
                   <td className="px-6 py-4 whitespace-nowrap text-sm">
                     <button
                       onClick={() => supprimerLigne(ligne.id)}
-                      className="text-red-600 hover:text-red-900"
+                      className="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300"
                     >
                       <TrashIcon className="h-4 w-4" />
                     </button>
