@@ -504,8 +504,8 @@ const TableauSuiviCommandes: React.FC = () => {
       {/* État vide */}
       {!loading && commandesFiltered.length === 0 && (
         <div className="px-6 py-12 text-center">
-          <ClockIcon className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-          <p className="text-gray-500">
+          <ClockIcon className="h-12 w-12 text-gray-400 dark:text-gray-500 mx-auto mb-4" />
+          <p className="text-gray-500 dark:text-gray-400">
             Aucune commande en cours trouvée avec les filtres appliqués.
           </p>
         </div>
@@ -514,15 +514,15 @@ const TableauSuiviCommandes: React.FC = () => {
       {/* Modal de détails */}
       {showModal && selectedCommande && (
         <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
-          <div className="relative top-20 mx-auto p-5 border w-11/12 md:w-3/4 lg:w-1/2 shadow-lg rounded-md bg-white">
+          <div className="relative top-20 mx-auto p-5 border w-11/12 md:w-3/4 lg:w-1/2 shadow-lg rounded-md bg-white dark:bg-gray-800">
             <div className="mt-3">
               <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg font-medium text-gray-900">
+                <h3 className="text-lg font-medium text-gray-900 dark:text-white">
                   Détails de la commande {selectedCommande.numero_commande}
                 </h3>
                 <button
                   onClick={closeModal}
-                  className="text-gray-400 hover:text-gray-600"
+                  className="text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300"
                 >
                   ✕
                 </button>
@@ -531,7 +531,7 @@ const TableauSuiviCommandes: React.FC = () => {
               <div className="space-y-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <h4 className="font-medium text-gray-900 mb-2">Informations générales</h4>
+                    <h4 className="font-medium text-gray-900 dark:text-white mb-2">Informations générales</h4>
                     <div className="space-y-2 text-sm">
                       <div><span className="font-medium">Fournisseur:</span> {selectedCommande.fournisseur.nom}</div>
                       <div><span className="font-medium">Statut:</span> {getStatusBadge(selectedCommande.status)}</div>
@@ -541,7 +541,7 @@ const TableauSuiviCommandes: React.FC = () => {
                   </div>
                   
                   <div>
-                    <h4 className="font-medium text-gray-900 mb-2">Dates et délais</h4>
+                    <h4 className="font-medium text-gray-900 dark:text-white mb-2">Dates et délais</h4>
                     <div className="space-y-2 text-sm">
                       <div><span className="font-medium">Date commande:</span> {new Date(selectedCommande.date_commande).toLocaleDateString('fr-FR')}</div>
                       <div><span className="font-medium">Livraison prévue:</span> {new Date(selectedCommande.date_livraison_prevue).toLocaleDateString('fr-FR')}</div>
@@ -553,7 +553,7 @@ const TableauSuiviCommandes: React.FC = () => {
                 
                 {selectedCommande.transporteur && (
                   <div>
-                    <h4 className="font-medium text-gray-900 mb-2">Transport</h4>
+                    <h4 className="font-medium text-gray-900 dark:text-white mb-2">Transport</h4>
                     <div className="space-y-2 text-sm">
                       <div><span className="font-medium">Transporteur:</span> {selectedCommande.transporteur}</div>
                       {selectedCommande.numero_tracking && (
@@ -565,10 +565,10 @@ const TableauSuiviCommandes: React.FC = () => {
                 
                 {selectedCommande.alertes.length > 0 && (
                   <div>
-                    <h4 className="font-medium text-gray-900 mb-2">Alertes</h4>
+                    <h4 className="font-medium text-gray-900 dark:text-white mb-2">Alertes</h4>
                     <div className="space-y-1">
                       {selectedCommande.alertes.map((alerte, index) => (
-                        <div key={index} className="text-sm bg-red-100 text-red-800 px-3 py-2 rounded">
+                        <div key={index} className="text-sm bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300 px-3 py-2 rounded">
                           {alerte}
                         </div>
                       ))}
@@ -578,8 +578,8 @@ const TableauSuiviCommandes: React.FC = () => {
                 
                 {selectedCommande.commentaires && (
                   <div>
-                    <h4 className="font-medium text-gray-900 mb-2">Commentaires</h4>
-                    <div className="text-sm text-gray-600 bg-gray-50 p-3 rounded">
+                    <h4 className="font-medium text-gray-900 dark:text-white mb-2">Commentaires</h4>
+                    <div className="text-sm text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-700 p-3 rounded">
                       {selectedCommande.commentaires}
                     </div>
                   </div>
