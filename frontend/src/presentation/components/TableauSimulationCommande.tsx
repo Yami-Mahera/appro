@@ -65,7 +65,8 @@ const TableauSimulationCommande: React.FC = () => {
 
   const loadFournisseurs = async () => {
     try {
-      const data = await apiService.getFournisseurs({ limit: 100 });
+      const response = await apiService.getFournisseurs({ limit: 100 });
+      const data = response.fournisseurs || response;
       setFournisseurs(data);
       if (data.length > 0 && !selectedFournisseur) {
         setSelectedFournisseur(data[0].id);
