@@ -384,28 +384,28 @@ const StockEvolutionChart: React.FC<StockEvolutionChartProps> = ({ className = '
         )}
 
         {/* Légende */}
-        <div className="mt-6 p-4 bg-gray-50 rounded-lg">
-          <h4 className="font-semibold mb-3">Légende</h4>
+        <div className="mt-6 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
+          <h4 className="font-semibold mb-3 text-gray-900 dark:text-white">Légende</h4>
           <div className="grid grid-cols-2 gap-4 text-sm">
             <div className="flex items-center space-x-2">
               <div className="w-4 h-0.5 bg-blue-600"></div>
-              <span>Niveau de stock</span>
+              <span className="text-gray-700 dark:text-gray-300">Niveau de stock</span>
             </div>
             <div className="flex items-center space-x-2">
               <div className="w-4 h-0.5 bg-red-500 border-dashed border-red-500" style={{borderBottomStyle: 'dashed'}}></div>
-              <span>Couverture moyenne précédente</span>
+              <span className="text-gray-700 dark:text-gray-300">Couverture moyenne précédente</span>
             </div>
             <div className="flex items-center space-x-2">
               <div className="w-4 h-0.5 bg-green-500 border-dashed border-green-500" style={{borderBottomStyle: 'dashed'}}></div>
-              <span>Couverture moyenne actuelle</span>
+              <span className="text-gray-700 dark:text-gray-300">Couverture moyenne actuelle</span>
             </div>
             <div className="flex items-center space-x-2">
               <div className="w-4 h-0.5 bg-pink-500 border-dashed border-pink-500" style={{borderBottomStyle: 'dashed'}}></div>
-              <span>Couverture prévision mensuelle</span>
+              <span className="text-gray-700 dark:text-gray-300">Couverture prévision mensuelle</span>
             </div>
             <div className="flex items-center space-x-2">
-              <div className="w-4 h-3 bg-gray-300 opacity-50"></div>
-              <span>Zone d'écartement</span>
+              <div className="w-4 h-3 bg-gray-300 dark:bg-gray-600 opacity-50"></div>
+              <span className="text-gray-700 dark:text-gray-300">Zone d'écartement</span>
             </div>
           </div>
         </div>
