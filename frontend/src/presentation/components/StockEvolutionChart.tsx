@@ -268,27 +268,27 @@ const StockEvolutionChart: React.FC<StockEvolutionChartProps> = ({ className = '
 
         {couvertureData && (
           <div className="grid grid-cols-4 gap-4 mb-6">
-            <div className="bg-blue-50 p-3 rounded">
-              <div className="text-sm font-medium text-blue-800">CMS</div>
-              <div className="text-xl font-bold text-blue-900">
+            <div className="bg-blue-50 dark:bg-blue-900/20 p-3 rounded">
+              <div className="text-sm font-medium text-blue-800 dark:text-blue-200">CMS</div>
+              <div className="text-xl font-bold text-blue-900 dark:text-blue-100">
                 {couvertureData.couverture_minimale_securite.toFixed(1)} sem
               </div>
             </div>
-            <div className="bg-green-50 p-3 rounded">
-              <div className="text-sm font-medium text-green-800">CMC</div>
-              <div className="text-xl font-bold text-green-900">
+            <div className="bg-green-50 dark:bg-green-900/20 p-3 rounded">
+              <div className="text-sm font-medium text-green-800 dark:text-green-200">CMC</div>
+              <div className="text-xl font-bold text-green-900 dark:text-green-100">
                 {couvertureData.couverture_maximale_commande.toFixed(1)} sem
               </div>
             </div>
-            <div className="bg-purple-50 p-3 rounded">
-              <div className="text-sm font-medium text-purple-800">QM</div>
-              <div className="text-xl font-bold text-purple-900">
+            <div className="bg-purple-50 dark:bg-purple-900/20 p-3 rounded">
+              <div className="text-sm font-medium text-purple-800 dark:text-purple-200">QM</div>
+              <div className="text-xl font-bold text-purple-900 dark:text-purple-100">
                 {couvertureData.quantite_maximale_commande.toFixed(0)} unités
               </div>
             </div>
-            <div className="bg-orange-50 p-3 rounded">
-              <div className="text-sm font-medium text-orange-800">Stock Actuel</div>
-              <div className="text-xl font-bold text-orange-900">
+            <div className="bg-orange-50 dark:bg-orange-900/20 p-3 rounded">
+              <div className="text-sm font-medium text-orange-800 dark:text-orange-200">Stock Actuel</div>
+              <div className="text-xl font-bold text-orange-900 dark:text-orange-100">
                 {couvertureData.stock_actuel} unités
               </div>
             </div>
