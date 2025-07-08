@@ -445,7 +445,7 @@ const TableauSuiviCommandes: React.FC = () => {
               </tr>
             </thead>
             <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
-              {commandesFiltered.map((commande) => (
+              {paginatedCommandes.map((commande) => (
                 <tr key={commande.id} className={`hover:bg-gray-50 dark:hover:bg-gray-700 ${commande.priorite === 'critique' ? 'bg-red-50 dark:bg-red-900/20' : commande.priorite === 'urgent' ? 'bg-yellow-50 dark:bg-yellow-900/20' : ''}`}>
                   <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">
                     {commande.numero_commande}
