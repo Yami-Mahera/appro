@@ -794,12 +794,12 @@ const FournisseursAdvanced: React.FC = () => {
       {/* Detail Modal */}
       {showDetailModal && viewingFournisseur && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+          <div className="bg-white dark:bg-gray-800 rounded-lg p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
             <div className="flex justify-between items-center mb-4">
-              <h2 className="text-xl font-bold">Détails du fournisseur</h2>
+              <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100">Détails du fournisseur</h2>
               <button
                 onClick={() => setShowDetailModal(false)}
-                className="text-gray-400 hover:text-gray-600"
+                className="text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300"
               >
                 ✕
               </button>
@@ -808,26 +808,26 @@ const FournisseursAdvanced: React.FC = () => {
             <div className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <span className="text-sm font-medium text-gray-500">
+                  <span className="text-sm font-medium text-gray-500 dark:text-gray-400">
                     Nom:
                   </span>
-                  <p className="text-gray-900">{viewingFournisseur.nom}</p>
+                  <p className="text-gray-900 dark:text-gray-100">{viewingFournisseur.nom}</p>
                 </div>
                 <div>
-                  <span className="text-sm font-medium text-gray-500">
+                  <span className="text-sm font-medium text-gray-500 dark:text-gray-400">
                     Code:
                   </span>
-                  <p className="text-gray-900">
+                  <p className="text-gray-900 dark:text-gray-100">
                     {viewingFournisseur.code_fournisseur}
                   </p>
                 </div>
               </div>
 
               <div>
-                <span className="text-sm font-medium text-gray-500">
+                <span className="text-sm font-medium text-gray-500 dark:text-gray-400">
                   Adresse complète:
                 </span>
-                <p className="text-gray-900">
+                <p className="text-gray-900 dark:text-gray-100">
                   {viewingFournisseur.adresse}
                   <br />
                   {viewingFournisseur.code_postal} {viewingFournisseur.ville}
@@ -838,18 +838,18 @@ const FournisseursAdvanced: React.FC = () => {
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <span className="text-sm font-medium text-gray-500">
+                  <span className="text-sm font-medium text-gray-500 dark:text-gray-400">
                     Téléphone:
                   </span>
-                  <p className="text-gray-900">
+                  <p className="text-gray-900 dark:text-gray-100">
                     {viewingFournisseur.telephone || "Non renseigné"}
                   </p>
                 </div>
                 <div>
-                  <span className="text-sm font-medium text-gray-500">
+                  <span className="text-sm font-medium text-gray-500 dark:text-gray-400">
                     Email:
                   </span>
-                  <p className="text-gray-900">
+                  <p className="text-gray-900 dark:text-gray-100">
                     {viewingFournisseur.email || "Non renseigné"}
                   </p>
                 </div>
@@ -857,15 +857,15 @@ const FournisseursAdvanced: React.FC = () => {
 
               {viewingFournisseur.site_web && (
                 <div>
-                  <span className="text-sm font-medium text-gray-500">
+                  <span className="text-sm font-medium text-gray-500 dark:text-gray-400">
                     Site web:
                   </span>
-                  <p className="text-gray-900">
+                  <p className="text-gray-900 dark:text-gray-100">
                     <a
                       href={viewingFournisseur.site_web}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-blue-600 hover:underline"
+                      className="text-blue-600 hover:underline dark:text-blue-400"
                     >
                       {viewingFournisseur.site_web}
                     </a>
@@ -875,10 +875,10 @@ const FournisseursAdvanced: React.FC = () => {
 
               {viewingFournisseur.conditions_paiement && (
                 <div>
-                  <span className="text-sm font-medium text-gray-500">
+                  <span className="text-sm font-medium text-gray-500 dark:text-gray-400">
                     Conditions de paiement:
                   </span>
-                  <p className="text-gray-900">
+                  <p className="text-gray-900 dark:text-gray-100">
                     {viewingFournisseur.conditions_paiement}
                   </p>
                 </div>
@@ -886,10 +886,10 @@ const FournisseursAdvanced: React.FC = () => {
 
               {viewingFournisseur.delai_livraison_moyen && (
                 <div>
-                  <span className="text-sm font-medium text-gray-500">
+                  <span className="text-sm font-medium text-gray-500 dark:text-gray-400">
                     Délai de livraison moyen:
                   </span>
-                  <p className="text-gray-900">
+                  <p className="text-gray-900 dark:text-gray-100">
                     {viewingFournisseur.delai_livraison_moyen} jours
                   </p>
                 </div>
@@ -898,25 +898,25 @@ const FournisseursAdvanced: React.FC = () => {
               {viewingFournisseur.contacts &&
                 viewingFournisseur.contacts.length > 0 && (
                   <div>
-                    <span className="text-sm font-medium text-gray-500">
+                    <span className="text-sm font-medium text-gray-500 dark:text-gray-400">
                       Contacts:
                     </span>
                     <div className="mt-2 space-y-2">
                       {viewingFournisseur.contacts.map((contact, index) => (
-                        <div key={index} className="bg-gray-50 p-3 rounded">
-                          <p className="font-medium">
+                        <div key={index} className="bg-gray-50 dark:bg-gray-700 p-3 rounded">
+                          <p className="font-medium text-gray-900 dark:text-gray-100">
                             {contact.prenom} {contact.nom}
                           </p>
                           {contact.poste && (
-                            <p className="text-sm text-gray-600">
+                            <p className="text-sm text-gray-600 dark:text-gray-400">
                               {contact.poste}
                             </p>
                           )}
                           {contact.telephone && (
-                            <p className="text-sm">{contact.telephone}</p>
+                            <p className="text-sm text-gray-900 dark:text-gray-100">{contact.telephone}</p>
                           )}
                           {contact.email && (
-                            <p className="text-sm">{contact.email}</p>
+                            <p className="text-sm text-gray-900 dark:text-gray-100">{contact.email}</p>
                           )}
                         </div>
                       ))}
@@ -924,7 +924,7 @@ const FournisseursAdvanced: React.FC = () => {
                   </div>
                 )}
 
-              <div className="grid grid-cols-2 gap-4 text-sm text-gray-500">
+              <div className="grid grid-cols-2 gap-4 text-sm text-gray-500 dark:text-gray-400">
                 <div>
                   <span className="font-medium">Créé le:</span>
                   <p>
