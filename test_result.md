@@ -749,17 +749,29 @@ frontend:
         agent: "testing"
         comment: "Le visualiseur de dashboard fonctionne correctement. Les widgets s'affichent avec leurs couleurs et données appropriées, et non plus en gris comme auparavant. Les fonctionnalités de plein écran, rafraîchissement automatique, partage et impression sont opérationnelles. Le bouton d'édition permet de basculer vers le mode édition sans problème."
 
-  - task: "Correction Mode Sombre Commandes + Pagination"
+  - task: "Système de pagination pour les utilisateurs"
     implemented: true
     working: false
-    file: "/app/frontend/src/presentation/screens/CommandesAdvanced.tsx"
+    file: "/app/frontend/src/presentation/screens/UsersAdvanced.tsx"
     stuck_count: 0
     priority: "high"
     needs_retesting: true
     status_history:
       - working: "NA"
         agent: "main"
-        comment: "Correction complète du mode sombre pour la page commandes : header, filtres, tableau, modals (création/édition/détails), pagination complète avec navigation, sélecteur d'éléments par page, indicateurs de progression. Ajout interface CommandesResponse pour support API pagination backend."
+        comment: "Implémenté système de pagination complet pour les utilisateurs : API backend modifiée pour retourner informations pagination (total, has_next, has_previous), service API frontend adapté, page UsersAdvanced mise à jour avec navigation par pages, sélecteur éléments par page, indicateurs de progression. Pagination par défaut 10 éléments par page avec options 5/10/20/50."
+
+  - task: "Mode sombre uniforme page utilisateurs"
+    implemented: true
+    working: false
+    file: "/app/frontend/src/presentation/screens/UsersAdvanced.tsx"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Correction complète mode sombre page utilisateurs : header, titre, boutons, filtres, recherche, tableau (headers/lignes/hover), modals (création/édition/détails/mot de passe), pagination, messages d'erreur. Toutes couleurs adaptées avec classes dark: appropriées pour parfaite lisibilité en mode sombre."
 
 metadata:
   created_by: "main_agent"
