@@ -420,7 +420,7 @@ const CommandesAdvanced: React.FC = () => {
               <input
                 type="date"
                 value={filters.date_from}
-                onChange={(e) => setFilters({ ...filters, date_from: e.target.value })}
+                onChange={(e) => handleFilterChange({ ...filters, date_from: e.target.value })}
                 className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
               />
             </div>
@@ -429,7 +429,7 @@ const CommandesAdvanced: React.FC = () => {
               <input
                 type="date"
                 value={filters.date_to}
-                onChange={(e) => setFilters({ ...filters, date_to: e.target.value })}
+                onChange={(e) => handleFilterChange({ ...filters, date_to: e.target.value })}
                 className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
               />
             </div>
