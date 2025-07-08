@@ -7,7 +7,7 @@ from datetime import datetime, timedelta
 from typing import Dict, List, Optional, Any
 
 # Configuration
-BASE_URL = "https://2439df7f-03ea-457b-bf49-19a4dbb92eef.preview.emergentagent.com/api"
+BASE_URL = "http://localhost:8000/api"
 ADMIN_USER = {
     "email": "admin@test.com",
     "password": "admin123",
