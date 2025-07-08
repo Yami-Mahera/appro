@@ -126,9 +126,11 @@ const WidgetPreview: React.FC<WidgetPreviewProps> = ({ widget }) => {
       case 'articles_stock_bas':
         return await apiService.getArticlesStockBas();
       case 'fournisseurs':
-        return await apiService.getFournisseurs({ limit: widget.config.rowCount || 10 });
+        const fournisseursResponse = await apiService.getFournisseurs({ limit: widget.config.rowCount || 10 });
+        return fournisseursResponse.fournisseurs || fournisseursResponse;
       case 'articles':
-        return await apiService.getArticles({ limit: widget.config.rowCount || 10 });
+        const articlesResponse = await apiService.getArticles({ limit: widget.config.rowCount || 10 });
+        return articlesResponse.articles || articlesResponse;
       case 'commandes':
         return await apiService.getCommandes({ limit: widget.config.rowCount || 10 });
       default:
