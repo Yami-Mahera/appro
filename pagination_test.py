@@ -73,7 +73,30 @@ def create_test_data(token, entity_type, count=15):
     
     created_ids = []
     
-    if entity_type == "fournisseurs":
+    if entity_type == "users":
+        for i in range(count):
+            # Alternate between different roles
+            role = "utilisateur"
+            if i % 5 == 0:
+                role = "manager"
+            elif i % 7 == 0:
+                role = "administrateur"
+                
+            data = {
+                "email": f"pagination.user{i+1}.{uuid.uuid4().hex[:6]}@example.com",
+                "password": "Password123!",
+                "nom": f"Pagination User {i+1}",
+                "prenom": f"Test {i+1}",
+                "role": role
+            }
+            success, message, response = make_request("post", f"/{entity_type}", data, token, expected_status=200)
+            if success and response and "id" in response:
+                created_ids.append(response["id"])
+                print(f"Created {entity_type[:-1]} {i+1}/{count}: {response['email']}")
+            else:
+                print(f"Failed to create {entity_type[:-1]} {i+1}: {message}")
+    
+    elif entity_type == "fournisseurs":
         for i in range(count):
             data = {
                 "nom": f"Pagination Test Supplier {i+1}",
