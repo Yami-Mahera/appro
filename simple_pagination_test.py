@@ -1,5 +1,6 @@
 import requests
 import json
+import uuid
 from datetime import datetime, timedelta
 
 # Configuration
@@ -64,6 +65,104 @@ def authenticate():
         print(f"   Response: {response.text}")
         return None
 
+def create_test_data(token):
+    print("\nCreating test data...")
+    headers = {
+        "Authorization": f"Bearer {token}"
+    }
+    
+    # Create a test fournisseur
+    fournisseur_data = {
+        "nom": f"Fournisseur Test {uuid.uuid4().hex[:6]}",
+        "code_fournisseur": f"FOUR-{uuid.uuid4().hex[:6]}",
+        "adresse": "123 Rue de Test",
+        "ville": "Paris",
+        "code_postal": "75001",
+        "pays": "France",
+        "telephone": "+33123456789",
+        "email": f"contact_{uuid.uuid4().hex[:6]}@fournisseur-test.com",
+        "site_web": "https://www.fournisseur-test.com",
+        "conditions_paiement": "30 jours",
+        "delai_livraison_moyen": 5,
+        "contacts": [
+            {
+                "nom": "Dupont",
+                "prenom": "Jean",
+                "telephone": "+33612345678",
+                "email": f"jean.dupont_{uuid.uuid4().hex[:6]}@fournisseur-test.com",
+                "poste": "Responsable commercial"
+            }
+        ]
+    }
+    
+    response = requests.post(f"{BASE_URL}/fournisseurs", json=fournisseur_data, headers=headers)
+    
+    if response.status_code == 200:
+        fournisseur_id = response.json()["id"]
+        print(f"✅ Created test fournisseur with ID: {fournisseur_id}")
+        
+        # Create a test article
+        article_data = {
+            "reference": f"ART-{uuid.uuid4().hex[:6]}",
+            "nom": "Article Test",
+            "description": "Description de l'article test",
+            "famille": "Test",
+            "fournisseur_id": fournisseur_id,
+            "prix_unitaire": 19.99,
+            "unite": "pièce",
+            "seuil_min": 10,
+            "seuil_max": 100,
+            "stock_actuel": 5,
+            "duree_vie": 365,
+            "emplacement_stockage": "Étagère A1"
+        }
+        
+        response = requests.post(f"{BASE_URL}/articles", json=article_data, headers=headers)
+        
+        if response.status_code == 200:
+            article_id = response.json()["id"]
+            print(f"✅ Created test article with ID: {article_id}")
+            
+            # Create multiple commandes for pagination testing
+            commande_ids = []
+            for i in range(15):  # Create 15 commandes to ensure we have enough for pagination
+                commande_data = {
+                    "fournisseur_id": fournisseur_id,
+                    "lignes": [
+                        {
+                            "article_id": article_id,
+                            "quantite": 10 + i,
+                            "prix_unitaire": 19.99,
+                            "total": (10 + i) * 19.99
+                        }
+                    ],
+                    "date_livraison_prevue": (datetime.now() + timedelta(days=7 + i)).isoformat(),
+                    "notes": f"Commande test pagination {i+1}"
+                }
+                
+                response = requests.post(f"{BASE_URL}/commandes", json=commande_data, headers=headers)
+                if response.status_code == 200:
+                    commande_id = response.json()["id"]
+                    commande_ids.append(commande_id)
+                    print(f"✅ Created test commande {i+1} with ID: {commande_id}")
+                else:
+                    print(f"❌ Failed to create test commande {i+1}")
+                    print(f"   Response status code: {response.status_code}")
+                    print(f"   Response text: {response.text}")
+            
+            print(f"✅ Created {len(commande_ids)} test commandes")
+            return True
+        else:
+            print(f"❌ Failed to create test article")
+            print(f"   Response status code: {response.status_code}")
+            print(f"   Response text: {response.text}")
+            return False
+    else:
+        print(f"❌ Failed to create test fournisseur")
+        print(f"   Response status code: {response.status_code}")
+        print(f"   Response text: {response.text}")
+        return False
+
 def test_commandes_pagination():
     print("Testing commandes pagination API...")
     
@@ -72,6 +171,9 @@ def test_commandes_pagination():
     if not token:
         print("Cannot proceed with tests without authentication")
         return
+    
+    # Create test data
+    create_test_data(token)
     
     # Set up headers with authentication token
     headers = {
@@ -105,10 +207,14 @@ def test_commandes_pagination():
         
         if "has_previous" in data:
             print(f"   Has previous page: {data['has_previous']}")
+            
+        # Store first page commandes for comparison
+        first_page_commandes = data['commandes']
     else:
         print(f"❌ Failed to retrieve commandes with limit=5, skip=0")
         print(f"   Response status code: {response.status_code}")
         print(f"   Response text: {response.text}")
+        return
     
     # Test 2: Next page - limit=5, skip=5
     print("\nTest 2: GET /api/commandes?limit=5&skip=5")
@@ -128,6 +234,17 @@ def test_commandes_pagination():
                 print("   ✅ has_previous is correctly set to True for second page")
             else:
                 print("   ❌ has_previous should be True for second page but is False")
+        
+        # Check if commandes are different from first page
+        if first_page_commandes and len(data['commandes']) > 0:
+            first_page_ids = [commande["id"] for commande in first_page_commandes]
+            second_page_ids = [commande["id"] for commande in data['commandes']]
+            
+            overlap = set(first_page_ids).intersection(set(second_page_ids))
+            if not overlap:
+                print("   ✅ No overlap between first and second page - pagination working correctly")
+            else:
+                print(f"   ❌ Found {len(overlap)} overlapping commandes between pages - pagination may not be working correctly")
     else:
         print(f"❌ Failed to retrieve commandes with limit=5, skip=5")
         print(f"   Response status code: {response.status_code}")
@@ -160,8 +277,8 @@ def test_commandes_pagination():
     
     # Test 4: Date range filter
     print("\nTest 4: GET /api/commandes with date range filter")
-    date_from = (datetime.now() - timedelta(days=30)).isoformat()
-    date_to = datetime.now().isoformat()
+    date_from = (datetime.now() - timedelta(days=1)).isoformat()
+    date_to = (datetime.now() + timedelta(days=30)).isoformat()
     
     response = requests.get(f"{BASE_URL}/commandes?date_from={date_from}&date_to={date_to}&limit=5&skip=0", headers=headers)
     
@@ -177,6 +294,33 @@ def test_commandes_pagination():
         print(f"❌ Failed to retrieve commandes with date range filter")
         print(f"   Response status code: {response.status_code}")
         print(f"   Response text: {response.text}")
+    
+    # Test 5: Filter by fournisseur_id
+    if len(first_page_commandes) > 0:
+        fournisseur_id = first_page_commandes[0]["fournisseur_id"]
+        print(f"\nTest 5: GET /api/commandes?fournisseur_id={fournisseur_id}&limit=5&skip=0")
+        response = requests.get(f"{BASE_URL}/commandes?fournisseur_id={fournisseur_id}&limit=5&skip=0", headers=headers)
+        
+        if response.status_code == 200:
+            data = response.json()
+            print(f"✅ Successfully retrieved commandes with fournisseur_id filter, limit=5, skip=0")
+            print(f"   Response status code: {response.status_code}")
+            
+            if "commandes" in data and "total" in data:
+                print(f"   Number of commandes: {len(data['commandes'])}")
+                print(f"   Total matching fournisseur_id: {data['total']}")
+                
+                # Check if all returned commandes have the correct fournisseur_id
+                if len(data['commandes']) > 0:
+                    all_correct_fournisseur = all(commande["fournisseur_id"] == fournisseur_id for commande in data['commandes'])
+                    if all_correct_fournisseur:
+                        print("   ✅ All returned commandes have the correct fournisseur_id - filtering working correctly")
+                    else:
+                        print("   ❌ Some returned commandes do not have the correct fournisseur_id - filtering may not be working correctly")
+        else:
+            print(f"❌ Failed to retrieve commandes with fournisseur_id filter")
+            print(f"   Response status code: {response.status_code}")
+            print(f"   Response text: {response.text}")
     
     print("\nCommandes pagination tests completed")
 
