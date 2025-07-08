@@ -274,26 +274,26 @@ const TableauSimulationCommande: React.FC = () => {
   const selectedFournisseurData = fournisseurs.find(f => f.id === selectedFournisseur);
 
   return (
-    <div className="bg-white rounded-lg shadow-sm">
+    <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm">
       {/* En-tête */}
-      <div className="px-6 py-4 border-b border-gray-200">
+      <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
         <div className="flex items-center justify-between">
           <div>
-            <h2 className="text-xl font-semibold text-gray-900">
+            <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
               Tableau de simulation de commande
             </h2>
-            <p className="text-sm text-gray-600 mt-1">
+            <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
               Simulation avancée avec validation des contraintes et calculs optimisés
             </p>
           </div>
           
           <div className="flex space-x-4">
             <div className="flex flex-col">
-              <label className="text-sm font-medium text-gray-700 mb-1">Fournisseur</label>
+              <label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Fournisseur</label>
               <select
                 value={selectedFournisseur}
                 onChange={(e) => setSelectedFournisseur(e.target.value)}
-                className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                className="px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
               >
                 <option value="">Sélectionner un fournisseur</option>
                 {fournisseurs.map((fournisseur) => (
@@ -308,7 +308,7 @@ const TableauSimulationCommande: React.FC = () => {
               <button
                 onClick={ajouterLigne}
                 disabled={!selectedFournisseur || articles.length === 0}
-                className="bg-blue-600 text-white px-4 py-2 rounded-lg flex items-center space-x-2 hover:bg-blue-700 disabled:bg-gray-300"
+                className="bg-blue-600 text-white px-4 py-2 rounded-lg flex items-center space-x-2 hover:bg-blue-700 disabled:bg-gray-300 dark:disabled:bg-gray-600"
               >
                 <PlusIcon className="w-5 h-5" />
                 <span>Ajouter ligne</span>
@@ -317,7 +317,7 @@ const TableauSimulationCommande: React.FC = () => {
               <button
                 onClick={validerToutesLignes}
                 disabled={lignes.length === 0}
-                className="bg-green-600 text-white px-4 py-2 rounded-lg flex items-center space-x-2 hover:bg-green-700 disabled:bg-gray-300"
+                className="bg-green-600 text-white px-4 py-2 rounded-lg flex items-center space-x-2 hover:bg-green-700 disabled:bg-gray-300 dark:disabled:bg-gray-600"
               >
                 <CalculatorIcon className="w-5 h-5" />
                 <span>Valider tout</span>
@@ -328,23 +328,23 @@ const TableauSimulationCommande: React.FC = () => {
 
         {/* Info fournisseur sélectionné */}
         {selectedFournisseurData && (
-          <div className="mt-4 p-4 bg-gray-50 rounded-lg">
+          <div className="mt-4 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4 text-sm">
               <div>
-                <span className="font-medium text-gray-700">Fournisseur:</span>
-                <span className="ml-2 text-gray-900">{selectedFournisseurData.nom}</span>
+                <span className="font-medium text-gray-700 dark:text-gray-300">Fournisseur:</span>
+                <span className="ml-2 text-gray-900 dark:text-white">{selectedFournisseurData.nom}</span>
               </div>
               <div>
-                <span className="font-medium text-gray-700">Délai moyen:</span>
-                <span className="ml-2 text-gray-900">{selectedFournisseurData.delai_livraison_moyen || 'N/A'} jours</span>
+                <span className="font-medium text-gray-700 dark:text-gray-300">Délai moyen:</span>
+                <span className="ml-2 text-gray-900 dark:text-white">{selectedFournisseurData.delai_livraison_moyen || 'N/A'} jours</span>
               </div>
               <div>
-                <span className="font-medium text-gray-700">Ville:</span>
-                <span className="ml-2 text-gray-900">{selectedFournisseurData.ville}</span>
+                <span className="font-medium text-gray-700 dark:text-gray-300">Ville:</span>
+                <span className="ml-2 text-gray-900 dark:text-white">{selectedFournisseurData.ville}</span>
               </div>
               <div>
-                <span className="font-medium text-gray-700">Articles disponibles:</span>
-                <span className="ml-2 text-gray-900">{articles.length}</span>
+                <span className="font-medium text-gray-700 dark:text-gray-300">Articles disponibles:</span>
+                <span className="ml-2 text-gray-900 dark:text-white">{articles.length}</span>
               </div>
             </div>
           </div>
