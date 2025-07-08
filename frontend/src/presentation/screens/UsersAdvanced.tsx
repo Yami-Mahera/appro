@@ -655,8 +655,8 @@ const UsersAdvanced: React.FC = () => {
       {/* Add/Edit Modal */}
       {showModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 w-full max-w-md">
-            <h2 className="text-xl font-bold mb-4">
+          <div className="bg-white dark:bg-gray-800 rounded-lg p-6 w-full max-w-md">
+            <h2 className="text-xl font-bold mb-4 text-gray-900 dark:text-white">
               {editingUser
                 ? "Modifier l'utilisateur"
                 : "Ajouter un utilisateur"}
@@ -664,7 +664,7 @@ const UsersAdvanced: React.FC = () => {
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                     Prénom *
                   </label>
                   <input
@@ -673,12 +673,12 @@ const UsersAdvanced: React.FC = () => {
                     onChange={(e) =>
                       setFormData({ ...formData, prenom: e.target.value })
                     }
-                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:placeholder-gray-400"
                     required
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                     Nom *
                   </label>
                   <input
@@ -687,14 +687,14 @@ const UsersAdvanced: React.FC = () => {
                     onChange={(e) =>
                       setFormData({ ...formData, nom: e.target.value })
                     }
-                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:placeholder-gray-400"
                     required
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                   Email *
                 </label>
                 <input
@@ -703,14 +703,14 @@ const UsersAdvanced: React.FC = () => {
                   onChange={(e) =>
                     setFormData({ ...formData, email: e.target.value })
                   }
-                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:placeholder-gray-400"
                   required
                 />
               </div>
 
               {!editingUser && (
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                     Mot de passe *
                   </label>
                   <input
@@ -719,7 +719,7 @@ const UsersAdvanced: React.FC = () => {
                     onChange={(e) =>
                       setFormData({ ...formData, password: e.target.value })
                     }
-                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:placeholder-gray-400"
                     required={!editingUser}
                     minLength={6}
                   />
@@ -727,7 +727,7 @@ const UsersAdvanced: React.FC = () => {
               )}
 
               <div>
-                <label className="block text-sm font-medium text-gray-700">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                   Rôle *
                 </label>
                 <select
@@ -735,7 +735,7 @@ const UsersAdvanced: React.FC = () => {
                   onChange={(e) =>
                     setFormData({ ...formData, role: e.target.value as any })
                   }
-                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
                   required
                 >
                   <option value="utilisateur">Utilisateur</option>
@@ -748,7 +748,7 @@ const UsersAdvanced: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => setShowModal(false)}
-                  className="px-4 py-2 text-gray-700 bg-gray-200 rounded-md hover:bg-gray-300"
+                  className="px-4 py-2 text-gray-700 bg-gray-200 rounded-md hover:bg-gray-300 dark:bg-gray-600 dark:text-gray-300 dark:hover:bg-gray-500"
                 >
                   Annuler
                 </button>
@@ -767,12 +767,12 @@ const UsersAdvanced: React.FC = () => {
       {/* Detail Modal */}
       {showDetailModal && viewingUser && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 w-full max-w-md">
+          <div className="bg-white dark:bg-gray-800 rounded-lg p-6 w-full max-w-md">
             <div className="flex justify-between items-center mb-4">
-              <h2 className="text-xl font-bold">Détails de l'utilisateur</h2>
+              <h2 className="text-xl font-bold text-gray-900 dark:text-white">Détails de l'utilisateur</h2>
               <button
                 onClick={() => setShowDetailModal(false)}
-                className="text-gray-400 hover:text-gray-600"
+                className="text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300"
               >
                 ✕
               </button>
@@ -780,50 +780,50 @@ const UsersAdvanced: React.FC = () => {
 
             <div className="space-y-4">
               <div className="text-center">
-                <div className="h-16 w-16 rounded-full bg-gray-300 flex items-center justify-center mx-auto mb-3">
-                  <span className="text-xl font-medium text-gray-700">
+                <div className="h-16 w-16 rounded-full bg-gray-300 dark:bg-gray-600 flex items-center justify-center mx-auto mb-3">
+                  <span className="text-xl font-medium text-gray-700 dark:text-gray-300">
                     {viewingUser.prenom[0]}
                     {viewingUser.nom[0]}
                   </span>
                 </div>
-                <h3 className="text-lg font-semibold">
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
                   {viewingUser.prenom} {viewingUser.nom}
                 </h3>
-                <p className="text-gray-500">{viewingUser.email}</p>
+                <p className="text-gray-500 dark:text-gray-400">{viewingUser.email}</p>
               </div>
 
-              <div className="grid grid-cols-2 gap-4 pt-4 border-t">
+              <div className="grid grid-cols-2 gap-4 pt-4 border-t dark:border-gray-700">
                 <div>
-                  <span className="text-sm font-medium text-gray-500">
+                  <span className="text-sm font-medium text-gray-500 dark:text-gray-400">
                     Rôle:
                   </span>
-                  <p className="text-gray-900">
+                  <p className="text-gray-900 dark:text-white">
                     {getRoleBadge(viewingUser.role).label}
                   </p>
                 </div>
                 <div>
-                  <span className="text-sm font-medium text-gray-500">
+                  <span className="text-sm font-medium text-gray-500 dark:text-gray-400">
                     Statut:
                   </span>
-                  <p className="text-gray-900">
+                  <p className="text-gray-900 dark:text-white">
                     {viewingUser.active ? "Actif" : "Inactif"}
                   </p>
                 </div>
                 <div>
-                  <span className="text-sm font-medium text-gray-500">
+                  <span className="text-sm font-medium text-gray-500 dark:text-gray-400">
                     Créé le:
                   </span>
-                  <p className="text-gray-900">
+                  <p className="text-gray-900 dark:text-white">
                     {new Date(viewingUser.created_at).toLocaleDateString(
                       "fr-FR"
                     )}
                   </p>
                 </div>
                 <div>
-                  <span className="text-sm font-medium text-gray-500">
+                  <span className="text-sm font-medium text-gray-500 dark:text-gray-400">
                     Dernière connexion:
                   </span>
-                  <p className="text-gray-900">
+                  <p className="text-gray-900 dark:text-white">
                     {viewingUser.last_login
                       ? new Date(viewingUser.last_login).toLocaleDateString(
                           "fr-FR"
@@ -840,24 +840,24 @@ const UsersAdvanced: React.FC = () => {
       {/* Password Reset Modal */}
       {showPasswordModal && resetPasswordUser && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 w-full max-w-md">
+          <div className="bg-white dark:bg-gray-800 rounded-lg p-6 w-full max-w-md">
             <div className="flex items-center space-x-3 mb-4">
               <KeyIcon className="w-6 h-6 text-orange-600" />
-              <h2 className="text-xl font-bold">
+              <h2 className="text-xl font-bold text-gray-900 dark:text-white">
                 Réinitialiser le mot de passe
               </h2>
             </div>
 
-            <p className="text-gray-600 mb-4">
+            <p className="text-gray-600 dark:text-gray-400 mb-4">
               Utilisateur:{" "}
-              <span className="font-medium">
+              <span className="font-medium text-gray-900 dark:text-white">
                 {resetPasswordUser.prenom} {resetPasswordUser.nom}
               </span>
             </p>
 
             <form onSubmit={handlePasswordReset} className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                   Nouveau mot de passe *
                 </label>
                 <input
@@ -869,14 +869,14 @@ const UsersAdvanced: React.FC = () => {
                       newPassword: e.target.value,
                     })
                   }
-                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:placeholder-gray-400"
                   required
                   minLength={6}
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                   Confirmer le mot de passe *
                 </label>
                 <input
@@ -888,7 +888,7 @@ const UsersAdvanced: React.FC = () => {
                       confirmPassword: e.target.value,
                     })
                   }
-                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:placeholder-gray-400"
                   required
                   minLength={6}
                 />
@@ -898,7 +898,7 @@ const UsersAdvanced: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => setShowPasswordModal(false)}
-                  className="px-4 py-2 text-gray-700 bg-gray-200 rounded-md hover:bg-gray-300"
+                  className="px-4 py-2 text-gray-700 bg-gray-200 rounded-md hover:bg-gray-300 dark:bg-gray-600 dark:text-gray-300 dark:hover:bg-gray-500"
                 >
                   Annuler
                 </button>
