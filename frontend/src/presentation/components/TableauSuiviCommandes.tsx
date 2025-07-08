@@ -385,11 +385,11 @@ const TableauSuiviCommandes: React.FC = () => {
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
           </div>
         ) : (
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
+          <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+            <thead className="bg-gray-50 dark:bg-gray-700">
               <tr>
                 <th 
-                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
+                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600"
                   onClick={() => {
                     if (sortBy === 'numero_commande') {
                       setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
@@ -402,7 +402,7 @@ const TableauSuiviCommandes: React.FC = () => {
                   N° Commande
                 </th>
                 <th 
-                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
+                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600"
                   onClick={() => {
                     if (sortBy === 'fournisseur') {
                       setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
@@ -414,42 +414,42 @@ const TableauSuiviCommandes: React.FC = () => {
                 >
                   Fournisseur
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Statut</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Dates</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Montant</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Priorité</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Progression</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Alertes</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Statut</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Dates</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Montant</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Priorité</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Progression</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Alertes</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Actions</th>
               </tr>
             </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
+            <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
               {commandesFiltered.map((commande) => (
-                <tr key={commande.id} className={`hover:bg-gray-50 ${commande.priorite === 'critique' ? 'bg-red-50' : commande.priorite === 'urgent' ? 'bg-yellow-50' : ''}`}>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                <tr key={commande.id} className={`hover:bg-gray-50 dark:hover:bg-gray-700 ${commande.priorite === 'critique' ? 'bg-red-50 dark:bg-red-900/20' : commande.priorite === 'urgent' ? 'bg-yellow-50 dark:bg-yellow-900/20' : ''}`}>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">
                     {commande.numero_commande}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
                     <div className="flex flex-col">
                       <span className="font-medium">{commande.fournisseur.nom}</span>
-                      <span className="text-xs text-gray-500">{commande.fournisseur.code_fournisseur}</span>
+                      <span className="text-xs text-gray-500 dark:text-gray-400">{commande.fournisseur.code_fournisseur}</span>
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     {getStatusBadge(commande.status)}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
                     <div className="flex flex-col">
                       <span>Cmd: {new Date(commande.date_commande).toLocaleDateString('fr-FR')}</span>
-                      <span className={`text-xs ${commande.retard_jours > 0 ? 'text-red-600 font-medium' : 'text-gray-500'}`}>
+                      <span className={`text-xs ${commande.retard_jours > 0 ? 'text-red-600 dark:text-red-400 font-medium' : 'text-gray-500 dark:text-gray-400'}`}>
                         Prév: {new Date(commande.date_livraison_prevue).toLocaleDateString('fr-FR')}
                       </span>
                     </div>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
                     <div className="flex flex-col">
                       <span className="font-medium">{commande.total_ttc.toLocaleString()}€</span>
-                      <span className="text-xs text-gray-500">{commande.nb_articles} articles</span>
+                      <span className="text-xs text-gray-500 dark:text-gray-400">{commande.nb_articles} articles</span>
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
@@ -457,7 +457,7 @@ const TableauSuiviCommandes: React.FC = () => {
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex items-center">
-                      <div className="w-full bg-gray-200 rounded-full h-2 mr-2">
+                      <div className="w-full bg-gray-200 dark:bg-gray-600 rounded-full h-2 mr-2">
                         <div 
                           className={`h-2 rounded-full ${
                             commande.progression === 100 ? 'bg-green-600' : 
@@ -467,29 +467,29 @@ const TableauSuiviCommandes: React.FC = () => {
                           style={{ width: `${commande.progression}%` }}
                         ></div>
                       </div>
-                      <span className="text-xs text-gray-600">{commande.progression}%</span>
+                      <span className="text-xs text-gray-600 dark:text-gray-400">{commande.progression}%</span>
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     {commande.alertes.length > 0 ? (
                       <div className="flex flex-col space-y-1">
                         {commande.alertes.slice(0, 2).map((alerte, index) => (
-                          <span key={index} className="text-xs bg-red-100 text-red-800 px-2 py-1 rounded">
+                          <span key={index} className="text-xs bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300 px-2 py-1 rounded">
                             {alerte}
                           </span>
                         ))}
                         {commande.alertes.length > 2 && (
-                          <span className="text-xs text-gray-500">+{commande.alertes.length - 2} autres</span>
+                          <span className="text-xs text-gray-500 dark:text-gray-400">+{commande.alertes.length - 2} autres</span>
                         )}
                       </div>
                     ) : (
-                      <span className="text-xs text-green-600">Aucune alerte</span>
+                      <span className="text-xs text-green-600 dark:text-green-400">Aucune alerte</span>
                     )}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
                     <button
                       onClick={() => openModal(commande)}
-                      className="text-blue-600 hover:text-blue-900"
+                      className="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300"
                     >
                       <EyeIcon className="h-4 w-4" />
                     </button>
