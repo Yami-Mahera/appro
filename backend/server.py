@@ -121,6 +121,14 @@ class Token(BaseModel):
     token_type: str
     user: User
 
+class UsersResponse(BaseModel):
+    users: List[User]
+    total: int
+    limit: int
+    skip: int
+    has_next: bool
+    has_previous: bool
+
 # Fournisseur Models
 class Contact(BaseModel):
     nom: str
