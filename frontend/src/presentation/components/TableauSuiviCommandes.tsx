@@ -258,15 +258,15 @@ const TableauSuiviCommandes: React.FC = () => {
   };
 
   return (
-    <div className="bg-white rounded-lg shadow-sm">
+    <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm">
       {/* En-tête */}
-      <div className="px-6 py-4 border-b border-gray-200">
+      <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
         <div className="flex items-center justify-between">
           <div>
-            <h2 className="text-xl font-semibold text-gray-900">
+            <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
               Tableau de suivi des commandes en cours
             </h2>
-            <p className="text-sm text-gray-600 mt-1">
+            <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
               Suivi temps réel avec alertes de retard et niveaux de priorité
             </p>
           </div>
@@ -288,7 +288,7 @@ const TableauSuiviCommandes: React.FC = () => {
             <select
               value={filters.status}
               onChange={(e) => setFilters({ ...filters, status: e.target.value })}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md text-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
             >
               <option value="">Tous les statuts</option>
               <option value="en_attente">En attente</option>
@@ -303,7 +303,7 @@ const TableauSuiviCommandes: React.FC = () => {
               placeholder="Fournisseur..."
               value={filters.fournisseur}
               onChange={(e) => setFilters({ ...filters, fournisseur: e.target.value })}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md text-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
             />
           </div>
           
@@ -311,7 +311,7 @@ const TableauSuiviCommandes: React.FC = () => {
             <select
               value={filters.priorite}
               onChange={(e) => setFilters({ ...filters, priorite: e.target.value })}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md text-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
             >
               <option value="">Toutes priorités</option>
               <option value="normale">Normale</option>
@@ -324,7 +324,7 @@ const TableauSuiviCommandes: React.FC = () => {
             <select
               value={filters.retard}
               onChange={(e) => setFilters({ ...filters, retard: e.target.value })}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md text-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
             >
               <option value="">Tous retards</option>
               <option value="avec_retard">Avec retard</option>
@@ -337,7 +337,7 @@ const TableauSuiviCommandes: React.FC = () => {
               type="date"
               value={filters.dateDebut}
               onChange={(e) => setFilters({ ...filters, dateDebut: e.target.value })}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md text-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
             />
           </div>
           
@@ -346,32 +346,32 @@ const TableauSuiviCommandes: React.FC = () => {
               type="date"
               value={filters.dateFin}
               onChange={(e) => setFilters({ ...filters, dateFin: e.target.value })}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md text-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
             />
           </div>
         </div>
 
         {/* Statistiques rapides */}
         <div className="mt-4 grid grid-cols-1 md:grid-cols-4 gap-4">
-          <div className="bg-blue-50 p-3 rounded-lg">
-            <div className="text-sm font-medium text-blue-900">Total commandes</div>
-            <div className="text-2xl font-bold text-blue-600">{commandesFiltered.length}</div>
+          <div className="bg-blue-50 dark:bg-blue-900/20 p-3 rounded-lg">
+            <div className="text-sm font-medium text-blue-900 dark:text-blue-100">Total commandes</div>
+            <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">{commandesFiltered.length}</div>
           </div>
-          <div className="bg-red-50 p-3 rounded-lg">
-            <div className="text-sm font-medium text-red-900">En retard</div>
-            <div className="text-2xl font-bold text-red-600">
+          <div className="bg-red-50 dark:bg-red-900/20 p-3 rounded-lg">
+            <div className="text-sm font-medium text-red-900 dark:text-red-100">En retard</div>
+            <div className="text-2xl font-bold text-red-600 dark:text-red-400">
               {commandesFiltered.filter(cmd => cmd.retard_jours > 0).length}
             </div>
           </div>
-          <div className="bg-yellow-50 p-3 rounded-lg">
-            <div className="text-sm font-medium text-yellow-900">Priorité urgente</div>
-            <div className="text-2xl font-bold text-yellow-600">
+          <div className="bg-yellow-50 dark:bg-yellow-900/20 p-3 rounded-lg">
+            <div className="text-sm font-medium text-yellow-900 dark:text-yellow-100">Priorité urgente</div>
+            <div className="text-2xl font-bold text-yellow-600 dark:text-yellow-400">
               {commandesFiltered.filter(cmd => cmd.priorite === 'urgent' || cmd.priorite === 'critique').length}
             </div>
           </div>
-          <div className="bg-green-50 p-3 rounded-lg">
-            <div className="text-sm font-medium text-green-900">Valeur totale</div>
-            <div className="text-2xl font-bold text-green-600">
+          <div className="bg-green-50 dark:bg-green-900/20 p-3 rounded-lg">
+            <div className="text-sm font-medium text-green-900 dark:text-green-100">Valeur totale</div>
+            <div className="text-2xl font-bold text-green-600 dark:text-green-400">
               {commandesFiltered.reduce((sum, cmd) => sum + cmd.total_ttc, 0).toLocaleString()}€
             </div>
           </div>
