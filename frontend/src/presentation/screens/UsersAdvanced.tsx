@@ -27,12 +27,28 @@ interface User {
   last_login?: string;
 }
 
+interface UsersResponse {
+  users: User[];
+  total: number;
+  limit: number;
+  skip: number;
+  has_next: boolean;
+  has_previous: boolean;
+}
+
 type SortField = "nom" | "prenom" | "email" | "role" | "created_at";
 type SortOrder = "asc" | "desc";
 
 const UsersAdvanced: React.FC = () => {
   const { user: currentUser } = useAuth();
-  const [users, setUsers] = useState<User[]>([]);
+  const [usersData, setUsersData] = useState<UsersResponse>({
+    users: [],
+    total: 0,
+    limit: 10,
+    skip: 0,
+    has_next: false,
+    has_previous: false,
+  });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showModal, setShowModal] = useState(false);
@@ -42,6 +58,10 @@ const UsersAdvanced: React.FC = () => {
   const [viewingUser, setViewingUser] = useState<User | null>(null);
   const [resetPasswordUser, setResetPasswordUser] = useState<User | null>(null);
   const [showFilters, setShowFilters] = useState(false);
+
+  // Pagination states
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
 
   // Vérifier si l'utilisateur actuel est administrateur
   const isAdmin = currentUser?.role === "administrateur";
