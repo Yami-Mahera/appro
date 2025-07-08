@@ -455,34 +455,34 @@ const TableauSimulationCommande: React.FC = () => {
 
       {/* Résumé de simulation */}
       {lignes.length > 0 && (
-        <div className="px-6 py-4 border-t border-gray-200 bg-gray-50">
+        <div className="px-6 py-4 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <div className="bg-white p-4 rounded-lg">
-              <h4 className="text-sm font-medium text-gray-700">Total HT</h4>
-              <p className="text-2xl font-bold text-gray-900">{simulationSummary.totalHT.toFixed(2)}€</p>
+            <div className="bg-white dark:bg-gray-800 p-4 rounded-lg">
+              <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300">Total HT</h4>
+              <p className="text-2xl font-bold text-gray-900 dark:text-white">{simulationSummary.totalHT.toFixed(2)}€</p>
             </div>
-            <div className="bg-white p-4 rounded-lg">
-              <h4 className="text-sm font-medium text-gray-700">Total TTC</h4>
-              <p className="text-2xl font-bold text-gray-900">{simulationSummary.totalTTC.toFixed(2)}€</p>
+            <div className="bg-white dark:bg-gray-800 p-4 rounded-lg">
+              <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300">Total TTC</h4>
+              <p className="text-2xl font-bold text-gray-900 dark:text-white">{simulationSummary.totalTTC.toFixed(2)}€</p>
             </div>
-            <div className="bg-white p-4 rounded-lg">
-              <h4 className="text-sm font-medium text-gray-700">Validations</h4>
-              <p className="text-2xl font-bold text-gray-900">
+            <div className="bg-white dark:bg-gray-800 p-4 rounded-lg">
+              <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300">Validations</h4>
+              <p className="text-2xl font-bold text-gray-900 dark:text-white">
                 {simulationSummary.validationsReussies}/{simulationSummary.nombreArticles}
               </p>
             </div>
-            <div className="bg-white p-4 rounded-lg">
-              <h4 className="text-sm font-medium text-gray-700">Alertes</h4>
-              <p className="text-2xl font-bold text-red-600">{simulationSummary.alertes.length}</p>
+            <div className="bg-white dark:bg-gray-800 p-4 rounded-lg">
+              <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300">Alertes</h4>
+              <p className="text-2xl font-bold text-red-600 dark:text-red-400">{simulationSummary.alertes.length}</p>
             </div>
           </div>
           
           {simulationSummary.alertes.length > 0 && (
             <div className="mt-4">
-              <h4 className="text-sm font-medium text-gray-700 mb-2">Alertes détaillées:</h4>
+              <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Alertes détaillées:</h4>
               <div className="space-y-1">
                 {simulationSummary.alertes.map((alerte, index) => (
-                  <div key={index} className="text-sm text-red-600 bg-red-50 px-3 py-1 rounded">
+                  <div key={index} className="text-sm text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/20 px-3 py-1 rounded">
                     {alerte}
                   </div>
                 ))}
@@ -495,7 +495,7 @@ const TableauSimulationCommande: React.FC = () => {
       {/* État vide */}
       {lignes.length === 0 && (
         <div className="px-6 py-12 text-center">
-          <p className="text-gray-500">
+          <p className="text-gray-500 dark:text-gray-400">
             Aucune ligne de commande. Sélectionnez un fournisseur et cliquez sur "Ajouter ligne" pour commencer.
           </p>
         </div>
