@@ -859,14 +859,14 @@ async def get_current_user_info(current_user: User = Depends(get_current_user)):
     return current_user
 
 # Users Management Routes
-@api_router.get("/users", response_model=List[User])
+@api_router.get("/users", response_model=UsersResponse)
 async def get_users(
     search: Optional[str] = None,
     sort_by: Optional[str] = "nom",
     sort_order: Optional[str] = "asc",
     role: Optional[UserRole] = None,
     active: Optional[bool] = None,
-    limit: Optional[int] = 1000,
+    limit: Optional[int] = 10,
     skip: Optional[int] = 0,
     current_user: User = Depends(require_roles([UserRole.ADMIN]))
 ):
@@ -889,8 +889,25 @@ async def get_users(
     sort_direction = 1 if sort_order == "asc" else -1
     sort_criteria = [(sort_by, sort_direction)]
     
+    # Get total count
+    total = await db.users.count_documents(query)
+    
+    # Get users
     users = await db.users.find(query).sort(sort_criteria).skip(skip).limit(limit).to_list(limit)
-    return [User(**u) for u in users]
+    users_list = [User(**u) for u in users]
+    
+    # Calculate pagination flags
+    has_next = skip + limit < total
+    has_previous = skip > 0
+    
+    return UsersResponse(
+        users=users_list,
+        total=total,
+        limit=limit,
+        skip=skip,
+        has_next=has_next,
+        has_previous=has_previous
+    )
 
 @api_router.post("/users", response_model=User)
 async def create_user(
