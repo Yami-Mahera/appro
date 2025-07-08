@@ -8,6 +8,7 @@ import {
   AdjustmentsHorizontalIcon
 } from '@heroicons/react/24/outline';
 import ApiService from '../../services/api';
+import Pagination from '../components/Pagination';
 
 interface ReportData {
   fournisseurs?: any[];
