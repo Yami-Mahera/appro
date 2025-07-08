@@ -4,13 +4,83 @@ from datetime import datetime, timedelta
 
 # Configuration
 BASE_URL = "http://localhost:8001/api"
+ADMIN_USER = {
+    "email": "admin@test.com",
+    "password": "admin123"
+}
+
+def authenticate():
+    print("Authenticating...")
+    response = requests.post(f"{BASE_URL}/auth/login", json=ADMIN_USER)
+    
+    if response.status_code == 200:
+        data = response.json()
+        if "access_token" in data:
+            print("✅ Authentication successful")
+            return data["access_token"]
+        else:
+            print("❌ Authentication failed - No access token in response")
+            print(f"   Response: {data}")
+            return None
+    elif response.status_code == 401:
+        print("❌ Authentication failed - Invalid credentials")
+        print("Trying to register the admin user...")
+        
+        # Try to register the admin user
+        register_data = {
+            "email": ADMIN_USER["email"],
+            "password": ADMIN_USER["password"],
+            "nom": "Admin",
+            "prenom": "Test",
+            "role": "administrateur"
+        }
+        
+        register_response = requests.post(f"{BASE_URL}/auth/register", json=register_data)
+        
+        if register_response.status_code == 200:
+            print("✅ Admin user registered successfully")
+            # Try to login again
+            login_response = requests.post(f"{BASE_URL}/auth/login", json=ADMIN_USER)
+            
+            if login_response.status_code == 200:
+                login_data = login_response.json()
+                if "access_token" in login_data:
+                    print("✅ Authentication successful after registration")
+                    return login_data["access_token"]
+                else:
+                    print("❌ Authentication failed after registration - No access token in response")
+                    print(f"   Response: {login_data}")
+                    return None
+            else:
+                print(f"❌ Authentication failed after registration - Status code: {login_response.status_code}")
+                print(f"   Response: {login_response.text}")
+                return None
+        else:
+            print(f"❌ Failed to register admin user - Status code: {register_response.status_code}")
+            print(f"   Response: {register_response.text}")
+            return None
+    else:
+        print(f"❌ Authentication failed - Status code: {response.status_code}")
+        print(f"   Response: {response.text}")
+        return None
 
 def test_commandes_pagination():
     print("Testing commandes pagination API...")
     
+    # Authenticate first
+    token = authenticate()
+    if not token:
+        print("Cannot proceed with tests without authentication")
+        return
+    
+    # Set up headers with authentication token
+    headers = {
+        "Authorization": f"Bearer {token}"
+    }
+    
     # Test 1: Basic pagination - limit and skip
     print("\nTest 1: GET /api/commandes?limit=5&skip=0")
-    response = requests.get(f"{BASE_URL}/commandes?limit=5&skip=0")
+    response = requests.get(f"{BASE_URL}/commandes?limit=5&skip=0", headers=headers)
     
     if response.status_code == 200:
         data = response.json()
@@ -42,7 +112,7 @@ def test_commandes_pagination():
     
     # Test 2: Next page - limit=5, skip=5
     print("\nTest 2: GET /api/commandes?limit=5&skip=5")
-    response = requests.get(f"{BASE_URL}/commandes?limit=5&skip=5")
+    response = requests.get(f"{BASE_URL}/commandes?limit=5&skip=5", headers=headers)
     
     if response.status_code == 200:
         data = response.json()
@@ -65,7 +135,7 @@ def test_commandes_pagination():
     
     # Test 3: Filter by status
     print("\nTest 3: GET /api/commandes?status=brouillon&limit=5&skip=0")
-    response = requests.get(f"{BASE_URL}/commandes?status=brouillon&limit=5&skip=0")
+    response = requests.get(f"{BASE_URL}/commandes?status=brouillon&limit=5&skip=0", headers=headers)
     
     if response.status_code == 200:
         data = response.json()
@@ -93,7 +163,7 @@ def test_commandes_pagination():
     date_from = (datetime.now() - timedelta(days=30)).isoformat()
     date_to = datetime.now().isoformat()
     
-    response = requests.get(f"{BASE_URL}/commandes?date_from={date_from}&date_to={date_to}&limit=5&skip=0")
+    response = requests.get(f"{BASE_URL}/commandes?date_from={date_from}&date_to={date_to}&limit=5&skip=0", headers=headers)
     
     if response.status_code == 200:
         data = response.json()
