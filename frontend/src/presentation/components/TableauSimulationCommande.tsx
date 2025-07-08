@@ -394,7 +394,7 @@ const TableauSimulationCommande: React.FC = () => {
               </tr>
             </thead>
             <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
-              {lignes.map((ligne) => (
+              {paginatedLignes.map((ligne) => (
                 <tr key={ligne.id} className={`hover:bg-gray-50 dark:hover:bg-gray-700 ${ligne.status === 'erreur' ? 'bg-red-50 dark:bg-red-900/20' : ligne.status === 'attention' ? 'bg-yellow-50 dark:bg-yellow-900/20' : ''}`}>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <select
