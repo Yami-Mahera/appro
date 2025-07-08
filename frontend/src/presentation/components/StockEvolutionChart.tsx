@@ -44,7 +44,7 @@ const StockEvolutionChart: React.FC<StockEvolutionChartProps> = ({ className = '
   const fetchArticles = async () => {
     try {
       const response = await apiService.getArticles({ limit: 100 });
-      setArticles(response);
+      setArticles(response.articles || []);
     } catch (error) {
       console.error('Error fetching articles:', error);
       setError('Erreur lors du chargement des articles');
