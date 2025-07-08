@@ -106,7 +106,8 @@ const ArticlesAdvanced: React.FC = () => {
 
   const loadFournisseurs = async () => {
     try {
-      const data = await ApiService.getFournisseurs();
+      const response = await ApiService.getFournisseurs();
+      const data = response.fournisseurs || response;
       setFournisseurs(data);
     } catch (err: any) {
       setError(
