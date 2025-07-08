@@ -21,7 +21,7 @@ def login():
     print_header("Authenticating")
     login_data = {
         "email": "admin@test.com",
-        "password": "password"
+        "password": "admin123"
     }
     
     response = requests.post(f"{BASE_URL}/auth/login", json=login_data)
