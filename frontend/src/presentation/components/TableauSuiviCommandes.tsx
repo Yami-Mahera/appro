@@ -71,7 +71,7 @@ const TableauSuiviCommandes: React.FC = () => {
 
   useEffect(() => {
     applyFilters();
-  }, [commandes, filters, sortBy, sortOrder]);
+  }, [commandes, filters, sortBy, sortOrder, currentPage, itemsPerPage]);
 
   const loadData = async () => {
     try {
