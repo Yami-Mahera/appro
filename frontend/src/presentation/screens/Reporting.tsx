@@ -29,6 +29,10 @@ const Reporting: React.FC = () => {
     date_to: ''
   });
 
+  // Pagination states
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
+
   useEffect(() => {
     loadReport();
   }, [activeReport, dateRange]);
