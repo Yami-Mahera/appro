@@ -785,12 +785,12 @@ const CommandesAdvanced: React.FC = () => {
       {/* Detail Modal */}
       {showDetailModal && viewingCommande && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 w-full max-w-4xl max-h-[90vh] overflow-y-auto">
+          <div className="bg-white dark:bg-gray-800 rounded-lg p-6 w-full max-w-4xl max-h-[90vh] overflow-y-auto">
             <div className="flex justify-between items-center mb-4">
-              <h2 className="text-xl font-bold">Détails de la commande</h2>
+              <h2 className="text-xl font-bold text-gray-900 dark:text-white">Détails de la commande</h2>
               <button
                 onClick={() => setShowDetailModal(false)}
-                className="text-gray-400 hover:text-gray-600"
+                className="text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300"
               >
                 ✕
               </button>
@@ -800,15 +800,15 @@ const CommandesAdvanced: React.FC = () => {
               {/* Header Info */}
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <span className="text-sm font-medium text-gray-500">N° Commande:</span>
-                  <p className="text-gray-900 font-semibold">{viewingCommande.numero_commande}</p>
+                  <span className="text-sm font-medium text-gray-500 dark:text-gray-400">N° Commande:</span>
+                  <p className="text-gray-900 dark:text-white font-semibold">{viewingCommande.numero_commande}</p>
                 </div>
                 <div>
-                  <span className="text-sm font-medium text-gray-500">Fournisseur:</span>
-                  <p className="text-gray-900">{getFournisseurNom(viewingCommande.fournisseur_id)}</p>
+                  <span className="text-sm font-medium text-gray-500 dark:text-gray-400">Fournisseur:</span>
+                  <p className="text-gray-900 dark:text-white">{getFournisseurNom(viewingCommande.fournisseur_id)}</p>
                 </div>
                 <div>
-                  <span className="text-sm font-medium text-gray-500">Statut:</span>
+                  <span className="text-sm font-medium text-gray-500 dark:text-gray-400">Statut:</span>
                   <p>
                     <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusColor(viewingCommande.status)}`}>
                       {getStatusLabel(viewingCommande.status)}
@@ -816,28 +816,28 @@ const CommandesAdvanced: React.FC = () => {
                   </p>
                 </div>
                 <div>
-                  <span className="text-sm font-medium text-gray-500">Date de création:</span>
-                  <p className="text-gray-900">{new Date(viewingCommande.created_at).toLocaleDateString('fr-FR')}</p>
+                  <span className="text-sm font-medium text-gray-500 dark:text-gray-400">Date de création:</span>
+                  <p className="text-gray-900 dark:text-white">{new Date(viewingCommande.created_at).toLocaleDateString('fr-FR')}</p>
                 </div>
               </div>
 
               {/* Dates */}
               <div className="grid grid-cols-3 gap-4">
                 <div>
-                  <span className="text-sm font-medium text-gray-500">Date commande:</span>
-                  <p className="text-gray-900">
+                  <span className="text-sm font-medium text-gray-500 dark:text-gray-400">Date commande:</span>
+                  <p className="text-gray-900 dark:text-white">
                     {viewingCommande.date_commande ? new Date(viewingCommande.date_commande).toLocaleDateString('fr-FR') : '-'}
                   </p>
                 </div>
                 <div>
-                  <span className="text-sm font-medium text-gray-500">Livraison prévue:</span>
-                  <p className="text-gray-900">
+                  <span className="text-sm font-medium text-gray-500 dark:text-gray-400">Livraison prévue:</span>
+                  <p className="text-gray-900 dark:text-white">
                     {viewingCommande.date_livraison_prevue ? new Date(viewingCommande.date_livraison_prevue).toLocaleDateString('fr-FR') : '-'}
                   </p>
                 </div>
                 <div>
-                  <span className="text-sm font-medium text-gray-500">Livraison réelle:</span>
-                  <p className="text-gray-900">
+                  <span className="text-sm font-medium text-gray-500 dark:text-gray-400">Livraison réelle:</span>
+                  <p className="text-gray-900 dark:text-white">
                     {viewingCommande.date_livraison_reelle ? new Date(viewingCommande.date_livraison_reelle).toLocaleDateString('fr-FR') : '-'}
                   </p>
                 </div>
@@ -845,30 +845,30 @@ const CommandesAdvanced: React.FC = () => {
 
               {/* Articles */}
               <div>
-                <h3 className="text-lg font-semibold mb-3">Articles commandés</h3>
-                <div className="border border-gray-200 rounded-lg overflow-hidden">
-                  <table className="min-w-full divide-y divide-gray-200">
-                    <thead className="bg-gray-50">
+                <h3 className="text-lg font-semibold mb-3 text-gray-900 dark:text-white">Articles commandés</h3>
+                <div className="border border-gray-200 dark:border-gray-600 rounded-lg overflow-hidden">
+                  <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-600">
+                    <thead className="bg-gray-50 dark:bg-gray-700">
                       <tr>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Article</th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Prix unitaire</th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Quantité</th>
-                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Article</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Prix unitaire</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Quantité</th>
+                        <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Total</th>
                       </tr>
                     </thead>
                     <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
                       {viewingCommande.lignes.map((ligne, index) => (
                         <tr key={index}>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-300">
                             {getArticleNom(ligne.article_id)}
                           </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-300">
                             {ligne.prix_unitaire.toFixed(2)}€
                           </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-300">
                             {ligne.quantite}
                           </td>
-                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                          <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-300">
                             {ligne.total.toFixed(2)}€
                           </td>
                         </tr>
@@ -877,18 +877,18 @@ const CommandesAdvanced: React.FC = () => {
                   </table>
                   
                   {/* Totals */}
-                  <div className="bg-gray-50 px-6 py-3">
+                  <div className="bg-gray-50 dark:bg-gray-700 px-6 py-3">
                     <div className="flex justify-between items-center">
-                      <span className="text-sm font-medium text-gray-700">Total HT:</span>
-                      <span className="text-sm font-semibold text-gray-900">{viewingCommande.total_ht.toFixed(2)}€</span>
+                      <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Total HT:</span>
+                      <span className="text-sm font-semibold text-gray-900 dark:text-white">{viewingCommande.total_ht.toFixed(2)}€</span>
                     </div>
                     <div className="flex justify-between items-center">
-                      <span className="text-sm font-medium text-gray-700">TVA ({viewingCommande.taux_tva}%):</span>
-                      <span className="text-sm font-semibold text-gray-900">{(viewingCommande.total_ttc - viewingCommande.total_ht).toFixed(2)}€</span>
+                      <span className="text-sm font-medium text-gray-700 dark:text-gray-300">TVA ({viewingCommande.taux_tva}%):</span>
+                      <span className="text-sm font-semibold text-gray-900 dark:text-white">{(viewingCommande.total_ttc - viewingCommande.total_ht).toFixed(2)}€</span>
                     </div>
-                    <div className="flex justify-between items-center border-t border-gray-200 pt-2 mt-2">
-                      <span className="text-base font-semibold text-gray-900">Total TTC:</span>
-                      <span className="text-base font-bold text-gray-900">{viewingCommande.total_ttc.toFixed(2)}€</span>
+                    <div className="flex justify-between items-center border-t border-gray-200 dark:border-gray-600 pt-2 mt-2">
+                      <span className="text-base font-semibold text-gray-900 dark:text-white">Total TTC:</span>
+                      <span className="text-base font-bold text-gray-900 dark:text-white">{viewingCommande.total_ttc.toFixed(2)}€</span>
                     </div>
                   </div>
                 </div>
@@ -897,8 +897,8 @@ const CommandesAdvanced: React.FC = () => {
               {/* Notes */}
               {viewingCommande.notes && (
                 <div>
-                  <span className="text-sm font-medium text-gray-500">Notes:</span>
-                  <p className="text-gray-900 mt-1">{viewingCommande.notes}</p>
+                  <span className="text-sm font-medium text-gray-500 dark:text-gray-400">Notes:</span>
+                  <p className="text-gray-900 dark:text-white mt-1">{viewingCommande.notes}</p>
                 </div>
               )}
             </div>
