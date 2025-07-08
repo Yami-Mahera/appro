@@ -192,6 +192,17 @@ const CommandesAdvanced: React.FC = () => {
       setSortField(field);
       setSortOrder('asc');
     }
+    setCurrentPage(1); // Reset to first page when sorting changes
+  };
+
+  const handleFilterChange = (newFilters: any) => {
+    setFilters(newFilters);
+    setCurrentPage(1); // Reset to first page when filters change
+  };
+
+  const handleSearchChange = (term: string) => {
+    setSearchTerm(term);
+    setCurrentPage(1); // Reset to first page when search changes
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
