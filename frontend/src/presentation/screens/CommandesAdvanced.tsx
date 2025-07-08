@@ -36,6 +36,15 @@ interface Commande {
   updated_at: string;
 }
 
+interface CommandesResponse {
+  commandes: Commande[];
+  total: number;
+  limit: number;
+  skip: number;
+  has_next: boolean;
+  has_previous: boolean;
+}
+
 interface Article {
   id: string;
   reference: string;
