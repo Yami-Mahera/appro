@@ -307,12 +307,12 @@ const TableauProjectionCouverture: React.FC<TableauProjectionCouvertureProps> = 
                   
                   {/* Ligne détaillée */}
                   {expandedRows.has(projection.semaine) && (
-                    <tr className="bg-gray-50">
+                    <tr className="bg-gray-50 dark:bg-gray-700">
                       <td colSpan={9} className="px-6 py-4">
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
                           <div className="space-y-2">
-                            <h4 className="font-medium text-gray-900">Calculs de Couverture</h4>
-                            <div className="space-y-1 text-gray-600">
+                            <h4 className="font-medium text-gray-900 dark:text-white">Calculs de Couverture</h4>
+                            <div className="space-y-1 text-gray-600 dark:text-gray-400">
                               <div>CMS (Couverture Minimale Sécurité): <span className="font-medium">{projection.cms.toFixed(2)}</span></div>
                               <div>CMC (Couverture Maximale Commande): <span className="font-medium">{projection.cmc.toFixed(2)}</span></div>
                               <div>Couverture Actuelle: <span className="font-medium">{projection.couvertureActuelle.toFixed(2)}</span></div>
@@ -320,24 +320,24 @@ const TableauProjectionCouverture: React.FC<TableauProjectionCouvertureProps> = 
                           </div>
                           
                           <div className="space-y-2">
-                            <h4 className="font-medium text-gray-900">Détails Stock</h4>
-                            <div className="space-y-1 text-gray-600">
+                            <h4 className="font-medium text-gray-900 dark:text-white">Détails Stock</h4>
+                            <div className="space-y-1 text-gray-600 dark:text-gray-400">
                               <div>Variation: <span className="font-medium">{(projection.stockFin - projection.stockDebut).toFixed(0)}</span></div>
                               <div>Rotation: <span className="font-medium">{projection.consommationPrevue > 0 ? (projection.stockFin / projection.consommationPrevue).toFixed(1) : 'N/A'} semaines</span></div>
                             </div>
                           </div>
                           
                           <div className="space-y-2">
-                            <h4 className="font-medium text-gray-900">Recommandations</h4>
-                            <div className="space-y-1 text-gray-600">
+                            <h4 className="font-medium text-gray-900 dark:text-white">Recommandations</h4>
+                            <div className="space-y-1 text-gray-600 dark:text-gray-400">
                               {projection.status === 'critique' && (
-                                <div className="text-red-600 font-medium">⚠️ Commande urgente recommandée</div>
+                                <div className="text-red-600 dark:text-red-400 font-medium">⚠️ Commande urgente recommandée</div>
                               )}
                               {projection.status === 'attention' && (
-                                <div className="text-yellow-600 font-medium">⚡ Surveiller de près</div>
+                                <div className="text-yellow-600 dark:text-yellow-400 font-medium">⚡ Surveiller de près</div>
                               )}
                               {projection.qmPrevisionnelle > 0 && (
-                                <div className="text-blue-600">📦 QM optimale: {projection.qmPrevisionnelle}</div>
+                                <div className="text-blue-600 dark:text-blue-400">📦 QM optimale: {projection.qmPrevisionnelle}</div>
                               )}
                             </div>
                           </div>
