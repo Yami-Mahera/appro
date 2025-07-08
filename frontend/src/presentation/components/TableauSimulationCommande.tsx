@@ -50,6 +50,10 @@ const TableauSimulationCommande: React.FC = () => {
     alertes: []
   });
 
+  // Pagination states
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
+
   useEffect(() => {
     loadFournisseurs();
   }, []);
