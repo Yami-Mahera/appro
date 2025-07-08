@@ -692,13 +692,13 @@ const FournisseursAdvanced: React.FC = () => {
               {/* Contacts */}
               <div>
                 <div className="flex justify-between items-center mb-3">
-                  <label className="block text-sm font-medium text-gray-700">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                     Contacts
                   </label>
                   <button
                     type="button"
                     onClick={addContact}
-                    className="text-blue-600 hover:text-blue-800 text-sm"
+                    className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 text-sm"
                   >
                     + Ajouter un contact
                   </button>
@@ -706,16 +706,16 @@ const FournisseursAdvanced: React.FC = () => {
                 {formData.contacts.map((contact, index) => (
                   <div
                     key={index}
-                    className="border border-gray-200 rounded-lg p-4 mb-3"
+                    className="border border-gray-200 dark:border-gray-600 rounded-lg p-4 mb-3 bg-gray-50 dark:bg-gray-750"
                   >
                     <div className="flex justify-between items-center mb-3">
-                      <span className="text-sm font-medium text-gray-700">
+                      <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
                         Contact {index + 1}
                       </span>
                       <button
                         type="button"
                         onClick={() => removeContact(index)}
-                        className="text-red-600 hover:text-red-800 text-sm"
+                        className="text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300 text-sm"
                       >
                         Supprimer
                       </button>
@@ -728,7 +728,7 @@ const FournisseursAdvanced: React.FC = () => {
                         onChange={(e) =>
                           updateContact(index, "nom", e.target.value)
                         }
-                        className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                        className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400"
                       />
                       <input
                         type="text"
@@ -737,7 +737,7 @@ const FournisseursAdvanced: React.FC = () => {
                         onChange={(e) =>
                           updateContact(index, "prenom", e.target.value)
                         }
-                        className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                        className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400"
                       />
                       <input
                         type="tel"
@@ -746,7 +746,7 @@ const FournisseursAdvanced: React.FC = () => {
                         onChange={(e) =>
                           updateContact(index, "telephone", e.target.value)
                         }
-                        className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                        className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400"
                       />
                       <input
                         type="email"
@@ -755,7 +755,7 @@ const FournisseursAdvanced: React.FC = () => {
                         onChange={(e) =>
                           updateContact(index, "email", e.target.value)
                         }
-                        className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                        className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400"
                       />
                       <input
                         type="text"
@@ -764,7 +764,7 @@ const FournisseursAdvanced: React.FC = () => {
                         onChange={(e) =>
                           updateContact(index, "poste", e.target.value)
                         }
-                        className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 md:col-span-2"
+                        className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 md:col-span-2"
                       />
                     </div>
                   </div>
@@ -775,13 +775,13 @@ const FournisseursAdvanced: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => setShowModal(false)}
-                  className="px-4 py-2 text-gray-700 bg-gray-200 rounded-md hover:bg-gray-300"
+                  className="px-4 py-2 text-gray-700 dark:text-gray-300 bg-gray-200 dark:bg-gray-600 rounded-md hover:bg-gray-300 dark:hover:bg-gray-500"
                 >
                   Annuler
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+                  className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-800"
                 >
                   {editingFournisseur ? "Modifier" : "Ajouter"}
                 </button>
