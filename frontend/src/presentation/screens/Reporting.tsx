@@ -35,7 +35,7 @@ const Reporting: React.FC = () => {
 
   useEffect(() => {
     loadReport();
-  }, [activeReport, dateRange]);
+  }, [activeReport, dateRange, currentPage, itemsPerPage]);
 
   const loadReport = async () => {
     try {
