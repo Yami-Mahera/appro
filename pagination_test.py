@@ -332,6 +332,9 @@ def run_tests():
         print("Authentication failed. Cannot proceed with tests.")
         return
     
+    # Test users pagination
+    test_pagination_api(token, "/users", "users")
+    
     # Test fournisseurs pagination
     test_pagination_api(token, "/fournisseurs", "fournisseurs")
     
