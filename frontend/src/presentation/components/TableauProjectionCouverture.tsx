@@ -266,7 +266,7 @@ const TableauProjectionCouverture: React.FC<TableauProjectionCouvertureProps> = 
               </tr>
             </thead>
             <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
-              {projections.map((projection) => (
+              {paginatedProjections.map((projection) => (
                 <React.Fragment key={projection.semaine}>
                   <tr className={`hover:bg-gray-50 dark:hover:bg-gray-700 ${projection.status === 'critique' ? 'bg-red-50 dark:bg-red-900/20' : projection.status === 'attention' ? 'bg-yellow-50 dark:bg-yellow-900/20' : ''}`}>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">
