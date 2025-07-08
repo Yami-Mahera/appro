@@ -749,20 +749,17 @@ frontend:
         agent: "testing"
         comment: "Le visualiseur de dashboard fonctionne correctement. Les widgets s'affichent avec leurs couleurs et données appropriées, et non plus en gris comme auparavant. Les fonctionnalités de plein écran, rafraîchissement automatique, partage et impression sont opérationnelles. Le bouton d'édition permet de basculer vers le mode édition sans problème."
 
-  - task: "Navigation Dashboard KPI"
+  - task: "Correction Mode Sombre Commandes + Pagination"
     implemented: true
-    working: true
-    file: "/app/frontend/src/App.tsx, /app/frontend/src/presentation/components/Layout.tsx"
+    working: false
+    file: "/app/frontend/src/presentation/screens/CommandesAdvanced.tsx"
     stuck_count: 0
     priority: "high"
-    needs_retesting: false
+    needs_retesting: true
     status_history:
       - working: "NA"
         agent: "main"
-        comment: "Ajouté la route /dashboards et le lien de navigation 'Dashboards KPI' avec icône PresentationChartBarIcon"
-      - working: true
-        agent: "testing"
-        comment: "La navigation vers les Dashboards KPI fonctionne correctement. L'onglet 'Dashboards KPI' est accessible depuis le dashboard principal et permet d'accéder à la liste des tableaux de bord personnalisés."
+        comment: "Correction complète du mode sombre pour la page commandes : header, filtres, tableau, modals (création/édition/détails), pagination complète avec navigation, sélecteur d'éléments par page, indicateurs de progression. Ajout interface CommandesResponse pour support API pagination backend."
 
 metadata:
   created_by: "main_agent"
