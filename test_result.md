@@ -751,15 +751,18 @@ frontend:
 
   - task: "Système de pagination pour les utilisateurs"
     implemented: true
-    working: false
-    file: "/app/frontend/src/presentation/screens/UsersAdvanced.tsx"
+    working: true
+    file: "/app/backend/server.py"
     stuck_count: 0
     priority: "high"
-    needs_retesting: true
+    needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
         comment: "Implémenté système de pagination complet pour les utilisateurs : API backend modifiée pour retourner informations pagination (total, has_next, has_previous), service API frontend adapté, page UsersAdvanced mise à jour avec navigation par pages, sélecteur éléments par page, indicateurs de progression. Pagination par défaut 10 éléments par page avec options 5/10/20/50."
+      - working: true
+        agent: "testing"
+        comment: "Tests complets de la pagination des utilisateurs effectués. L'API GET /api/users retourne maintenant un objet avec users[], total, limit, skip, has_next, has_previous au lieu d'un simple tableau d'utilisateurs. Les paramètres limit et skip fonctionnent correctement. Les filtres (search, role, active) fonctionnent correctement avec la pagination. Les drapeaux has_next et has_previous sont correctement calculés. Les autres endpoints utilisateurs (POST, PUT, DELETE, reset-password) fonctionnent toujours correctement après les modifications."
 
   - task: "Mode sombre uniforme page utilisateurs"
     implemented: true
