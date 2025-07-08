@@ -486,10 +486,22 @@ const FournisseursAdvanced: React.FC = () => {
 
         {fournisseurs.length === 0 && (
           <div className="text-center py-8">
-            <p className="text-gray-500">Aucun fournisseur trouvé</p>
+            <p className="text-gray-500 dark:text-gray-400">Aucun fournisseur trouvé</p>
           </div>
         )}
       </div>
+
+      {/* Pagination */}
+      {totalItems > 0 && (
+        <Pagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          totalItems={totalItems}
+          itemsPerPage={itemsPerPage}
+          onPageChange={handlePageChange}
+          onItemsPerPageChange={handleItemsPerPageChange}
+        />
+      )}
 
       {/* Edit/Add Modal */}
       {showModal && (
