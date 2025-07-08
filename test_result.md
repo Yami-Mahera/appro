@@ -233,6 +233,9 @@ backend:
       - working: true
         agent: "testing"
         comment: "Les APIs de pagination fonctionnent correctement. Tests réussis pour GET /api/articles?limit=5&skip=0, GET /api/articles?limit=10&skip=5, GET /api/articles?search=test&limit=5&skip=0, GET /api/fournisseurs?limit=5&skip=0, GET /api/fournisseurs?limit=10&skip=5, et GET /api/fournisseurs?search=test&limit=5&skip=0. Les paramètres limit et skip fonctionnent comme prévu, et la recherche fonctionne correctement avec la pagination. Cependant, les APIs ne retournent pas d'information sur le nombre total d'éléments, seulement un tableau d'éléments. Cela pourrait rendre plus difficile l'implémentation de la pagination côté frontend."
+      - working: true
+        agent: "testing"
+        comment: "Les APIs de pagination ont été mises à jour pour retourner des informations complètes de pagination. Tests réussis pour GET /api/articles et GET /api/fournisseurs avec différents paramètres de pagination. Les réponses incluent maintenant 'total', 'limit', 'skip', 'has_next', et 'has_previous', ce qui facilite l'implémentation de la pagination côté frontend. Les drapeaux has_next et has_previous fonctionnent correctement, indiquant s'il y a des pages suivantes ou précédentes disponibles."
         
   - task: "Nouvelles APIs de gestion avancée des stocks"
     implemented: true
