@@ -8,6 +8,7 @@ import {
   ArrowPathIcon
 } from '@heroicons/react/24/outline';
 import apiService from '../../services/api';
+import Pagination from './Pagination';
 
 interface CommandeEnCours {
   id: string;
