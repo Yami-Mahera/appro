@@ -370,7 +370,7 @@ const CommandesAdvanced: React.FC = () => {
               type="text"
               placeholder="Rechercher par numéro de commande, notes..."
               value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
+              onChange={(e) => handleSearchChange(e.target.value)}
               className="w-full pl-10 pr-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
             />
           </div>
