@@ -95,6 +95,14 @@ const CommandesAdvanced: React.FC = () => {
     date_to: ''
   });
 
+  // Pagination states
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
+  const [totalItems, setTotalItems] = useState(0);
+  const [totalPages, setTotalPages] = useState(0);
+  const [hasNext, setHasNext] = useState(false);
+  const [hasPrevious, setHasPrevious] = useState(false);
+
   const [formData, setFormData] = useState({
     fournisseur_id: '',
     lignes: [] as LigneCommande[],
