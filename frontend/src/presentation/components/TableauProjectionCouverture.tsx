@@ -45,7 +45,8 @@ const TableauProjectionCouverture: React.FC<TableauProjectionCouvertureProps> = 
 
   const loadArticles = async () => {
     try {
-      const data = await apiService.getArticles({ limit: 100 });
+      const response = await apiService.getArticles({ limit: 100 });
+      const data = response.articles || response;
       setArticles(data);
       if (!selectedArticleId && data.length > 0) {
         setSelectedArticleId(data[0].id);
