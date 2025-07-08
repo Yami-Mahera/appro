@@ -114,18 +114,18 @@ const GestionStocksAvancee: React.FC = () => {
       </div>
 
       {/* Informations sur les modalités de calcul */}
-      <div className="bg-gray-50 p-6 rounded-lg">
-        <h3 className="text-lg font-medium text-gray-900 mb-4">
+      <div className="bg-gray-50 dark:bg-gray-700 p-6 rounded-lg">
+        <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">
           Modalités de Calcul - Rappel des Formules
         </h3>
         
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          <div className="bg-white p-4 rounded-lg">
-            <h4 className="font-medium text-blue-900 mb-2">CMS - Couverture Minimale de Sécurité</h4>
-            <p className="text-sm text-gray-600 mb-2">
+          <div className="bg-white dark:bg-gray-800 p-4 rounded-lg">
+            <h4 className="font-medium text-blue-900 dark:text-blue-100 mb-2">CMS - Couverture Minimale de Sécurité</h4>
+            <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">
               <strong>Formule:</strong> CMS = VL × (1+Vp) + H × Vp
             </p>
-            <div className="text-xs text-gray-500 space-y-1">
+            <div className="text-xs text-gray-500 dark:text-gray-400 space-y-1">
               <div><strong>VL:</strong> Variation logistique</div>
               <div><strong>Vp:</strong> Variation de la prévision</div>
               <div><strong>H:</strong> Horizon (délai d'acheminement)</div>
@@ -133,44 +133,44 @@ const GestionStocksAvancee: React.FC = () => {
             </div>
           </div>
           
-          <div className="bg-white p-4 rounded-lg">
-            <h4 className="font-medium text-green-900 mb-2">CMC - Couverture Maximale Commande</h4>
-            <p className="text-sm text-gray-600 mb-2">
+          <div className="bg-white dark:bg-gray-800 p-4 rounded-lg">
+            <h4 className="font-medium text-green-900 dark:text-green-100 mb-2">CMC - Couverture Maximale Commande</h4>
+            <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">
               <strong>Formule:</strong> CMC = (Dv-10-Da) × (1-Vp) - H × Vp
             </p>
-            <div className="text-xs text-gray-500 space-y-1">
+            <div className="text-xs text-gray-500 dark:text-gray-400 space-y-1">
               <div><strong>Dv:</strong> Durée de vie du produit</div>
               <div><strong>Da:</strong> Délai d'acheminement</div>
               <div><strong>10:</strong> Marge pour consommation optimale</div>
             </div>
           </div>
           
-          <div className="bg-white p-4 rounded-lg">
-            <h4 className="font-medium text-purple-900 mb-2">QM - Quantité Maximale Commande</h4>
-            <p className="text-sm text-gray-600 mb-2">
+          <div className="bg-white dark:bg-gray-800 p-4 rounded-lg">
+            <h4 className="font-medium text-purple-900 dark:text-purple-100 mb-2">QM - Quantité Maximale Commande</h4>
+            <p className="text-sm text-gray-600 dark:text-gray-400 mb-2">
               <strong>Formule:</strong> QM = CMC - Cr
             </p>
-            <div className="text-xs text-gray-500 space-y-1">
+            <div className="text-xs text-gray-500 dark:text-gray-400 space-y-1">
               <div><strong>Cr:</strong> Couverture réelle avant réception</div>
               <div><strong>Calcul Cr:</strong> Stock / Prévision consommation</div>
             </div>
           </div>
         </div>
 
-        <div className="mt-6 p-4 bg-blue-50 rounded-lg">
-          <h4 className="font-medium text-blue-900 mb-2">Niveaux d'Alerte</h4>
+        <div className="mt-6 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg">
+          <h4 className="font-medium text-blue-900 dark:text-blue-100 mb-2">Niveaux d'Alerte</h4>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
             <div>
-              <strong className="text-blue-900">Nouvelles commandes:</strong>
-              <div className="mt-1 space-y-1 text-blue-700">
+              <strong className="text-blue-900 dark:text-blue-100">Nouvelles commandes:</strong>
+              <div className="mt-1 space-y-1 text-blue-700 dark:text-blue-300">
                 <div>• <strong>Normal:</strong> Db - Do - Dc &gt; 4 jours</div>
                 <div>• <strong>Urgent:</strong> -4 &lt; Db - Do - Dc &lt; 0</div>
                 <div>• <strong>Critique:</strong> Db - Do - Dc &lt; -4</div>
               </div>
             </div>
             <div>
-              <strong className="text-blue-900">Commandes en cours:</strong>
-              <div className="mt-1 space-y-1 text-blue-700">
+              <strong className="text-blue-900 dark:text-blue-100">Commandes en cours:</strong>
+              <div className="mt-1 space-y-1 text-blue-700 dark:text-blue-300">
                 <div>• <strong>Normal:</strong> (Cp-CMS)/(CMS+da) &gt; 10%</div>
                 <div>• <strong>À suivre:</strong> 0% &lt; (Cp-CMS)/(CMS+da) &lt; 10%</div>
                 <div>• <strong>Urgent:</strong> (Cp-CMS)/(CMS+da) &lt; 0%</div>
