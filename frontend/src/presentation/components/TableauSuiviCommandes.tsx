@@ -61,6 +61,10 @@ const TableauSuiviCommandes: React.FC = () => {
   const [selectedCommande, setSelectedCommande] = useState<CommandeEnCours | null>(null);
   const [showModal, setShowModal] = useState(false);
 
+  // Pagination states
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
+
   useEffect(() => {
     loadData();
   }, []);
