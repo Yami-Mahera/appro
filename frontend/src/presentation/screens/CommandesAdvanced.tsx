@@ -109,7 +109,8 @@ const CommandesAdvanced: React.FC = () => {
 
   const loadFournisseurs = async () => {
     try {
-      const data = await ApiService.getFournisseurs();
+      const response = await ApiService.getFournisseurs();
+      const data = response.fournisseurs || response;
       setFournisseurs(data);
     } catch (err: any) {
       setError(err.response?.data?.detail || 'Erreur lors du chargement des fournisseurs');
@@ -118,7 +119,8 @@ const CommandesAdvanced: React.FC = () => {
 
   const loadArticles = async () => {
     try {
-      const data = await ApiService.getArticles();
+      const response = await ApiService.getArticles();
+      const data = response.articles || response;
       setArticles(data);
     } catch (err: any) {
       setError(err.response?.data?.detail || 'Erreur lors du chargement des articles');
