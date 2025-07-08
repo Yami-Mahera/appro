@@ -107,6 +107,7 @@ const TableauProjectionCouverture: React.FC<TableauProjectionCouvertureProps> = 
         };
       });
 
+      setTotalItems(projectionsData.length);
       setProjections(projectionsData);
     } catch (error) {
       console.error('Erreur lors du chargement des projections:', error);
