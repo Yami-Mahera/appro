@@ -703,7 +703,7 @@ const FournisseursAdvanced: React.FC = () => {
                 {formData.contacts.map((contact, index) => (
                   <div
                     key={index}
-                    className="border border-gray-200 dark:border-gray-600 rounded-lg p-4 mb-3 bg-gray-50 dark:bg-gray-750"
+                    className="border border-gray-200 dark:border-gray-600 rounded-lg p-4 mb-3 bg-gray-50 dark:bg-gray-700"
                   >
                     <div className="flex justify-between items-center mb-3">
                       <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
