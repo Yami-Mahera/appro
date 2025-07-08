@@ -7,7 +7,10 @@ from datetime import datetime
 BASE_URL = "http://localhost:8001/api"
 ADMIN_USER = {
     "email": "admin@test.com",
-    "password": "admin123"
+    "password": "admin123",
+    "nom": "Admin",
+    "prenom": "Test",
+    "role": "administrateur"
 }
 
 # Test results
@@ -15,6 +18,7 @@ test_results = {
     "dashboard_stats": {"success": False, "message": "Not tested"},
     "articles": {"success": False, "message": "Not tested"},
     "auth_login": {"success": False, "message": "Not tested"},
+    "auth_register": {"success": False, "message": "Not tested"},
     "services": {"success": False, "message": "Not tested"}
 }
 
@@ -58,6 +62,20 @@ def make_request(method, endpoint, data=None, token=None, expected_status=200):
             return False, f"Expected status {expected_status}, got {response.status_code}: {response.text}", None
     except Exception as e:
         return False, f"Request error: {str(e)}", None
+
+def test_auth_register():
+    print_header("Testing User Registration")
+    success, message, data = make_request("post", "/auth/register", ADMIN_USER, expected_status=200)
+    
+    if success:
+        print_test_result("Register user", True, f"Created user: {ADMIN_USER['email']}")
+        test_results["auth_register"]["success"] = True
+        test_results["auth_register"]["message"] = f"Successfully registered user: {ADMIN_USER['email']}"
+        return True
+    else:
+        print_test_result("Register user", False, message)
+        test_results["auth_register"]["message"] = message
+        return False
 
 def test_auth_login():
     print_header("Testing User Login")
@@ -198,6 +216,9 @@ def run_tests():
         print("Backend services are not running. Cannot proceed with tests.")
         print_summary()
         return
+    
+    # Try to register a new user first
+    registered = test_auth_register()
     
     # Login to get token
     token = test_auth_login()
