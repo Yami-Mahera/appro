@@ -5,7 +5,7 @@ import uuid
 from datetime import datetime, timedelta
 
 # Configuration
-BASE_URL = "https://fd9177f2-1bcf-486d-b5e9-ac472b93d60d.preview.emergentagent.com/api"
+BASE_URL = "https://045bed1e-03cb-4e44-a014-599d9ba481a4.preview.emergentagent.com/api"
 ADMIN_USER = {
     "email": "admin@test.com",
     "password": "admin123",
