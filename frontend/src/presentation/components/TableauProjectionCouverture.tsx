@@ -353,19 +353,19 @@ const TableauProjectionCouverture: React.FC<TableauProjectionCouvertureProps> = 
       </div>
 
       {/* Légende */}
-      <div className="px-6 py-4 border-t border-gray-200 bg-gray-50">
-        <h4 className="text-sm font-medium text-gray-900 mb-2">Légende</h4>
-        <div className="flex flex-wrap gap-4 text-xs text-gray-600">
+      <div className="px-6 py-4 border-t border-gray-200 dark:border-gray-600 bg-gray-50 dark:bg-gray-700">
+        <h4 className="text-sm font-medium text-gray-900 dark:text-white mb-2">Légende</h4>
+        <div className="flex flex-wrap gap-4 text-xs text-gray-600 dark:text-gray-400">
           <div className="flex items-center">
-            <span className="w-3 h-3 bg-green-100 border border-green-200 rounded mr-2"></span>
+            <span className="w-3 h-3 bg-green-100 dark:bg-green-900 border border-green-200 dark:border-green-700 rounded mr-2"></span>
             Normal: Stock suffisant
           </div>
           <div className="flex items-center">
-            <span className="w-3 h-3 bg-yellow-100 border border-yellow-200 rounded mr-2"></span>
+            <span className="w-3 h-3 bg-yellow-100 dark:bg-yellow-900 border border-yellow-200 dark:border-yellow-700 rounded mr-2"></span>
             Attention: Proche du seuil minimum
           </div>
           <div className="flex items-center">
-            <span className="w-3 h-3 bg-red-100 border border-red-200 rounded mr-2"></span>
+            <span className="w-3 h-3 bg-red-100 dark:bg-red-900 border border-red-200 dark:border-red-700 rounded mr-2"></span>
             Critique: En dessous du seuil de sécurité
           </div>
           <div className="ml-8">
