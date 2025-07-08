@@ -114,24 +114,21 @@ const FournisseursAdvanced: React.FC = () => {
 
       const response = await ApiService.getFournisseurs(params);
       
-      // Handle response - it might return fournisseurs array directly or a response object
-      let fournisseursData = response;
-      let total = response.length;
+      // Handle new paginated response format
+      let fournisseursData, total;
       
-      // If the API returns a paginated response with metadata
-      if (response && typeof response === 'object' && !Array.isArray(response)) {
-        fournisseursData = response.fournisseurs || response.data || response;
-        total = response.total || response.count || fournisseursData.length;
-      }
-      
-      // If we got fewer items than requested and it's the first page, use the actual count
-      if (currentPage === 1 && fournisseursData.length < itemsPerPage) {
-        total = fournisseursData.length;
-      }
-      
-      // Estimate total if not provided
-      if (!total || total < skip + fournisseursData.length) {
-        total = skip + fournisseursData.length + (fournisseursData.length === itemsPerPage ? itemsPerPage : 0);
+      if (response && response.fournisseurs) {
+        // New format with pagination info
+        fournisseursData = response.fournisseurs;
+        total = response.total;
+      } else if (Array.isArray(response)) {
+        // Fallback for old format (array directly)
+        fournisseursData = response;
+        total = response.length;
+      } else {
+        // Unexpected format
+        fournisseursData = [];
+        total = 0;
       }
       
       setFournisseurs(fournisseursData);
