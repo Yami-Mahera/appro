@@ -998,7 +998,7 @@ async def create_fournisseur(
     await db.fournisseurs.insert_one(fournisseur.dict())
     return fournisseur
 
-@api_router.get("/fournisseurs", response_model=List[Fournisseur])
+@api_router.get("/fournisseurs")
 async def get_fournisseurs(
     search: Optional[str] = None,
     sort_by: Optional[str] = "nom",
@@ -1034,8 +1034,20 @@ async def get_fournisseurs(
     sort_direction = 1 if sort_order == "asc" else -1
     sort_criteria = [(sort_by, sort_direction)]
     
+    # Get total count for pagination
+    total_count = await db.fournisseurs.count_documents(query)
+    
+    # Get paginated results
     fournisseurs = await db.fournisseurs.find(query).sort(sort_criteria).skip(skip).limit(limit).to_list(limit)
-    return [Fournisseur(**f) for f in fournisseurs]
+    
+    return {
+        "fournisseurs": [Fournisseur(**f) for f in fournisseurs],
+        "total": total_count,
+        "limit": limit,
+        "skip": skip,
+        "has_next": (skip + limit) < total_count,
+        "has_previous": skip > 0
+    }
 
 @api_router.get("/fournisseurs/{fournisseur_id}", response_model=Fournisseur)
 async def get_fournisseur(
