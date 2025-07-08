@@ -122,7 +122,7 @@ const CommandesAdvanced: React.FC = () => {
 
   useEffect(() => {
     loadCommandes();
-  }, [searchTerm, sortField, sortOrder, filters]);
+  }, [searchTerm, sortField, sortOrder, filters, currentPage, itemsPerPage]);
 
   const loadFournisseurs = async () => {
     try {
