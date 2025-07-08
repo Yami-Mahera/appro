@@ -139,6 +139,21 @@ const TableauProjectionCouverture: React.FC<TableauProjectionCouvertureProps> = 
 
   const selectedArticle = articles.find(a => a.id === selectedArticleId);
 
+  // Paginated data
+  const totalPages = Math.ceil(totalItems / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const paginatedProjections = projections.slice(startIndex, endIndex);
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+  };
+
+  const handleItemsPerPageChange = (items: number) => {
+    setItemsPerPage(items);
+    setCurrentPage(1);
+  };
+
   return (
     <div className={`bg-white dark:bg-gray-800 rounded-lg shadow-sm ${className}`}>
       {/* En-tête */}
