@@ -7,7 +7,7 @@ from datetime import datetime
 BASE_URL = "http://localhost:8001/api"
 ADMIN_CREDENTIALS = {
     "email": "admin@test.com",
-    "password": "password"
+    "password": "admin123"
 }
 
 # Helper functions
