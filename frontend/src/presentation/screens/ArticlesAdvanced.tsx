@@ -863,10 +863,10 @@ const ArticlesAdvanced: React.FC = () => {
                   </p>
                 </div>
                 <div>
-                  <span className="text-sm font-medium text-gray-500">
+                  <span className="text-sm font-medium text-gray-500 dark:text-gray-400">
                     Valeur stock:
                   </span>
-                  <p className="text-gray-900">
+                  <p className="text-gray-900 dark:text-gray-100">
                     {(
                       viewingArticle.prix_unitaire * viewingArticle.stock_actuel
                     ).toFixed(2)}
@@ -877,31 +877,31 @@ const ArticlesAdvanced: React.FC = () => {
 
               <div className="grid grid-cols-3 gap-4">
                 <div>
-                  <span className="text-sm font-medium text-gray-500">
+                  <span className="text-sm font-medium text-gray-500 dark:text-gray-400">
                     Stock actuel:
                   </span>
-                  <p className="text-gray-900">{viewingArticle.stock_actuel}</p>
+                  <p className="text-gray-900 dark:text-gray-100">{viewingArticle.stock_actuel}</p>
                 </div>
                 <div>
-                  <span className="text-sm font-medium text-gray-500">
+                  <span className="text-sm font-medium text-gray-500 dark:text-gray-400">
                     Seuil minimum:
                   </span>
-                  <p className="text-gray-900">{viewingArticle.seuil_min}</p>
+                  <p className="text-gray-900 dark:text-gray-100">{viewingArticle.seuil_min}</p>
                 </div>
                 <div>
-                  <span className="text-sm font-medium text-gray-500">
+                  <span className="text-sm font-medium text-gray-500 dark:text-gray-400">
                     Seuil maximum:
                   </span>
-                  <p className="text-gray-900">{viewingArticle.seuil_max}</p>
+                  <p className="text-gray-900 dark:text-gray-100">{viewingArticle.seuil_max}</p>
                 </div>
               </div>
 
               {viewingArticle.duree_vie && (
                 <div>
-                  <span className="text-sm font-medium text-gray-500">
+                  <span className="text-sm font-medium text-gray-500 dark:text-gray-400">
                     Durée de vie:
                   </span>
-                  <p className="text-gray-900">
+                  <p className="text-gray-900 dark:text-gray-100">
                     {viewingArticle.duree_vie} jours
                   </p>
                 </div>
@@ -909,10 +909,10 @@ const ArticlesAdvanced: React.FC = () => {
 
               {viewingArticle.emplacement_stockage && (
                 <div>
-                  <span className="text-sm font-medium text-gray-500">
+                  <span className="text-sm font-medium text-gray-500 dark:text-gray-400">
                     Emplacement de stockage:
                   </span>
-                  <p className="text-gray-900">
+                  <p className="text-gray-900 dark:text-gray-100">
                     {viewingArticle.emplacement_stockage}
                   </p>
                 </div>
