@@ -149,6 +149,23 @@ const Reporting: React.FC = () => {
 
   const resetDateRange = () => {
     setDateRange({ date_from: '', date_to: '' });
+    setCurrentPage(1);
+  };
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+  };
+
+  const handleItemsPerPageChange = (items: number) => {
+    setItemsPerPage(items);
+    setCurrentPage(1);
+  };
+
+  // Helper function to get paginated data
+  const getPaginatedData = (data: any[]) => {
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    return data.slice(startIndex, endIndex);
   };
 
   const REPORT_TYPES = [
