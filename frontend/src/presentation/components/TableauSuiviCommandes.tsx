@@ -79,7 +79,8 @@ const TableauSuiviCommandes: React.FC = () => {
       });
 
       // Charger les fournisseurs
-      const fournisseursData = await apiService.getFournisseurs({ limit: 100 });
+      const fournisseursResponse = await apiService.getFournisseurs({ limit: 100 });
+      const fournisseursData = fournisseursResponse.fournisseurs || fournisseursResponse;
       setFournisseurs(fournisseursData);
 
       // Transformer les données en format CommandeEnCours
