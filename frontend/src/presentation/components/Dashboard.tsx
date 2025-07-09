@@ -218,20 +218,20 @@ const Dashboard: React.FC = () => {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-2xl font-bold text-gray-900">Dashboard</h1>
-          <p className="mt-1 text-sm text-gray-500">
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Dashboard</h1>
+          <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
             Vue d'ensemble et tableaux de bord personnalisés
           </p>
         </div>
         
         {/* Tabs */}
-        <div className="flex space-x-1 bg-gray-100 p-1 rounded-lg">
+        <div className="flex space-x-1 bg-gray-100 dark:bg-gray-700 p-1 rounded-lg">
           <button
             onClick={() => setActiveTab('overview')}
             className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
               activeTab === 'overview'
-                ? 'bg-white text-blue-600 shadow-sm'
-                : 'text-gray-500 hover:text-gray-700'
+                ? 'bg-white dark:bg-gray-800 text-blue-600 dark:text-blue-400 shadow-sm'
+                : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'
             }`}
           >
             Vue d'ensemble
@@ -240,8 +240,8 @@ const Dashboard: React.FC = () => {
             onClick={() => setActiveTab('kpi')}
             className={`px-4 py-2 rounded-md text-sm font-medium transition-colors ${
               activeTab === 'kpi'
-                ? 'bg-white text-blue-600 shadow-sm'
-                : 'text-gray-500 hover:text-gray-700'
+                ? 'bg-white dark:bg-gray-800 text-blue-600 dark:text-blue-400 shadow-sm'
+                : 'text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200'
             }`}
           >
             Dashboards KPI
@@ -255,7 +255,7 @@ const Dashboard: React.FC = () => {
           {/* Stats Grid */}
           <div className="grid grid-cols-1 gap-5 sm:grid-cols-2 lg:grid-cols-4">
             {statCards.map((card) => (
-              <div key={card.name} className="bg-white overflow-hidden shadow rounded-lg">
+              <div key={card.name} className="bg-white dark:bg-gray-800 overflow-hidden shadow rounded-lg">
                 <div className="p-5">
                   <div className="flex items-center">
                     <div className="flex-shrink-0">
@@ -265,10 +265,10 @@ const Dashboard: React.FC = () => {
                     </div>
                     <div className="ml-5 w-0 flex-1">
                       <dl>
-                        <dt className="text-sm font-medium text-gray-500 truncate">
+                        <dt className="text-sm font-medium text-gray-500 dark:text-gray-400 truncate">
                           {card.name}
                         </dt>
-                        <dd className="text-2xl font-bold text-gray-900">
+                        <dd className="text-2xl font-bold text-gray-900 dark:text-white">
                           {formatNumber(card.stat)}
                         </dd>
                       </dl>
@@ -282,7 +282,7 @@ const Dashboard: React.FC = () => {
           {/* Alert Cards */}
           <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
             {alertCards.map((card) => (
-              <div key={card.name} className="bg-white overflow-hidden shadow rounded-lg">
+              <div key={card.name} className="bg-white dark:bg-gray-800 overflow-hidden shadow rounded-lg">
                 <div className="p-5">
                   <div className="flex items-center">
                     <div className="flex-shrink-0">
@@ -292,10 +292,10 @@ const Dashboard: React.FC = () => {
                     </div>
                     <div className="ml-5 w-0 flex-1">
                       <dl>
-                        <dt className="text-sm font-medium text-gray-500 truncate">
+                        <dt className="text-sm font-medium text-gray-500 dark:text-gray-400 truncate">
                           {card.name}
                         </dt>
-                        <dd className="text-2xl font-bold text-gray-900">
+                        <dd className="text-2xl font-bold text-gray-900 dark:text-white">
                           {formatNumber(card.stat)}
                         </dd>
                       </dl>
@@ -309,8 +309,8 @@ const Dashboard: React.FC = () => {
           {/* Charts */}
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
             {/* Bar Chart */}
-            <div className="bg-white p-6 rounded-lg shadow">
-              <h3 className="text-lg font-medium text-gray-900 mb-4">
+            <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow">
+              <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">
                 Évolution mensuelle
               </h3>
               <ResponsiveContainer width="100%" height={300}>
@@ -326,8 +326,8 @@ const Dashboard: React.FC = () => {
             </div>
 
             {/* Pie Chart */}
-            <div className="bg-white p-6 rounded-lg shadow">
-              <h3 className="text-lg font-medium text-gray-900 mb-4">
+            <div className="bg-white dark:bg-gray-800 p-6 rounded-lg shadow">
+              <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">
                 Répartition par catégorie
               </h3>
               <ResponsiveContainer width="100%" height={300}>
@@ -356,25 +356,25 @@ const Dashboard: React.FC = () => {
           <StockEvolutionChart className="mt-6" />
 
           {/* Recent Activity */}
-          <div className="bg-white shadow rounded-lg">
+          <div className="bg-white dark:bg-gray-800 shadow rounded-lg">
             <div className="px-4 py-5 sm:p-6">
-              <h3 className="text-lg leading-6 font-medium text-gray-900 mb-4">
+              <h3 className="text-lg leading-6 font-medium text-gray-900 dark:text-white mb-4">
                 Activité récente
               </h3>
               <div className="flow-root">
                 <ul className="-mb-8">
                   <li className="relative pb-8">
                     <div className="relative flex space-x-3">
-                      <div className="h-8 w-8 rounded-full bg-green-500 flex items-center justify-center ring-8 ring-white">
+                      <div className="h-8 w-8 rounded-full bg-green-500 flex items-center justify-center ring-8 ring-white dark:ring-gray-800">
                         <DocumentTextIcon className="h-5 w-5 text-white" />
                       </div>
                       <div className="min-w-0 flex-1 pt-1.5 flex justify-between space-x-4">
                         <div>
-                          <p className="text-sm text-gray-500">
-                            Nouvelle commande créée <span className="font-medium text-gray-900">CMD-20250101-001</span>
+                          <p className="text-sm text-gray-500 dark:text-gray-400">
+                            Nouvelle commande créée <span className="font-medium text-gray-900 dark:text-white">CMD-20250101-001</span>
                           </p>
                         </div>
-                        <div className="text-right text-sm whitespace-nowrap text-gray-500">
+                        <div className="text-right text-sm whitespace-nowrap text-gray-500 dark:text-gray-400">
                           Il y a 2h
                         </div>
                       </div>
@@ -382,16 +382,16 @@ const Dashboard: React.FC = () => {
                   </li>
                   <li className="relative pb-8">
                     <div className="relative flex space-x-3">
-                      <div className="h-8 w-8 rounded-full bg-blue-500 flex items-center justify-center ring-8 ring-white">
+                      <div className="h-8 w-8 rounded-full bg-blue-500 flex items-center justify-center ring-8 ring-white dark:ring-gray-800">
                         <CubeIcon className="h-5 w-5 text-white" />
                       </div>
                       <div className="min-w-0 flex-1 pt-1.5 flex justify-between space-x-4">
                         <div>
-                          <p className="text-sm text-gray-500">
-                            Stock mis à jour pour <span className="font-medium text-gray-900">Article A123</span>
+                          <p className="text-sm text-gray-500 dark:text-gray-400">
+                            Stock mis à jour pour <span className="font-medium text-gray-900 dark:text-white">Article A123</span>
                           </p>
                         </div>
-                        <div className="text-right text-sm whitespace-nowrap text-gray-500">
+                        <div className="text-right text-sm whitespace-nowrap text-gray-500 dark:text-gray-400">
                           Il y a 4h
                         </div>
                       </div>
@@ -399,16 +399,16 @@ const Dashboard: React.FC = () => {
                   </li>
                   <li className="relative">
                     <div className="relative flex space-x-3">
-                      <div className="h-8 w-8 rounded-full bg-orange-500 flex items-center justify-center ring-8 ring-white">
+                      <div className="h-8 w-8 rounded-full bg-orange-500 flex items-center justify-center ring-8 ring-white dark:ring-gray-800">
                         <ExclamationTriangleIcon className="h-5 w-5 text-white" />
                       </div>
                       <div className="min-w-0 flex-1 pt-1.5 flex justify-between space-x-4">
                         <div>
-                          <p className="text-sm text-gray-500">
-                            Alerte stock bas pour <span className="font-medium text-gray-900">Vis M6</span>
+                          <p className="text-sm text-gray-500 dark:text-gray-400">
+                            Alerte stock bas pour <span className="font-medium text-gray-900 dark:text-white">Vis M6</span>
                           </p>
                         </div>
-                        <div className="text-right text-sm whitespace-nowrap text-gray-500">
+                        <div className="text-right text-sm whitespace-nowrap text-gray-500 dark:text-gray-400">
                           Il y a 6h
                         </div>
                       </div>
@@ -425,7 +425,7 @@ const Dashboard: React.FC = () => {
       {activeTab === 'kpi' && (
         <div className="space-y-6">
           <div className="flex items-center justify-between">
-            <h2 className="text-xl font-bold text-gray-900">
+            <h2 className="text-xl font-bold text-gray-900 dark:text-white">
               Tableaux de bord personnalisés
             </h2>
             <button
@@ -440,10 +440,10 @@ const Dashboard: React.FC = () => {
           {customDashboards.length === 0 ? (
             <div className="text-center py-12">
               <ChartBarIcon className="mx-auto h-12 w-12 text-gray-400" />
-              <h3 className="mt-2 text-sm font-medium text-gray-900">
+              <h3 className="mt-2 text-sm font-medium text-gray-900 dark:text-white">
                 Aucun dashboard personnalisé
               </h3>
-              <p className="mt-1 text-sm text-gray-500">
+              <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
                 Créez votre premier tableau de bord pour suivre vos KPIs.
               </p>
               <div className="mt-6">
@@ -459,9 +459,9 @@ const Dashboard: React.FC = () => {
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {customDashboards.map((dashboard) => (
-                <div key={dashboard.id} className="bg-white rounded-lg shadow p-6">
+                <div key={dashboard.id} className="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
                   <div className="flex items-center justify-between mb-4">
-                    <h3 className="text-lg font-medium text-gray-900">
+                    <h3 className="text-lg font-medium text-gray-900 dark:text-white">
                       {dashboard.nom}
                     </h3>
                     <div className="flex space-x-2">
@@ -490,12 +490,12 @@ const Dashboard: React.FC = () => {
                   </div>
                   
                   {dashboard.description && (
-                    <p className="text-sm text-gray-600 mb-4">
+                    <p className="text-sm text-gray-600 dark:text-gray-400 mb-4">
                       {dashboard.description}
                     </p>
                   )}
                   
-                  <div className="flex items-center justify-between text-sm text-gray-500">
+                  <div className="flex items-center justify-between text-sm text-gray-500 dark:text-gray-400">
                     <span>{dashboard.widgets.length} widgets</span>
                     <span>
                       {dashboard.partage && (

@@ -69,19 +69,19 @@ const DashboardViewer: React.FC<DashboardViewerProps> = ({
   };
 
   return (
-    <div className={`${fullscreen ? 'fixed inset-0 z-50 bg-white' : ''}`}>
+    <div className={`${fullscreen ? 'fixed inset-0 z-50 bg-white dark:bg-gray-900' : ''}`}>
       {/* Header */}
-      <div className="bg-white shadow-sm border-b border-gray-200 px-6 py-4">
+      <div className="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700 px-6 py-4">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-xl font-semibold text-gray-900">{dashboard.nom}</h1>
+            <h1 className="text-xl font-semibold text-gray-900 dark:text-white">{dashboard.nom}</h1>
             {dashboard.description && (
-              <p className="text-sm text-gray-500 mt-1">{dashboard.description}</p>
+              <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">{dashboard.description}</p>
             )}
-            <div className="flex items-center space-x-4 mt-2 text-xs text-gray-500">
+            <div className="flex items-center space-x-4 mt-2 text-xs text-gray-500 dark:text-gray-400">
               <span>Dernière mise à jour: {lastRefresh.toLocaleTimeString()}</span>
               <span>{dashboard.widgets?.length || 0} widgets</span>
-              {dashboard.partage && <span className="text-green-600">Partagé</span>}
+              {dashboard.partage && <span className="text-green-600 dark:text-green-400">Partagé</span>}
             </div>
           </div>
           
@@ -90,7 +90,7 @@ const DashboardViewer: React.FC<DashboardViewerProps> = ({
             <select
               value={refreshInterval || ''}
               onChange={(e) => setRefreshInterval(e.target.value ? parseInt(e.target.value) : null)}
-              className="text-sm border-gray-300 rounded-md"
+              className="text-sm border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md"
             >
               <option value="">Pas de rafraîchissement</option>
               <option value="30">30 secondes</option>
@@ -101,7 +101,7 @@ const DashboardViewer: React.FC<DashboardViewerProps> = ({
 
             <button
               onClick={handleShare}
-              className="p-2 text-gray-400 hover:text-blue-600 rounded-lg"
+              className="p-2 text-gray-400 dark:text-gray-500 hover:text-blue-600 dark:hover:text-blue-400 rounded-lg"
               title="Partager"
             >
               <ShareIcon className="h-5 w-5" />
@@ -109,7 +109,7 @@ const DashboardViewer: React.FC<DashboardViewerProps> = ({
 
             <button
               onClick={handlePrint}
-              className="p-2 text-gray-400 hover:text-blue-600 rounded-lg"
+              className="p-2 text-gray-400 dark:text-gray-500 hover:text-blue-600 dark:hover:text-blue-400 rounded-lg"
               title="Imprimer"
             >
               <PrinterIcon className="h-5 w-5" />
@@ -117,7 +117,7 @@ const DashboardViewer: React.FC<DashboardViewerProps> = ({
 
             <button
               onClick={handleFullscreen}
-              className="p-2 text-gray-400 hover:text-blue-600 rounded-lg"
+              className="p-2 text-gray-400 dark:text-gray-500 hover:text-blue-600 dark:hover:text-blue-400 rounded-lg"
               title="Plein écran"
             >
               {fullscreen ? (
@@ -129,7 +129,7 @@ const DashboardViewer: React.FC<DashboardViewerProps> = ({
 
             <button
               onClick={onEdit}
-              className="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50"
+              className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-sm font-medium text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600"
             >
               <PencilIcon className="h-4 w-4 mr-1 inline" />
               Modifier
@@ -138,7 +138,7 @@ const DashboardViewer: React.FC<DashboardViewerProps> = ({
             {!fullscreen && (
               <button
                 onClick={onClose}
-                className="p-2 text-gray-400 hover:text-gray-600 rounded-lg"
+                className="p-2 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-400 rounded-lg"
                 title="Fermer"
               >
                 <XMarkIcon className="h-5 w-5" />
@@ -149,13 +149,13 @@ const DashboardViewer: React.FC<DashboardViewerProps> = ({
       </div>
 
       {/* Dashboard Content */}
-      <div className="p-6 bg-gray-50 min-h-screen">
+      <div className="p-6 bg-gray-50 dark:bg-gray-900 min-h-screen">
         {dashboard.widgets && dashboard.widgets.length > 0 ? (
           <div className="grid grid-cols-12 gap-4 auto-rows-max">
             {dashboard.widgets.map((widget) => (
               <div
                 key={widget.id}
-                className={`col-span-${widget.position?.w || 4} bg-white rounded-lg shadow-sm border border-gray-200 p-4`}
+                className={`col-span-${widget.position?.w || 4} bg-white dark:bg-gray-800 rounded-lg shadow-sm border border-gray-200 dark:border-gray-700 p-4`}
                 style={{ 
                   gridColumn: `span ${widget.position?.w || 4}`,
                   minHeight: `${(widget.position?.h || 3) * 80}px`
@@ -167,13 +167,13 @@ const DashboardViewer: React.FC<DashboardViewerProps> = ({
           </div>
         ) : (
           <div className="text-center py-12">
-            <div className="text-gray-400 mb-4">
+            <div className="text-gray-400 dark:text-gray-500 mb-4">
               <svg className="mx-auto h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
               </svg>
             </div>
-            <h3 className="text-lg font-medium text-gray-900">Tableau de bord vide</h3>
-            <p className="text-gray-500 mt-2">
+            <h3 className="text-lg font-medium text-gray-900 dark:text-white">Tableau de bord vide</h3>
+            <p className="text-gray-500 dark:text-gray-400 mt-2">
               Ce tableau de bord ne contient aucun widget.
             </p>
             <button

@@ -155,22 +155,22 @@ const DashboardBuilder: React.FC<DashboardBuilderProps> = ({
   }, {}) : {};
 
   return (
-    <div className="h-screen flex flex-col bg-gray-100">
+    <div className="h-screen flex flex-col bg-gray-100 dark:bg-gray-900">
       {/* Header */}
-      <div className="bg-white shadow-sm border-b border-gray-200 px-6 py-4">
+      <div className="bg-white dark:bg-gray-800 shadow-sm border-b border-gray-200 dark:border-gray-700 px-6 py-4">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-xl font-semibold text-gray-900">
+            <h1 className="text-xl font-semibold text-gray-900 dark:text-white">
               {isEdit ? 'Modifier' : 'Créer'} un Tableau de Bord
             </h1>
-            <p className="text-sm text-gray-500">
+            <p className="text-sm text-gray-500 dark:text-gray-400">
               Configurez votre tableau de bord personnalisé
             </p>
           </div>
           <div className="flex space-x-3">
             <button
               onClick={onCancel}
-              className="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50"
+              className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-sm font-medium text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600"
             >
               Annuler
             </button>
@@ -187,14 +187,14 @@ const DashboardBuilder: React.FC<DashboardBuilderProps> = ({
 
       <div className="flex-1 flex overflow-hidden">
         {/* Sidebar - Widget Library */}
-        <div className="w-80 bg-white shadow-sm border-r border-gray-200 overflow-y-auto">
+        <div className="w-80 bg-white dark:bg-gray-800 shadow-sm border-r border-gray-200 dark:border-gray-700 overflow-y-auto">
           <div className="p-4">
-            <h3 className="text-lg font-medium text-gray-900 mb-4">Configuration</h3>
+            <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-4">Configuration</h3>
             
             {/* Dashboard Info */}
             <div className="space-y-4 mb-6">
               <div>
-                <label className="block text-sm font-medium text-gray-700">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                   Nom du tableau de bord *
                 </label>
                 <input
@@ -202,13 +202,13 @@ const DashboardBuilder: React.FC<DashboardBuilderProps> = ({
                   name="nom"
                   value={formData.nom}
                   onChange={handleInputChange}
-                  className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                  className="mt-1 block w-full border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                   placeholder="Ex: Dashboard Ventes"
                 />
               </div>
               
               <div>
-                <label className="block text-sm font-medium text-gray-700">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                   Description
                 </label>
                 <textarea
@@ -216,7 +216,7 @@ const DashboardBuilder: React.FC<DashboardBuilderProps> = ({
                   value={formData.description}
                   onChange={handleInputChange}
                   rows={3}
-                  className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                  className="mt-1 block w-full border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                   placeholder="Description optionnelle..."
                 />
               </div>
@@ -227,22 +227,22 @@ const DashboardBuilder: React.FC<DashboardBuilderProps> = ({
                   name="partage"
                   checked={formData.partage}
                   onChange={handleInputChange}
-                  className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+                  className="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 dark:border-gray-600 rounded"
                 />
-                <label className="ml-2 block text-sm text-gray-900">
+                <label className="ml-2 block text-sm text-gray-900 dark:text-white">
                   Partager avec d'autres utilisateurs
                 </label>
               </div>
             </div>
 
-            <hr className="my-6" />
+            <hr className="my-6 border-gray-200 dark:border-gray-600" />
 
             {/* Available Widgets */}
-            <h4 className="text-md font-medium text-gray-900 mb-3">Widgets Disponibles</h4>
+            <h4 className="text-md font-medium text-gray-900 dark:text-white mb-3">Widgets Disponibles</h4>
             <div className="space-y-3">
               {Object.entries(widgetCategories).map(([category, widgets]: [string, any]) => (
                 <div key={category}>
-                  <h5 className="text-xs font-semibold text-gray-500 uppercase tracking-wide mb-2">
+                  <h5 className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wide mb-2">
                     {category}
                   </h5>
                   <div className="space-y-1">
@@ -250,7 +250,7 @@ const DashboardBuilder: React.FC<DashboardBuilderProps> = ({
                       <button
                         key={widget.type}
                         onClick={() => handleAddWidget(widget)}
-                        className="w-full text-left px-3 py-2 text-sm text-gray-700 hover:bg-blue-50 hover:text-blue-700 rounded-md transition-colors duration-150"
+                        className="w-full text-left px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:text-blue-700 dark:hover:text-blue-300 rounded-md transition-colors duration-150"
                       >
                         <PlusIcon className="h-4 w-4 mr-2 inline" />
                         {widget.nom || widget.name}
@@ -264,24 +264,24 @@ const DashboardBuilder: React.FC<DashboardBuilderProps> = ({
         </div>
 
         {/* Main Canvas */}
-        <div className="flex-1 p-6 overflow-auto">
-          <div className="bg-white rounded-lg shadow-sm min-h-full p-6">
+        <div className="flex-1 p-6 overflow-auto bg-gray-50 dark:bg-gray-900">
+          <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm min-h-full p-6">
             <div className="mb-4 flex items-center justify-between">
-              <h3 className="text-lg font-medium text-gray-900">
+              <h3 className="text-lg font-medium text-gray-900 dark:text-white">
                 Aperçu du Tableau de Bord
               </h3>
-              <span className="text-sm text-gray-500">
+              <span className="text-sm text-gray-500 dark:text-gray-400">
                 {formData.widgets.length} widget(s)
               </span>
             </div>
 
             {formData.widgets.length === 0 ? (
-              <div className="border-2 border-dashed border-gray-300 rounded-lg p-12 text-center">
-                <ArrowsPointingOutIcon className="mx-auto h-12 w-12 text-gray-400" />
-                <h3 className="mt-2 text-sm font-medium text-gray-900">
+              <div className="border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-lg p-12 text-center">
+                <ArrowsPointingOutIcon className="mx-auto h-12 w-12 text-gray-400 dark:text-gray-500" />
+                <h3 className="mt-2 text-sm font-medium text-gray-900 dark:text-white">
                   Aucun widget ajouté
                 </h3>
-                <p className="mt-1 text-sm text-gray-500">
+                <p className="mt-1 text-sm text-gray-500 dark:text-gray-400">
                   Commencez par ajouter des widgets depuis la bibliothèque.
                 </p>
               </div>
@@ -290,7 +290,7 @@ const DashboardBuilder: React.FC<DashboardBuilderProps> = ({
                 {formData.widgets.map((widget) => (
                   <div
                     key={widget.id}
-                    className={`col-span-${widget.position.w} relative bg-gray-50 border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow`}
+                    className={`col-span-${widget.position.w} relative bg-gray-50 dark:bg-gray-700 border border-gray-200 dark:border-gray-600 rounded-lg p-4 hover:shadow-md transition-shadow`}
                     style={{ 
                       gridColumn: `span ${widget.position.w}`,
                       minHeight: `${widget.position.h * 60}px`
@@ -299,14 +299,14 @@ const DashboardBuilder: React.FC<DashboardBuilderProps> = ({
                     <div className="absolute top-2 right-2 flex space-x-1">
                       <button
                         onClick={() => handleConfigureWidget(widget)}
-                        className="p-1 text-gray-400 hover:text-blue-600 rounded"
+                        className="p-1 text-gray-400 dark:text-gray-500 hover:text-blue-600 dark:hover:text-blue-400 rounded"
                         title="Configurer"
                       >
                         <Cog6ToothIcon className="h-4 w-4" />
                       </button>
                       <button
                         onClick={() => handleDeleteWidget(widget.id)}
-                        className="p-1 text-gray-400 hover:text-red-600 rounded"
+                        className="p-1 text-gray-400 dark:text-gray-500 hover:text-red-600 dark:hover:text-red-400 rounded"
                         title="Supprimer"
                       >
                         <TrashIcon className="h-4 w-4" />

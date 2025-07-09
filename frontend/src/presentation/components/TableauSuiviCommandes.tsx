@@ -8,6 +8,7 @@ import {
   ArrowPathIcon
 } from '@heroicons/react/24/outline';
 import apiService from '../../services/api';
+import Pagination from './Pagination';
 
 interface CommandeEnCours {
   id: string;
@@ -60,13 +61,17 @@ const TableauSuiviCommandes: React.FC = () => {
   const [selectedCommande, setSelectedCommande] = useState<CommandeEnCours | null>(null);
   const [showModal, setShowModal] = useState(false);
 
+  // Pagination states
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
+
   useEffect(() => {
     loadData();
   }, []);
 
   useEffect(() => {
     applyFilters();
-  }, [commandes, filters, sortBy, sortOrder]);
+  }, [commandes, filters, sortBy, sortOrder, currentPage, itemsPerPage]);
 
   const loadData = async () => {
     try {
@@ -79,7 +84,8 @@ const TableauSuiviCommandes: React.FC = () => {
       });
 
       // Charger les fournisseurs
-      const fournisseursData = await apiService.getFournisseurs({ limit: 100 });
+      const fournisseursResponse = await apiService.getFournisseurs({ limit: 100 });
+      const fournisseursData = fournisseursResponse.fournisseurs || fournisseursResponse;
       setFournisseurs(fournisseursData);
 
       // Transformer les données en format CommandeEnCours
@@ -256,16 +262,32 @@ const TableauSuiviCommandes: React.FC = () => {
     setShowModal(false);
   };
 
+  // Paginated data
+  const totalItems = commandesFiltered.length;
+  const totalPages = Math.ceil(totalItems / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const paginatedCommandes = commandesFiltered.slice(startIndex, endIndex);
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+  };
+
+  const handleItemsPerPageChange = (items: number) => {
+    setItemsPerPage(items);
+    setCurrentPage(1);
+  };
+
   return (
-    <div className="bg-white rounded-lg shadow-sm">
+    <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm">
       {/* En-tête */}
-      <div className="px-6 py-4 border-b border-gray-200">
+      <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
         <div className="flex items-center justify-between">
           <div>
-            <h2 className="text-xl font-semibold text-gray-900">
+            <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
               Tableau de suivi des commandes en cours
             </h2>
-            <p className="text-sm text-gray-600 mt-1">
+            <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
               Suivi temps réel avec alertes de retard et niveaux de priorité
             </p>
           </div>
@@ -287,7 +309,7 @@ const TableauSuiviCommandes: React.FC = () => {
             <select
               value={filters.status}
               onChange={(e) => setFilters({ ...filters, status: e.target.value })}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md text-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
             >
               <option value="">Tous les statuts</option>
               <option value="en_attente">En attente</option>
@@ -302,7 +324,7 @@ const TableauSuiviCommandes: React.FC = () => {
               placeholder="Fournisseur..."
               value={filters.fournisseur}
               onChange={(e) => setFilters({ ...filters, fournisseur: e.target.value })}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md text-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
             />
           </div>
           
@@ -310,7 +332,7 @@ const TableauSuiviCommandes: React.FC = () => {
             <select
               value={filters.priorite}
               onChange={(e) => setFilters({ ...filters, priorite: e.target.value })}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md text-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
             >
               <option value="">Toutes priorités</option>
               <option value="normale">Normale</option>
@@ -323,7 +345,7 @@ const TableauSuiviCommandes: React.FC = () => {
             <select
               value={filters.retard}
               onChange={(e) => setFilters({ ...filters, retard: e.target.value })}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md text-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
             >
               <option value="">Tous retards</option>
               <option value="avec_retard">Avec retard</option>
@@ -336,7 +358,7 @@ const TableauSuiviCommandes: React.FC = () => {
               type="date"
               value={filters.dateDebut}
               onChange={(e) => setFilters({ ...filters, dateDebut: e.target.value })}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md text-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
             />
           </div>
           
@@ -345,32 +367,32 @@ const TableauSuiviCommandes: React.FC = () => {
               type="date"
               value={filters.dateFin}
               onChange={(e) => setFilters({ ...filters, dateFin: e.target.value })}
-              className="w-full px-3 py-2 border border-gray-300 rounded-md text-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md text-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
             />
           </div>
         </div>
 
         {/* Statistiques rapides */}
         <div className="mt-4 grid grid-cols-1 md:grid-cols-4 gap-4">
-          <div className="bg-blue-50 p-3 rounded-lg">
-            <div className="text-sm font-medium text-blue-900">Total commandes</div>
-            <div className="text-2xl font-bold text-blue-600">{commandesFiltered.length}</div>
+          <div className="bg-blue-50 dark:bg-blue-900/20 p-3 rounded-lg">
+            <div className="text-sm font-medium text-blue-900 dark:text-blue-100">Total commandes</div>
+            <div className="text-2xl font-bold text-blue-600 dark:text-blue-400">{commandesFiltered.length}</div>
           </div>
-          <div className="bg-red-50 p-3 rounded-lg">
-            <div className="text-sm font-medium text-red-900">En retard</div>
-            <div className="text-2xl font-bold text-red-600">
+          <div className="bg-red-50 dark:bg-red-900/20 p-3 rounded-lg">
+            <div className="text-sm font-medium text-red-900 dark:text-red-100">En retard</div>
+            <div className="text-2xl font-bold text-red-600 dark:text-red-400">
               {commandesFiltered.filter(cmd => cmd.retard_jours > 0).length}
             </div>
           </div>
-          <div className="bg-yellow-50 p-3 rounded-lg">
-            <div className="text-sm font-medium text-yellow-900">Priorité urgente</div>
-            <div className="text-2xl font-bold text-yellow-600">
+          <div className="bg-yellow-50 dark:bg-yellow-900/20 p-3 rounded-lg">
+            <div className="text-sm font-medium text-yellow-900 dark:text-yellow-100">Priorité urgente</div>
+            <div className="text-2xl font-bold text-yellow-600 dark:text-yellow-400">
               {commandesFiltered.filter(cmd => cmd.priorite === 'urgent' || cmd.priorite === 'critique').length}
             </div>
           </div>
-          <div className="bg-green-50 p-3 rounded-lg">
-            <div className="text-sm font-medium text-green-900">Valeur totale</div>
-            <div className="text-2xl font-bold text-green-600">
+          <div className="bg-green-50 dark:bg-green-900/20 p-3 rounded-lg">
+            <div className="text-sm font-medium text-green-900 dark:text-green-100">Valeur totale</div>
+            <div className="text-2xl font-bold text-green-600 dark:text-green-400">
               {commandesFiltered.reduce((sum, cmd) => sum + cmd.total_ttc, 0).toLocaleString()}€
             </div>
           </div>
@@ -384,11 +406,11 @@ const TableauSuiviCommandes: React.FC = () => {
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
           </div>
         ) : (
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
+          <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+            <thead className="bg-gray-50 dark:bg-gray-700">
               <tr>
                 <th 
-                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
+                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600"
                   onClick={() => {
                     if (sortBy === 'numero_commande') {
                       setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
@@ -401,7 +423,7 @@ const TableauSuiviCommandes: React.FC = () => {
                   N° Commande
                 </th>
                 <th 
-                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
+                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600"
                   onClick={() => {
                     if (sortBy === 'fournisseur') {
                       setSortOrder(sortOrder === 'asc' ? 'desc' : 'asc');
@@ -413,42 +435,42 @@ const TableauSuiviCommandes: React.FC = () => {
                 >
                   Fournisseur
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Statut</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Dates</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Montant</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Priorité</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Progression</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Alertes</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Statut</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Dates</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Montant</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Priorité</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Progression</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Alertes</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Actions</th>
               </tr>
             </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
-              {commandesFiltered.map((commande) => (
-                <tr key={commande.id} className={`hover:bg-gray-50 ${commande.priorite === 'critique' ? 'bg-red-50' : commande.priorite === 'urgent' ? 'bg-yellow-50' : ''}`}>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+            <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+              {paginatedCommandes.map((commande) => (
+                <tr key={commande.id} className={`hover:bg-gray-50 dark:hover:bg-gray-700 ${commande.priorite === 'critique' ? 'bg-red-50 dark:bg-red-900/20' : commande.priorite === 'urgent' ? 'bg-yellow-50 dark:bg-yellow-900/20' : ''}`}>
+                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">
                     {commande.numero_commande}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
                     <div className="flex flex-col">
                       <span className="font-medium">{commande.fournisseur.nom}</span>
-                      <span className="text-xs text-gray-500">{commande.fournisseur.code_fournisseur}</span>
+                      <span className="text-xs text-gray-500 dark:text-gray-400">{commande.fournisseur.code_fournisseur}</span>
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     {getStatusBadge(commande.status)}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
                     <div className="flex flex-col">
                       <span>Cmd: {new Date(commande.date_commande).toLocaleDateString('fr-FR')}</span>
-                      <span className={`text-xs ${commande.retard_jours > 0 ? 'text-red-600 font-medium' : 'text-gray-500'}`}>
+                      <span className={`text-xs ${commande.retard_jours > 0 ? 'text-red-600 dark:text-red-400 font-medium' : 'text-gray-500 dark:text-gray-400'}`}>
                         Prév: {new Date(commande.date_livraison_prevue).toLocaleDateString('fr-FR')}
                       </span>
                     </div>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
                     <div className="flex flex-col">
                       <span className="font-medium">{commande.total_ttc.toLocaleString()}€</span>
-                      <span className="text-xs text-gray-500">{commande.nb_articles} articles</span>
+                      <span className="text-xs text-gray-500 dark:text-gray-400">{commande.nb_articles} articles</span>
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
@@ -456,7 +478,7 @@ const TableauSuiviCommandes: React.FC = () => {
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div className="flex items-center">
-                      <div className="w-full bg-gray-200 rounded-full h-2 mr-2">
+                      <div className="w-full bg-gray-200 dark:bg-gray-600 rounded-full h-2 mr-2">
                         <div 
                           className={`h-2 rounded-full ${
                             commande.progression === 100 ? 'bg-green-600' : 
@@ -466,29 +488,29 @@ const TableauSuiviCommandes: React.FC = () => {
                           style={{ width: `${commande.progression}%` }}
                         ></div>
                       </div>
-                      <span className="text-xs text-gray-600">{commande.progression}%</span>
+                      <span className="text-xs text-gray-600 dark:text-gray-400">{commande.progression}%</span>
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
                     {commande.alertes.length > 0 ? (
                       <div className="flex flex-col space-y-1">
                         {commande.alertes.slice(0, 2).map((alerte, index) => (
-                          <span key={index} className="text-xs bg-red-100 text-red-800 px-2 py-1 rounded">
+                          <span key={index} className="text-xs bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300 px-2 py-1 rounded">
                             {alerte}
                           </span>
                         ))}
                         {commande.alertes.length > 2 && (
-                          <span className="text-xs text-gray-500">+{commande.alertes.length - 2} autres</span>
+                          <span className="text-xs text-gray-500 dark:text-gray-400">+{commande.alertes.length - 2} autres</span>
                         )}
                       </div>
                     ) : (
-                      <span className="text-xs text-green-600">Aucune alerte</span>
+                      <span className="text-xs text-green-600 dark:text-green-400">Aucune alerte</span>
                     )}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
                     <button
                       onClick={() => openModal(commande)}
-                      className="text-blue-600 hover:text-blue-900"
+                      className="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300"
                     >
                       <EyeIcon className="h-4 w-4" />
                     </button>
@@ -500,11 +522,23 @@ const TableauSuiviCommandes: React.FC = () => {
         )}
       </div>
 
+      {/* Pagination */}
+      {totalItems > itemsPerPage && (
+        <Pagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          totalItems={totalItems}
+          itemsPerPage={itemsPerPage}
+          onPageChange={handlePageChange}
+          onItemsPerPageChange={handleItemsPerPageChange}
+        />
+      )}
+
       {/* État vide */}
-      {!loading && commandesFiltered.length === 0 && (
+      {!loading && paginatedCommandes.length === 0 && (
         <div className="px-6 py-12 text-center">
-          <ClockIcon className="h-12 w-12 text-gray-400 mx-auto mb-4" />
-          <p className="text-gray-500">
+          <ClockIcon className="h-12 w-12 text-gray-400 dark:text-gray-500 mx-auto mb-4" />
+          <p className="text-gray-500 dark:text-gray-400">
             Aucune commande en cours trouvée avec les filtres appliqués.
           </p>
         </div>
@@ -513,15 +547,15 @@ const TableauSuiviCommandes: React.FC = () => {
       {/* Modal de détails */}
       {showModal && selectedCommande && (
         <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
-          <div className="relative top-20 mx-auto p-5 border w-11/12 md:w-3/4 lg:w-1/2 shadow-lg rounded-md bg-white">
+          <div className="relative top-20 mx-auto p-5 border w-11/12 md:w-3/4 lg:w-1/2 shadow-lg rounded-md bg-white dark:bg-gray-800">
             <div className="mt-3">
               <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg font-medium text-gray-900">
+                <h3 className="text-lg font-medium text-gray-900 dark:text-white">
                   Détails de la commande {selectedCommande.numero_commande}
                 </h3>
                 <button
                   onClick={closeModal}
-                  className="text-gray-400 hover:text-gray-600"
+                  className="text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300"
                 >
                   ✕
                 </button>
@@ -530,7 +564,7 @@ const TableauSuiviCommandes: React.FC = () => {
               <div className="space-y-4">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                   <div>
-                    <h4 className="font-medium text-gray-900 mb-2">Informations générales</h4>
+                    <h4 className="font-medium text-gray-900 dark:text-white mb-2">Informations générales</h4>
                     <div className="space-y-2 text-sm">
                       <div><span className="font-medium">Fournisseur:</span> {selectedCommande.fournisseur.nom}</div>
                       <div><span className="font-medium">Statut:</span> {getStatusBadge(selectedCommande.status)}</div>
@@ -540,7 +574,7 @@ const TableauSuiviCommandes: React.FC = () => {
                   </div>
                   
                   <div>
-                    <h4 className="font-medium text-gray-900 mb-2">Dates et délais</h4>
+                    <h4 className="font-medium text-gray-900 dark:text-white mb-2">Dates et délais</h4>
                     <div className="space-y-2 text-sm">
                       <div><span className="font-medium">Date commande:</span> {new Date(selectedCommande.date_commande).toLocaleDateString('fr-FR')}</div>
                       <div><span className="font-medium">Livraison prévue:</span> {new Date(selectedCommande.date_livraison_prevue).toLocaleDateString('fr-FR')}</div>
@@ -552,7 +586,7 @@ const TableauSuiviCommandes: React.FC = () => {
                 
                 {selectedCommande.transporteur && (
                   <div>
-                    <h4 className="font-medium text-gray-900 mb-2">Transport</h4>
+                    <h4 className="font-medium text-gray-900 dark:text-white mb-2">Transport</h4>
                     <div className="space-y-2 text-sm">
                       <div><span className="font-medium">Transporteur:</span> {selectedCommande.transporteur}</div>
                       {selectedCommande.numero_tracking && (
@@ -564,10 +598,10 @@ const TableauSuiviCommandes: React.FC = () => {
                 
                 {selectedCommande.alertes.length > 0 && (
                   <div>
-                    <h4 className="font-medium text-gray-900 mb-2">Alertes</h4>
+                    <h4 className="font-medium text-gray-900 dark:text-white mb-2">Alertes</h4>
                     <div className="space-y-1">
                       {selectedCommande.alertes.map((alerte, index) => (
-                        <div key={index} className="text-sm bg-red-100 text-red-800 px-3 py-2 rounded">
+                        <div key={index} className="text-sm bg-red-100 dark:bg-red-900/30 text-red-800 dark:text-red-300 px-3 py-2 rounded">
                           {alerte}
                         </div>
                       ))}
@@ -577,8 +611,8 @@ const TableauSuiviCommandes: React.FC = () => {
                 
                 {selectedCommande.commentaires && (
                   <div>
-                    <h4 className="font-medium text-gray-900 mb-2">Commentaires</h4>
-                    <div className="text-sm text-gray-600 bg-gray-50 p-3 rounded">
+                    <h4 className="font-medium text-gray-900 dark:text-white mb-2">Commentaires</h4>
+                    <div className="text-sm text-gray-600 dark:text-gray-400 bg-gray-50 dark:bg-gray-700 p-3 rounded">
                       {selectedCommande.commentaires}
                     </div>
                   </div>

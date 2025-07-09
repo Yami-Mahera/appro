@@ -27,12 +27,28 @@ interface User {
   last_login?: string;
 }
 
+interface UsersResponse {
+  users: User[];
+  total: number;
+  limit: number;
+  skip: number;
+  has_next: boolean;
+  has_previous: boolean;
+}
+
 type SortField = "nom" | "prenom" | "email" | "role" | "created_at";
 type SortOrder = "asc" | "desc";
 
 const UsersAdvanced: React.FC = () => {
   const { user: currentUser } = useAuth();
-  const [users, setUsers] = useState<User[]>([]);
+  const [usersData, setUsersData] = useState<UsersResponse>({
+    users: [],
+    total: 0,
+    limit: 10,
+    skip: 0,
+    has_next: false,
+    has_previous: false,
+  });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [showModal, setShowModal] = useState(false);
@@ -42,6 +58,10 @@ const UsersAdvanced: React.FC = () => {
   const [viewingUser, setViewingUser] = useState<User | null>(null);
   const [resetPasswordUser, setResetPasswordUser] = useState<User | null>(null);
   const [showFilters, setShowFilters] = useState(false);
+
+  // Pagination states
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
 
   // Vérifier si l'utilisateur actuel est administrateur
   const isAdmin = currentUser?.role === "administrateur";
@@ -76,30 +96,22 @@ const UsersAdvanced: React.FC = () => {
     confirmPassword: "",
   });
 
-  useEffect(() => {
-    const debouncedLoad = debounce(() => {
-      loadUsers();
-    }, 300); // délai de 300ms
-
-    debouncedLoad();
-
-    // Nettoyage pour éviter des appels en cascade
-    return () => debouncedLoad.cancel();
-  }, [searchTerm, sortField, sortOrder, filters]);
-
   const loadUsers = async () => {
     try {
       setLoading(true);
+      const skip = (currentPage - 1) * itemsPerPage;
       const params = {
         search: searchTerm || undefined,
         sort_by: sortField,
         sort_order: sortOrder,
         role: filters.role || undefined,
         active: filters.active,
+        limit: itemsPerPage,
+        skip: skip,
       };
 
       const data = await ApiService.getUsers(params);
-      setUsers(data);
+      setUsersData(data);
     } catch (err: any) {
       setError(
         err.response?.data?.detail ||
@@ -109,6 +121,20 @@ const UsersAdvanced: React.FC = () => {
       setLoading(false);
     }
   };
+
+  // Reset to first page when filters change
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm, sortField, sortOrder, filters, itemsPerPage]);
+
+  useEffect(() => {
+    const debouncedLoad = debounce(() => {
+      loadUsers();
+    }, 300);
+
+    debouncedLoad();
+    return () => debouncedLoad.cancel();
+  }, [searchTerm, sortField, sortOrder, filters, currentPage, itemsPerPage]);
 
   const handleSort = (field: SortField) => {
     if (sortField === field) {
@@ -249,7 +275,7 @@ const UsersAdvanced: React.FC = () => {
     children: React.ReactNode;
   }) => (
     <th
-      className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
+      className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700"
       onClick={() => handleSort(field)}
     >
       <div className="flex items-center space-x-1">
@@ -264,6 +290,74 @@ const UsersAdvanced: React.FC = () => {
     </th>
   );
 
+  // Pagination functions
+  const totalPages = Math.ceil(usersData.total / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage + 1;
+  const endIndex = Math.min(currentPage * itemsPerPage, usersData.total);
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+  };
+
+  const handleItemsPerPageChange = (newItemsPerPage: number) => {
+    setItemsPerPage(newItemsPerPage);
+    setCurrentPage(1);
+  };
+
+  const renderPaginationButtons = () => {
+    const buttons = [];
+    const maxButtons = 5;
+    let startPage = Math.max(1, currentPage - Math.floor(maxButtons / 2));
+    let endPage = Math.min(totalPages, startPage + maxButtons - 1);
+
+    if (endPage - startPage + 1 < maxButtons) {
+      startPage = Math.max(1, endPage - maxButtons + 1);
+    }
+
+    // Previous button
+    buttons.push(
+      <button
+        key="prev"
+        onClick={() => handlePageChange(currentPage - 1)}
+        disabled={!usersData.has_previous}
+        className="px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-l-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed dark:bg-gray-800 dark:border-gray-600 dark:text-gray-400 dark:hover:bg-gray-700"
+      >
+        Précédent
+      </button>
+    );
+
+    // Page numbers
+    for (let i = startPage; i <= endPage; i++) {
+      buttons.push(
+        <button
+          key={i}
+          onClick={() => handlePageChange(i)}
+          className={`px-3 py-2 text-sm font-medium border-t border-b border-gray-300 hover:bg-gray-50 dark:border-gray-600 dark:hover:bg-gray-700 ${
+            i === currentPage
+              ? "text-blue-600 bg-blue-50 dark:bg-blue-900 dark:text-blue-300"
+              : "text-gray-500 bg-white dark:bg-gray-800 dark:text-gray-400"
+          }`}
+        >
+          {i}
+        </button>
+      );
+    }
+
+    // Next button
+    buttons.push(
+      <button
+        key="next"
+        onClick={() => handlePageChange(currentPage + 1)}
+        disabled={!usersData.has_next}
+        className="px-3 py-2 text-sm font-medium text-gray-500 bg-white border border-gray-300 rounded-r-md hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed dark:bg-gray-800 dark:border-gray-600 dark:text-gray-400 dark:hover:bg-gray-700"
+      >
+        Suivant
+      </button>
+    );
+
+    return buttons;
+  };
+
   if (loading) {
     return (
       <div className="flex justify-center items-center h-64">
@@ -277,10 +371,10 @@ const UsersAdvanced: React.FC = () => {
     return (
       <div className="flex flex-col items-center justify-center h-64">
         <ShieldCheckIcon className="w-16 h-16 text-red-500 mb-4" />
-        <h2 className="text-xl font-semibold text-gray-900 mb-2">
+        <h2 className="text-xl font-semibold text-gray-900 dark:text-white mb-2">
           Accès refusé
         </h2>
-        <p className="text-gray-600">
+        <p className="text-gray-600 dark:text-gray-400">
           Vous devez être administrateur pour accéder à cette page.
         </p>
       </div>
@@ -292,7 +386,7 @@ const UsersAdvanced: React.FC = () => {
       <div className="flex justify-between items-center">
         <div className="flex items-center space-x-3">
           <UserCircleIcon className="w-8 h-8 text-blue-600" />
-          <h1 className="text-2xl font-bold text-gray-900">
+          <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
             Gestion des Utilisateurs
           </h1>
         </div>
@@ -306,13 +400,13 @@ const UsersAdvanced: React.FC = () => {
       </div>
 
       {error && (
-        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
+        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded dark:bg-red-900 dark:border-red-600 dark:text-red-300">
           {error}
         </div>
       )}
 
       {/* Search and Filters */}
-      <div className="bg-white p-4 rounded-lg shadow-sm space-y-4">
+      <div className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-sm space-y-4">
         <div className="flex flex-wrap gap-4 items-center">
           <div className="flex-1 min-w-64 relative">
             <MagnifyingGlassIcon className="w-5 h-5 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
@@ -321,12 +415,12 @@ const UsersAdvanced: React.FC = () => {
               placeholder="Rechercher par nom, prénom, email..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+              className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:placeholder-gray-400"
             />
           </div>
           <button
             onClick={() => setShowFilters(!showFilters)}
-            className="flex items-center space-x-2 px-3 py-2 border border-gray-300 rounded-md hover:bg-gray-50"
+            className="flex items-center space-x-2 px-3 py-2 border border-gray-300 rounded-md hover:bg-gray-50 dark:border-gray-600 dark:hover:bg-gray-700 dark:text-gray-200"
           >
             <AdjustmentsHorizontalIcon className="w-5 h-5" />
             <span>Filtres</span>
@@ -334,9 +428,9 @@ const UsersAdvanced: React.FC = () => {
         </div>
 
         {showFilters && (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4 border-t">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 pt-4 border-t dark:border-gray-700">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 Rôle
               </label>
               <select
@@ -344,7 +438,7 @@ const UsersAdvanced: React.FC = () => {
                 onChange={(e) =>
                   setFilters({ ...filters, role: e.target.value })
                 }
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
               >
                 <option value="">Tous les rôles</option>
                 <option value="administrateur">Administrateur</option>
@@ -353,7 +447,7 @@ const UsersAdvanced: React.FC = () => {
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 Statut
               </label>
               <select
@@ -371,7 +465,7 @@ const UsersAdvanced: React.FC = () => {
                         : e.target.value === "true",
                   })
                 }
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
               >
                 <option value="all">Tous</option>
                 <option value="true">Actifs</option>
@@ -383,49 +477,49 @@ const UsersAdvanced: React.FC = () => {
       </div>
 
       {/* Table */}
-      <div className="bg-white shadow-sm rounded-lg overflow-hidden">
+      <div className="bg-white dark:bg-gray-800 shadow-sm rounded-lg overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
+          <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+            <thead className="bg-gray-50 dark:bg-gray-900">
               <tr>
                 <SortableHeader field="nom">Utilisateur</SortableHeader>
                 <SortableHeader field="email">Email</SortableHeader>
                 <SortableHeader field="role">Rôle</SortableHeader>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                   Statut
                 </th>
                 <SortableHeader field="created_at">Créé le</SortableHeader>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                   Dernière connexion
                 </th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                   Actions
                 </th>
               </tr>
             </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
-              {users.map((user) => {
+            <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+              {usersData.users && usersData.users.map((user) => {
                 const roleBadge = getRoleBadge(user.role);
                 return (
-                  <tr key={user.id} className="hover:bg-gray-50">
+                  <tr key={user.id} className="hover:bg-gray-50 dark:hover:bg-gray-700">
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center">
                         <div className="flex-shrink-0 h-10 w-10">
-                          <div className="h-10 w-10 rounded-full bg-gray-300 flex items-center justify-center">
-                            <span className="text-sm font-medium text-gray-700">
+                          <div className="h-10 w-10 rounded-full bg-gray-300 dark:bg-gray-600 flex items-center justify-center">
+                            <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
                               {user.prenom[0]}
                               {user.nom[0]}
                             </span>
                           </div>
                         </div>
                         <div className="ml-4">
-                          <div className="text-sm font-medium text-gray-900">
+                          <div className="text-sm font-medium text-gray-900 dark:text-white">
                             {user.prenom} {user.nom}
                           </div>
                         </div>
                       </div>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-300">
                       {user.email}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
@@ -439,17 +533,17 @@ const UsersAdvanced: React.FC = () => {
                       <span
                         className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${
                           user.active
-                            ? "bg-green-100 text-green-800"
-                            : "bg-red-100 text-red-800"
+                            ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300"
+                            : "bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300"
                         }`}
                       >
                         {user.active ? "Actif" : "Inactif"}
                       </span>
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
                       {new Date(user.created_at).toLocaleDateString("fr-FR")}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
                       {user.last_login
                         ? new Date(user.last_login).toLocaleDateString("fr-FR")
                         : "Jamais"}
@@ -458,21 +552,21 @@ const UsersAdvanced: React.FC = () => {
                       <div className="flex space-x-2">
                         <button
                           onClick={() => handleView(user)}
-                          className="text-green-600 hover:text-green-900"
+                          className="text-green-600 hover:text-green-900 dark:text-green-400 dark:hover:text-green-300"
                           title="Voir les détails"
                         >
                           <EyeIcon className="w-4 h-4" />
                         </button>
                         <button
                           onClick={() => handleEdit(user)}
-                          className="text-blue-600 hover:text-blue-900"
+                          className="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300"
                           title="Modifier"
                         >
                           <PencilIcon className="w-4 h-4" />
                         </button>
                         <button
                           onClick={() => openPasswordResetModal(user)}
-                          className="text-orange-600 hover:text-orange-900"
+                          className="text-orange-600 hover:text-orange-900 dark:text-orange-400 dark:hover:text-orange-300"
                           title="Réinitialiser le mot de passe"
                         >
                           <KeyIcon className="w-4 h-4" />
@@ -481,7 +575,7 @@ const UsersAdvanced: React.FC = () => {
                         {user.id !== currentUser?.id && (
                           <button
                             onClick={() => handleDelete(user)}
-                            className="text-red-600 hover:text-red-900"
+                            className="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300"
                             title="Supprimer"
                           >
                             <TrashIcon className="w-4 h-4" />
@@ -496,19 +590,73 @@ const UsersAdvanced: React.FC = () => {
           </table>
         </div>
 
-        {users.length === 0 && (
+        {usersData.users.length === 0 && (
           <div className="text-center py-8">
-            <UserCircleIcon className="mx-auto h-12 w-12 text-gray-400" />
-            <p className="mt-2 text-gray-500">Aucun utilisateur trouvé</p>
+            <UserCircleIcon className="mx-auto h-12 w-12 text-gray-400 dark:text-gray-600" />
+            <p className="mt-2 text-gray-500 dark:text-gray-400">Aucun utilisateur trouvé</p>
           </div>
         )}
       </div>
 
+      {/* Pagination */}
+      {usersData.users.length > 0 && (
+        <div className="bg-white dark:bg-gray-800 px-4 py-3 flex items-center justify-between border-t border-gray-200 dark:border-gray-700 sm:px-6 rounded-lg">
+          <div className="flex-1 flex justify-between sm:hidden">
+            <button
+              onClick={() => handlePageChange(currentPage - 1)}
+              disabled={!usersData.has_previous}
+              className="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed dark:bg-gray-800 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700"
+            >
+              Précédent
+            </button>
+            <button
+              onClick={() => handlePageChange(currentPage + 1)}
+              disabled={!usersData.has_next}
+              className="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed dark:bg-gray-800 dark:border-gray-600 dark:text-gray-300 dark:hover:bg-gray-700"
+            >
+              Suivant
+            </button>
+          </div>
+          <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
+            <div className="flex items-center space-x-4">
+              <p className="text-sm text-gray-700 dark:text-gray-300">
+                Affichage de <span className="font-medium">{startIndex}</span> à{" "}
+                <span className="font-medium">{endIndex}</span> sur{" "}
+                <span className="font-medium">{usersData.total}</span> résultats
+              </p>
+              <div className="flex items-center space-x-2">
+                <label className="text-sm text-gray-700 dark:text-gray-300">
+                  Afficher:
+                </label>
+                <select
+                  value={itemsPerPage}
+                  onChange={(e) => handleItemsPerPageChange(Number(e.target.value))}
+                  className="text-sm border border-gray-300 rounded px-2 py-1 focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
+                >
+                  <option value={5}>5</option>
+                  <option value={10}>10</option>
+                  <option value={20}>20</option>
+                  <option value={50}>50</option>
+                </select>
+                <span className="text-sm text-gray-700 dark:text-gray-300">
+                  par page
+                </span>
+              </div>
+            </div>
+            <div>
+              <nav className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px">
+                {renderPaginationButtons()}
+              </nav>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Add/Edit Modal */}
       {showModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 w-full max-w-md">
-            <h2 className="text-xl font-bold mb-4">
+          <div className="bg-white dark:bg-gray-800 rounded-lg p-6 w-full max-w-md">
+            <h2 className="text-xl font-bold mb-4 text-gray-900 dark:text-white">
               {editingUser
                 ? "Modifier l'utilisateur"
                 : "Ajouter un utilisateur"}
@@ -516,7 +664,7 @@ const UsersAdvanced: React.FC = () => {
             <form onSubmit={handleSubmit} className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                     Prénom *
                   </label>
                   <input
@@ -525,12 +673,12 @@ const UsersAdvanced: React.FC = () => {
                     onChange={(e) =>
                       setFormData({ ...formData, prenom: e.target.value })
                     }
-                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:placeholder-gray-400"
                     required
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                     Nom *
                   </label>
                   <input
@@ -539,14 +687,14 @@ const UsersAdvanced: React.FC = () => {
                     onChange={(e) =>
                       setFormData({ ...formData, nom: e.target.value })
                     }
-                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:placeholder-gray-400"
                     required
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                   Email *
                 </label>
                 <input
@@ -555,14 +703,14 @@ const UsersAdvanced: React.FC = () => {
                   onChange={(e) =>
                     setFormData({ ...formData, email: e.target.value })
                   }
-                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:placeholder-gray-400"
                   required
                 />
               </div>
 
               {!editingUser && (
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                     Mot de passe *
                   </label>
                   <input
@@ -571,7 +719,7 @@ const UsersAdvanced: React.FC = () => {
                     onChange={(e) =>
                       setFormData({ ...formData, password: e.target.value })
                     }
-                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:placeholder-gray-400"
                     required={!editingUser}
                     minLength={6}
                   />
@@ -579,7 +727,7 @@ const UsersAdvanced: React.FC = () => {
               )}
 
               <div>
-                <label className="block text-sm font-medium text-gray-700">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                   Rôle *
                 </label>
                 <select
@@ -587,7 +735,7 @@ const UsersAdvanced: React.FC = () => {
                   onChange={(e) =>
                     setFormData({ ...formData, role: e.target.value as any })
                   }
-                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white"
                   required
                 >
                   <option value="utilisateur">Utilisateur</option>
@@ -600,7 +748,7 @@ const UsersAdvanced: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => setShowModal(false)}
-                  className="px-4 py-2 text-gray-700 bg-gray-200 rounded-md hover:bg-gray-300"
+                  className="px-4 py-2 text-gray-700 bg-gray-200 rounded-md hover:bg-gray-300 dark:bg-gray-600 dark:text-gray-300 dark:hover:bg-gray-500"
                 >
                   Annuler
                 </button>
@@ -619,12 +767,12 @@ const UsersAdvanced: React.FC = () => {
       {/* Detail Modal */}
       {showDetailModal && viewingUser && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 w-full max-w-md">
+          <div className="bg-white dark:bg-gray-800 rounded-lg p-6 w-full max-w-md">
             <div className="flex justify-between items-center mb-4">
-              <h2 className="text-xl font-bold">Détails de l'utilisateur</h2>
+              <h2 className="text-xl font-bold text-gray-900 dark:text-white">Détails de l'utilisateur</h2>
               <button
                 onClick={() => setShowDetailModal(false)}
-                className="text-gray-400 hover:text-gray-600"
+                className="text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300"
               >
                 ✕
               </button>
@@ -632,50 +780,50 @@ const UsersAdvanced: React.FC = () => {
 
             <div className="space-y-4">
               <div className="text-center">
-                <div className="h-16 w-16 rounded-full bg-gray-300 flex items-center justify-center mx-auto mb-3">
-                  <span className="text-xl font-medium text-gray-700">
+                <div className="h-16 w-16 rounded-full bg-gray-300 dark:bg-gray-600 flex items-center justify-center mx-auto mb-3">
+                  <span className="text-xl font-medium text-gray-700 dark:text-gray-300">
                     {viewingUser.prenom[0]}
                     {viewingUser.nom[0]}
                   </span>
                 </div>
-                <h3 className="text-lg font-semibold">
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
                   {viewingUser.prenom} {viewingUser.nom}
                 </h3>
-                <p className="text-gray-500">{viewingUser.email}</p>
+                <p className="text-gray-500 dark:text-gray-400">{viewingUser.email}</p>
               </div>
 
-              <div className="grid grid-cols-2 gap-4 pt-4 border-t">
+              <div className="grid grid-cols-2 gap-4 pt-4 border-t dark:border-gray-700">
                 <div>
-                  <span className="text-sm font-medium text-gray-500">
+                  <span className="text-sm font-medium text-gray-500 dark:text-gray-400">
                     Rôle:
                   </span>
-                  <p className="text-gray-900">
+                  <p className="text-gray-900 dark:text-white">
                     {getRoleBadge(viewingUser.role).label}
                   </p>
                 </div>
                 <div>
-                  <span className="text-sm font-medium text-gray-500">
+                  <span className="text-sm font-medium text-gray-500 dark:text-gray-400">
                     Statut:
                   </span>
-                  <p className="text-gray-900">
+                  <p className="text-gray-900 dark:text-white">
                     {viewingUser.active ? "Actif" : "Inactif"}
                   </p>
                 </div>
                 <div>
-                  <span className="text-sm font-medium text-gray-500">
+                  <span className="text-sm font-medium text-gray-500 dark:text-gray-400">
                     Créé le:
                   </span>
-                  <p className="text-gray-900">
+                  <p className="text-gray-900 dark:text-white">
                     {new Date(viewingUser.created_at).toLocaleDateString(
                       "fr-FR"
                     )}
                   </p>
                 </div>
                 <div>
-                  <span className="text-sm font-medium text-gray-500">
+                  <span className="text-sm font-medium text-gray-500 dark:text-gray-400">
                     Dernière connexion:
                   </span>
-                  <p className="text-gray-900">
+                  <p className="text-gray-900 dark:text-white">
                     {viewingUser.last_login
                       ? new Date(viewingUser.last_login).toLocaleDateString(
                           "fr-FR"
@@ -692,24 +840,24 @@ const UsersAdvanced: React.FC = () => {
       {/* Password Reset Modal */}
       {showPasswordModal && resetPasswordUser && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 w-full max-w-md">
+          <div className="bg-white dark:bg-gray-800 rounded-lg p-6 w-full max-w-md">
             <div className="flex items-center space-x-3 mb-4">
               <KeyIcon className="w-6 h-6 text-orange-600" />
-              <h2 className="text-xl font-bold">
+              <h2 className="text-xl font-bold text-gray-900 dark:text-white">
                 Réinitialiser le mot de passe
               </h2>
             </div>
 
-            <p className="text-gray-600 mb-4">
+            <p className="text-gray-600 dark:text-gray-400 mb-4">
               Utilisateur:{" "}
-              <span className="font-medium">
+              <span className="font-medium text-gray-900 dark:text-white">
                 {resetPasswordUser.prenom} {resetPasswordUser.nom}
               </span>
             </p>
 
             <form onSubmit={handlePasswordReset} className="space-y-4">
               <div>
-                <label className="block text-sm font-medium text-gray-700">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                   Nouveau mot de passe *
                 </label>
                 <input
@@ -721,14 +869,14 @@ const UsersAdvanced: React.FC = () => {
                       newPassword: e.target.value,
                     })
                   }
-                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:placeholder-gray-400"
                   required
                   minLength={6}
                 />
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                   Confirmer le mot de passe *
                 </label>
                 <input
@@ -740,7 +888,7 @@ const UsersAdvanced: React.FC = () => {
                       confirmPassword: e.target.value,
                     })
                   }
-                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 dark:bg-gray-700 dark:border-gray-600 dark:text-white dark:placeholder-gray-400"
                   required
                   minLength={6}
                 />
@@ -750,7 +898,7 @@ const UsersAdvanced: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => setShowPasswordModal(false)}
-                  className="px-4 py-2 text-gray-700 bg-gray-200 rounded-md hover:bg-gray-300"
+                  className="px-4 py-2 text-gray-700 bg-gray-200 rounded-md hover:bg-gray-300 dark:bg-gray-600 dark:text-gray-300 dark:hover:bg-gray-500"
                 >
                   Annuler
                 </button>

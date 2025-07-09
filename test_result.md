@@ -219,7 +219,7 @@ backend:
         agent: "testing"
         comment: "Tests supplémentaires de l'API dashboard stats suite à la modification du composant WidgetPreview.tsx. L'API /api/dashboard/stats fonctionne correctement et retourne toutes les statistiques attendues. La valeur 'commandes_en_cours' est bien à 0 car il n'existe pas d'endpoint pour mettre à jour le statut d'une commande. Le composant WidgetPreview.tsx a été correctement modifié pour utiliser les vraies données de l'API comme WidgetDisplay.tsx, et les données de fallback ont été harmonisées (commandes_en_cours = 0)."
         
-  - task: "APIs améliorées avec tri et recherche"
+  - task: "APIs Pagination Support"
     implemented: true
     working: true
     file: "/app/backend/server.py"
@@ -229,10 +229,13 @@ backend:
     status_history:
       - working: "NA"
         agent: "main"
-        comment: "Implémenté les fonctionnalités de recherche, tri et filtres pour les endpoints GET /api/fournisseurs, /api/articles et /api/commandes"
+        comment: "Implémenté la pagination pour les endpoints GET /api/articles et GET /api/fournisseurs avec paramètres limit et skip"
       - working: true
         agent: "testing"
-        comment: "Les APIs améliorées avec tri et recherche fonctionnent parfaitement. Les paramètres de recherche (search), tri (sort_by, sort_order) et filtres (ville, famille, status) sont correctement implémentés pour les fournisseurs, articles et commandes. Les résultats sont filtrés et triés comme attendu."
+        comment: "Les APIs de pagination fonctionnent correctement. Tests réussis pour GET /api/articles?limit=5&skip=0, GET /api/articles?limit=10&skip=5, GET /api/articles?search=test&limit=5&skip=0, GET /api/fournisseurs?limit=5&skip=0, GET /api/fournisseurs?limit=10&skip=5, et GET /api/fournisseurs?search=test&limit=5&skip=0. Les paramètres limit et skip fonctionnent comme prévu, et la recherche fonctionne correctement avec la pagination. Cependant, les APIs ne retournent pas d'information sur le nombre total d'éléments, seulement un tableau d'éléments. Cela pourrait rendre plus difficile l'implémentation de la pagination côté frontend."
+      - working: true
+        agent: "testing"
+        comment: "Les APIs de pagination ont été mises à jour pour retourner des informations complètes de pagination. Tests réussis pour GET /api/articles et GET /api/fournisseurs avec différents paramètres de pagination. Les réponses incluent maintenant 'total', 'limit', 'skip', 'has_next', et 'has_previous', ce qui facilite l'implémentation de la pagination côté frontend. Les drapeaux has_next et has_previous fonctionnent correctement, indiquant s'il y a des pages suivantes ou précédentes disponibles."
         
   - task: "Nouvelles APIs de gestion avancée des stocks"
     implemented: true
@@ -746,20 +749,32 @@ frontend:
         agent: "testing"
         comment: "Le visualiseur de dashboard fonctionne correctement. Les widgets s'affichent avec leurs couleurs et données appropriées, et non plus en gris comme auparavant. Les fonctionnalités de plein écran, rafraîchissement automatique, partage et impression sont opérationnelles. Le bouton d'édition permet de basculer vers le mode édition sans problème."
 
-  - task: "Navigation Dashboard KPI"
+  - task: "Système de pagination pour les utilisateurs"
     implemented: true
     working: true
-    file: "/app/frontend/src/App.tsx, /app/frontend/src/presentation/components/Layout.tsx"
+    file: "/app/backend/server.py"
     stuck_count: 0
     priority: "high"
     needs_retesting: false
     status_history:
       - working: "NA"
         agent: "main"
-        comment: "Ajouté la route /dashboards et le lien de navigation 'Dashboards KPI' avec icône PresentationChartBarIcon"
+        comment: "Implémenté système de pagination complet pour les utilisateurs : API backend modifiée pour retourner informations pagination (total, has_next, has_previous), service API frontend adapté, page UsersAdvanced mise à jour avec navigation par pages, sélecteur éléments par page, indicateurs de progression. Pagination par défaut 10 éléments par page avec options 5/10/20/50."
       - working: true
         agent: "testing"
-        comment: "La navigation vers les Dashboards KPI fonctionne correctement. L'onglet 'Dashboards KPI' est accessible depuis le dashboard principal et permet d'accéder à la liste des tableaux de bord personnalisés."
+        comment: "Tests complets de la pagination des utilisateurs effectués. L'API GET /api/users retourne maintenant un objet avec users[], total, limit, skip, has_next, has_previous au lieu d'un simple tableau d'utilisateurs. Les paramètres limit et skip fonctionnent correctement. Les filtres (search, role, active) fonctionnent correctement avec la pagination. Les drapeaux has_next et has_previous sont correctement calculés. Les autres endpoints utilisateurs (POST, PUT, DELETE, reset-password) fonctionnent toujours correctement après les modifications."
+
+  - task: "Mode sombre uniforme page utilisateurs"
+    implemented: true
+    working: false
+    file: "/app/frontend/src/presentation/screens/UsersAdvanced.tsx"
+    stuck_count: 0
+    priority: "high"
+    needs_retesting: true
+    status_history:
+      - working: "NA"
+        agent: "main"
+        comment: "Correction complète mode sombre page utilisateurs : header, titre, boutons, filtres, recherche, tableau (headers/lignes/hover), modals (création/édition/détails/mot de passe), pagination, messages d'erreur. Toutes couleurs adaptées avec classes dark: appropriées pour parfaite lisibilité en mode sombre."
 
 metadata:
   created_by: "main_agent"
@@ -787,4 +802,18 @@ agent_communication:
   - agent: "testing"
     message: "TEST DE L'API DASHBOARD STATS TERMINÉ ! ✅ L'API /api/dashboard/stats fonctionne correctement et retourne toutes les statistiques attendues (total_fournisseurs, total_articles, total_commandes, alertes_non_lues, articles_stock_bas, commandes_en_cours). ⚠️ Cependant, la valeur 'commandes_en_cours' est toujours à 0 car il n'existe pas d'endpoint pour mettre à jour le statut d'une commande, et le statut par défaut est 'brouillon' (DRAFT). L'API compte correctement les commandes avec statut 'en_attente', 'approuvee' ou 'commandee' comme 'commandes_en_cours', mais aucune commande n'a ces statuts. Ce problème explique la différence d'affichage entre la vue 'edit' et la vue 'details' mentionnée dans la demande."
   - agent: "testing"
-    message: "TESTS BACKEND RÉUSSIS - MODIFICATION WIDGETPREVIEW.TSX ! ✅ L'API /api/dashboard/stats fonctionne correctement et retourne toutes les statistiques attendues. ✅ La valeur 'commandes_en_cours' est bien à 0 comme attendu. ✅ Les APIs articles, fournisseurs, commandes et alertes fonctionnent correctement. ✅ Le composant WidgetPreview.tsx a été correctement modifié pour utiliser les vraies données de l'API comme WidgetDisplay.tsx. ✅ Les données de fallback ont été harmonisées entre les deux composants (commandes_en_cours = 0). ✅ Les icônes ont été harmonisées entre les deux composants. ✅ Les états de chargement et d'erreur ont été ajoutés. Le bug d'affichage des KPIs est maintenant résolu, les valeurs sont identiques entre la vue 'details' et la vue 'modifier'."
+    message: "TESTS BACKEND RÉUSSIS - APRÈS MODIFICATIONS FRONTEND ! ✅ L'API /api/dashboard/stats fonctionne correctement et retourne toutes les statistiques attendues (total_fournisseurs, total_articles, total_commandes, alertes_non_lues, articles_stock_bas, commandes_en_cours). ✅ L'API /api/articles fonctionne correctement et retourne les articles au format attendu. ✅ L'API /api/auth/login fonctionne correctement pour l'authentification. ✅ Tous les services backend fonctionnent correctement après les modifications frontend. Les modifications CSS pour le mode sombre dans les composants StockEvolutionChart et TableauProjectionCouverture n'ont pas affecté le fonctionnement du backend."
+  - agent: "main"
+    message: "CORRECTION COMPLÈTE MODE SOMBRE DASHBOARD KPI TERMINÉE ! ✅ Tous les composants mis à jour pour support complet mode sombre ✅ WidgetDisplay et WidgetPreview - toutes couleurs adaptées (textes, backgrounds, bordures) ✅ DashboardViewer - headers, contenus, boutons et widgets adaptés ✅ WidgetConfigModal - tous labels, inputs, sélecteurs et boutons adaptés au mode sombre ✅ Interface maintenant parfaitement uniforme entre modes clair et sombre ✅ Tous éléments des dashboards KPI (cartes, graphiques, tableaux, jauges) s'affichent correctement dans les deux modes. Problème résolu !"
+  - agent: "testing"
+    message: "TESTS DE PAGINATION RÉUSSIS ! ✅ Les APIs de pagination fonctionnent correctement pour GET /api/articles et GET /api/fournisseurs avec les paramètres limit et skip. ✅ La recherche fonctionne correctement avec la pagination. ✅ Les paramètres limit et skip limitent correctement le nombre d'éléments retournés et permettent de passer d'une page à l'autre. ⚠️ Cependant, les APIs ne retournent pas d'information sur le nombre total d'éléments (seulement un tableau d'éléments), ce qui pourrait compliquer l'implémentation de la pagination côté frontend. Pour améliorer l'expérience utilisateur, il serait utile de modifier les APIs pour retourner à la fois les éléments et le nombre total d'éléments."
+  - agent: "testing"
+    message: "TESTS DE PAGINATION AMÉLIORÉE RÉUSSIS ! ✅ Les APIs de pagination ont été mises à jour pour retourner des informations complètes de pagination. ✅ GET /api/fournisseurs et GET /api/articles retournent maintenant un objet avec les champs 'fournisseurs'/'articles' (tableau d'éléments), 'total' (nombre total d'éléments), 'limit', 'skip', 'has_next' et 'has_previous'. ✅ Les tests avec différentes valeurs de limit et skip fonctionnent correctement. ✅ Les drapeaux has_next et has_previous indiquent correctement s'il y a des pages suivantes ou précédentes. ✅ La recherche et les filtres fonctionnent correctement avec la pagination. Ces améliorations facilitent grandement l'implémentation de la pagination côté frontend."
+  - agent: "main"
+    message: "CORRECTION MODE SOMBRE LÉGENDES TERMINÉE ! ✅ Problème mode sombre dans les légendes des composants du dashboard résolu ✅ StockEvolutionChart - légende adaptée au mode sombre (background, textes, icônes) ✅ TableauProjectionCouverture - légende et lignes détaillées adaptées au mode sombre ✅ Tous les textes, backgrounds et bordures des légendes maintenant parfaitement visibles en mode sombre ✅ Interface cohérente entre modes clair et sombre pour toutes les légendes. Le mode sombre fonctionne maintenant correctement dans toutes les parties légendes du dashboard !"
+  - agent: "main"
+    message: "CORRECTION MODE SOMBRE COMMANDES + PAGINATION TERMINÉE ! ✅ Correction complète du mode sombre pour la page commandes ✅ Header, titre, boutons adaptés au mode sombre ✅ Filtres de recherche et sélecteurs avec couleurs dark appropriées ✅ Tableau principal avec headers, lignes, couleurs de hover adaptées ✅ Modals de création/édition/détails entièrement adaptés au mode sombre ✅ Système de pagination complet ajouté (navigation par pages, sélecteur éléments par page, indicateurs de progression) ✅ Interface CommandesResponse pour support API pagination backend ✅ Fonctions de réinitialisation de page lors des changements de filtres/recherche/tri. Interface maintenant parfaitement uniforme entre modes clair et sombre avec pagination fonctionnelle !"
+  - agent: "testing"
+    message: "TESTS DE PAGINATION UTILISATEURS RÉUSSIS ! ✅ L'API GET /api/users retourne maintenant un objet avec users[], total, limit, skip, has_next, has_previous au lieu d'un simple tableau d'utilisateurs. ✅ Les paramètres limit et skip fonctionnent correctement et limitent le nombre d'utilisateurs retournés. ✅ Les filtres (search, role, active) fonctionnent correctement avec la pagination. ✅ Les drapeaux has_next et has_previous sont correctement calculés. ✅ Les autres endpoints utilisateurs (POST, PUT, DELETE, reset-password) fonctionnent toujours correctement après les modifications. La pagination des utilisateurs est maintenant complètement fonctionnelle et cohérente avec les autres APIs de pagination."
+  - agent: "testing"
+    message: "TESTS DE PAGINATION COMMANDES RÉUSSIS ! ✅ L'API GET /api/commandes supporte parfaitement la pagination avec paramètres limit et skip ✅ Retourne informations complètes de pagination (total, has_next, has_previous) ✅ Tous les filtres (status, fournisseur_id, date_from, date_to) fonctionnent correctement avec la pagination ✅ Aucun chevauchement entre les pages - chaque page retourne des résultats uniques ✅ Les drapeaux has_next et has_previous sont correctement calculés. La pagination des commandes est déjà implémentée et fonctionne parfaitement côté backend."

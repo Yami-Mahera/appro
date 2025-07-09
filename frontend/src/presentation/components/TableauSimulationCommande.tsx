@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { PlusIcon, TrashIcon, CalculatorIcon, CheckCircleIcon, XCircleIcon } from '@heroicons/react/24/outline';
 import apiService from '../../services/api';
+import Pagination from './Pagination';
 
 interface LigneSimulation {
   id: string;
@@ -49,6 +50,10 @@ const TableauSimulationCommande: React.FC = () => {
     alertes: []
   });
 
+  // Pagination states
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
+
   useEffect(() => {
     loadFournisseurs();
   }, []);
@@ -65,7 +70,8 @@ const TableauSimulationCommande: React.FC = () => {
 
   const loadFournisseurs = async () => {
     try {
-      const data = await apiService.getFournisseurs({ limit: 100 });
+      const response = await apiService.getFournisseurs({ limit: 100 });
+      const data = response.fournisseurs || response;
       setFournisseurs(data);
       if (data.length > 0 && !selectedFournisseur) {
         setSelectedFournisseur(data[0].id);
@@ -77,10 +83,11 @@ const TableauSimulationCommande: React.FC = () => {
 
   const loadArticlesByFournisseur = async () => {
     try {
-      const data = await apiService.getArticles({ 
+      const response = await apiService.getArticles({ 
         fournisseur_id: selectedFournisseur,
         limit: 100 
       });
+      const data = response.articles || response;
       setArticles(data);
     } catch (error) {
       console.error('Erreur lors du chargement des articles:', error);
@@ -271,27 +278,43 @@ const TableauSimulationCommande: React.FC = () => {
 
   const selectedFournisseurData = fournisseurs.find(f => f.id === selectedFournisseur);
 
+  // Paginated data
+  const totalItems = lignes.length;
+  const totalPages = Math.ceil(totalItems / itemsPerPage);
+  const startIndex = (currentPage - 1) * itemsPerPage;
+  const endIndex = startIndex + itemsPerPage;
+  const paginatedLignes = lignes.slice(startIndex, endIndex);
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+  };
+
+  const handleItemsPerPageChange = (items: number) => {
+    setItemsPerPage(items);
+    setCurrentPage(1);
+  };
+
   return (
-    <div className="bg-white rounded-lg shadow-sm">
+    <div className="bg-white dark:bg-gray-800 rounded-lg shadow-sm">
       {/* En-tête */}
-      <div className="px-6 py-4 border-b border-gray-200">
+      <div className="px-6 py-4 border-b border-gray-200 dark:border-gray-700">
         <div className="flex items-center justify-between">
           <div>
-            <h2 className="text-xl font-semibold text-gray-900">
+            <h2 className="text-xl font-semibold text-gray-900 dark:text-white">
               Tableau de simulation de commande
             </h2>
-            <p className="text-sm text-gray-600 mt-1">
+            <p className="text-sm text-gray-600 dark:text-gray-400 mt-1">
               Simulation avancée avec validation des contraintes et calculs optimisés
             </p>
           </div>
           
           <div className="flex space-x-4">
             <div className="flex flex-col">
-              <label className="text-sm font-medium text-gray-700 mb-1">Fournisseur</label>
+              <label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Fournisseur</label>
               <select
                 value={selectedFournisseur}
                 onChange={(e) => setSelectedFournisseur(e.target.value)}
-                className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                className="px-3 py-2 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
               >
                 <option value="">Sélectionner un fournisseur</option>
                 {fournisseurs.map((fournisseur) => (
@@ -306,7 +329,7 @@ const TableauSimulationCommande: React.FC = () => {
               <button
                 onClick={ajouterLigne}
                 disabled={!selectedFournisseur || articles.length === 0}
-                className="bg-blue-600 text-white px-4 py-2 rounded-lg flex items-center space-x-2 hover:bg-blue-700 disabled:bg-gray-300"
+                className="bg-blue-600 text-white px-4 py-2 rounded-lg flex items-center space-x-2 hover:bg-blue-700 disabled:bg-gray-300 dark:disabled:bg-gray-600"
               >
                 <PlusIcon className="w-5 h-5" />
                 <span>Ajouter ligne</span>
@@ -315,7 +338,7 @@ const TableauSimulationCommande: React.FC = () => {
               <button
                 onClick={validerToutesLignes}
                 disabled={lignes.length === 0}
-                className="bg-green-600 text-white px-4 py-2 rounded-lg flex items-center space-x-2 hover:bg-green-700 disabled:bg-gray-300"
+                className="bg-green-600 text-white px-4 py-2 rounded-lg flex items-center space-x-2 hover:bg-green-700 disabled:bg-gray-300 dark:disabled:bg-gray-600"
               >
                 <CalculatorIcon className="w-5 h-5" />
                 <span>Valider tout</span>
@@ -326,28 +349,40 @@ const TableauSimulationCommande: React.FC = () => {
 
         {/* Info fournisseur sélectionné */}
         {selectedFournisseurData && (
-          <div className="mt-4 p-4 bg-gray-50 rounded-lg">
+          <div className="mt-4 p-4 bg-gray-50 dark:bg-gray-700 rounded-lg">
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4 text-sm">
               <div>
-                <span className="font-medium text-gray-700">Fournisseur:</span>
-                <span className="ml-2 text-gray-900">{selectedFournisseurData.nom}</span>
+                <span className="font-medium text-gray-700 dark:text-gray-300">Fournisseur:</span>
+                <span className="ml-2 text-gray-900 dark:text-white">{selectedFournisseurData.nom}</span>
               </div>
               <div>
-                <span className="font-medium text-gray-700">Délai moyen:</span>
-                <span className="ml-2 text-gray-900">{selectedFournisseurData.delai_livraison_moyen || 'N/A'} jours</span>
+                <span className="font-medium text-gray-700 dark:text-gray-300">Délai moyen:</span>
+                <span className="ml-2 text-gray-900 dark:text-white">{selectedFournisseurData.delai_livraison_moyen || 'N/A'} jours</span>
               </div>
               <div>
-                <span className="font-medium text-gray-700">Ville:</span>
-                <span className="ml-2 text-gray-900">{selectedFournisseurData.ville}</span>
+                <span className="font-medium text-gray-700 dark:text-gray-300">Ville:</span>
+                <span className="ml-2 text-gray-900 dark:text-white">{selectedFournisseurData.ville}</span>
               </div>
               <div>
-                <span className="font-medium text-gray-700">Articles disponibles:</span>
-                <span className="ml-2 text-gray-900">{articles.length}</span>
+                <span className="font-medium text-gray-700 dark:text-gray-300">Articles disponibles:</span>
+                <span className="ml-2 text-gray-900 dark:text-white">{articles.length}</span>
               </div>
             </div>
           </div>
         )}
       </div>
+
+      {/* Pagination */}
+      {totalItems > itemsPerPage && (
+        <Pagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          totalItems={totalItems}
+          itemsPerPage={itemsPerPage}
+          onPageChange={handlePageChange}
+          onItemsPerPageChange={handleItemsPerPageChange}
+        />
+      )}
 
       {/* Tableau de simulation */}
       <div className="overflow-x-auto">
@@ -356,28 +391,28 @@ const TableauSimulationCommande: React.FC = () => {
             <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
           </div>
         ) : (
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
+          <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+            <thead className="bg-gray-50 dark:bg-gray-700">
               <tr>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Article</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Référence</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Quantité</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Prix Unit.</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Total</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Stock</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">CMS/CMC/QM</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Validation</th>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Actions</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Article</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Référence</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Quantité</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Prix Unit.</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Total</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Stock</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">CMS/CMC/QM</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Validation</th>
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">Actions</th>
               </tr>
             </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
-              {lignes.map((ligne) => (
-                <tr key={ligne.id} className={`hover:bg-gray-50 ${ligne.status === 'erreur' ? 'bg-red-50' : ligne.status === 'attention' ? 'bg-yellow-50' : ''}`}>
+            <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+              {paginatedLignes.map((ligne) => (
+                <tr key={ligne.id} className={`hover:bg-gray-50 dark:hover:bg-gray-700 ${ligne.status === 'erreur' ? 'bg-red-50 dark:bg-red-900/20' : ligne.status === 'attention' ? 'bg-yellow-50 dark:bg-yellow-900/20' : ''}`}>
                   <td className="px-6 py-4 whitespace-nowrap">
                     <select
                       value={ligne.articleId}
                       onChange={(e) => mettreAJourLigne(ligne.id, 'articleId', e.target.value)}
-                      className="w-full px-2 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                      className="w-full px-2 py-1 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded text-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                     >
                       {articles.map((article) => (
                         <option key={article.id} value={article.id}>
@@ -386,7 +421,7 @@ const TableauSimulationCommande: React.FC = () => {
                       ))}
                     </select>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">
                     {ligne.reference}
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
@@ -395,28 +430,28 @@ const TableauSimulationCommande: React.FC = () => {
                       min="1"
                       value={ligne.quantite}
                       onChange={(e) => mettreAJourLigne(ligne.id, 'quantite', parseInt(e.target.value) || 0)}
-                      className="w-20 px-2 py-1 border border-gray-300 rounded text-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                      className="w-20 px-2 py-1 border border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded text-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
                     />
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
                     {ligne.prixUnitaire.toFixed(2)}€
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">
                     {ligne.total.toFixed(2)}€
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
                     <div className="flex flex-col">
                       <span>Actuel: {ligne.stockActuel}</span>
-                      <span className="text-xs text-gray-500">
+                      <span className="text-xs text-gray-500 dark:text-gray-400">
                         Couv: {ligne.couvertureActuelle.toFixed(1)}
                       </span>
                     </div>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
                     <div className="flex flex-col space-y-1 text-xs">
                       <span>CMS: {ligne.cms.toFixed(1)}</span>
                       <span>CMC: {ligne.cmc.toFixed(1)}</span>
-                      <span className="font-medium text-blue-600">QM: {ligne.qm.toFixed(0)}</span>
+                      <span className="font-medium text-blue-600 dark:text-blue-400">QM: {ligne.qm.toFixed(0)}</span>
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
@@ -429,7 +464,7 @@ const TableauSimulationCommande: React.FC = () => {
                       </div>
                     </div>
                     {ligne.recommandations.length > 0 && (
-                      <div className="mt-1 text-xs text-gray-600">
+                      <div className="mt-1 text-xs text-gray-600 dark:text-gray-400">
                         {ligne.recommandations.slice(0, 1).map((rec, idx) => (
                           <div key={idx}>{rec}</div>
                         ))}
@@ -439,7 +474,7 @@ const TableauSimulationCommande: React.FC = () => {
                   <td className="px-6 py-4 whitespace-nowrap text-sm">
                     <button
                       onClick={() => supprimerLigne(ligne.id)}
-                      className="text-red-600 hover:text-red-900"
+                      className="text-red-600 hover:text-red-900 dark:text-red-400 dark:hover:text-red-300"
                     >
                       <TrashIcon className="h-4 w-4" />
                     </button>
@@ -453,34 +488,34 @@ const TableauSimulationCommande: React.FC = () => {
 
       {/* Résumé de simulation */}
       {lignes.length > 0 && (
-        <div className="px-6 py-4 border-t border-gray-200 bg-gray-50">
+        <div className="px-6 py-4 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-700">
           <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-            <div className="bg-white p-4 rounded-lg">
-              <h4 className="text-sm font-medium text-gray-700">Total HT</h4>
-              <p className="text-2xl font-bold text-gray-900">{simulationSummary.totalHT.toFixed(2)}€</p>
+            <div className="bg-white dark:bg-gray-800 p-4 rounded-lg">
+              <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300">Total HT</h4>
+              <p className="text-2xl font-bold text-gray-900 dark:text-white">{simulationSummary.totalHT.toFixed(2)}€</p>
             </div>
-            <div className="bg-white p-4 rounded-lg">
-              <h4 className="text-sm font-medium text-gray-700">Total TTC</h4>
-              <p className="text-2xl font-bold text-gray-900">{simulationSummary.totalTTC.toFixed(2)}€</p>
+            <div className="bg-white dark:bg-gray-800 p-4 rounded-lg">
+              <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300">Total TTC</h4>
+              <p className="text-2xl font-bold text-gray-900 dark:text-white">{simulationSummary.totalTTC.toFixed(2)}€</p>
             </div>
-            <div className="bg-white p-4 rounded-lg">
-              <h4 className="text-sm font-medium text-gray-700">Validations</h4>
-              <p className="text-2xl font-bold text-gray-900">
+            <div className="bg-white dark:bg-gray-800 p-4 rounded-lg">
+              <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300">Validations</h4>
+              <p className="text-2xl font-bold text-gray-900 dark:text-white">
                 {simulationSummary.validationsReussies}/{simulationSummary.nombreArticles}
               </p>
             </div>
-            <div className="bg-white p-4 rounded-lg">
-              <h4 className="text-sm font-medium text-gray-700">Alertes</h4>
-              <p className="text-2xl font-bold text-red-600">{simulationSummary.alertes.length}</p>
+            <div className="bg-white dark:bg-gray-800 p-4 rounded-lg">
+              <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300">Alertes</h4>
+              <p className="text-2xl font-bold text-red-600 dark:text-red-400">{simulationSummary.alertes.length}</p>
             </div>
           </div>
           
           {simulationSummary.alertes.length > 0 && (
             <div className="mt-4">
-              <h4 className="text-sm font-medium text-gray-700 mb-2">Alertes détaillées:</h4>
+              <h4 className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">Alertes détaillées:</h4>
               <div className="space-y-1">
                 {simulationSummary.alertes.map((alerte, index) => (
-                  <div key={index} className="text-sm text-red-600 bg-red-50 px-3 py-1 rounded">
+                  <div key={index} className="text-sm text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/20 px-3 py-1 rounded">
                     {alerte}
                   </div>
                 ))}
@@ -493,7 +528,7 @@ const TableauSimulationCommande: React.FC = () => {
       {/* État vide */}
       {lignes.length === 0 && (
         <div className="px-6 py-12 text-center">
-          <p className="text-gray-500">
+          <p className="text-gray-500 dark:text-gray-400">
             Aucune ligne de commande. Sélectionnez un fournisseur et cliquez sur "Ajouter ligne" pour commencer.
           </p>
         </div>

@@ -174,9 +174,11 @@ const WidgetDisplay: React.FC<WidgetDisplayProps> = ({ widget, refreshTrigger })
       case 'articles_stock_bas':
         return await apiService.getArticlesStockBas();
       case 'fournisseurs':
-        return await apiService.getFournisseurs({ limit: widget.config.rowCount || 10 });
+        const fournisseursResponse = await apiService.getFournisseurs({ limit: widget.config.rowCount || 10 });
+        return fournisseursResponse.fournisseurs || fournisseursResponse;
       case 'articles':
-        return await apiService.getArticles({ limit: widget.config.rowCount || 10 });
+        const articlesResponse = await apiService.getArticles({ limit: widget.config.rowCount || 10 });
+        return articlesResponse.articles || articlesResponse;
       case 'commandes':
         return await apiService.getCommandes({ limit: widget.config.rowCount || 10 });
       default:
@@ -264,11 +266,11 @@ const WidgetDisplay: React.FC<WidgetDisplayProps> = ({ widget, refreshTrigger })
 
   if (loading) {
     return (
-      <div className="h-full flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-50 rounded-lg">
+      <div className="h-full flex items-center justify-center bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-900 dark:to-indigo-900 rounded-lg">
         <div className="text-center">
           <div className="animate-spin rounded-full h-8 w-8 border-2 border-blue-500 border-t-transparent mx-auto mb-2"></div>
-          <p className="text-sm text-blue-600 font-medium">{widget.title}</p>
-          <p className="text-xs text-blue-400">Chargement en cours...</p>
+          <p className="text-sm text-blue-600 dark:text-blue-400 font-medium">{widget.title}</p>
+          <p className="text-xs text-blue-400 dark:text-blue-500">Chargement en cours...</p>
         </div>
       </div>
     );
@@ -276,11 +278,11 @@ const WidgetDisplay: React.FC<WidgetDisplayProps> = ({ widget, refreshTrigger })
 
   if (error) {
     return (
-      <div className="h-full flex items-center justify-center bg-gradient-to-br from-yellow-50 to-orange-50 rounded-lg">
+      <div className="h-full flex items-center justify-center bg-gradient-to-br from-yellow-50 to-orange-50 dark:from-yellow-900 dark:to-orange-900 rounded-lg">
         <div className="text-center">
           <ExclamationTriangleIcon className="h-8 w-8 text-orange-500 mx-auto mb-2" />
-          <p className="text-sm font-medium text-orange-700">{widget.title}</p>
-          <p className="text-xs text-orange-500">Données de démonstration</p>
+          <p className="text-sm font-medium text-orange-700 dark:text-orange-300">{widget.title}</p>
+          <p className="text-xs text-orange-500 dark:text-orange-400">Données de démonstration</p>
         </div>
       </div>
     );
@@ -301,17 +303,17 @@ const WidgetDisplay: React.FC<WidgetDisplayProps> = ({ widget, refreshTrigger })
                 <IconComponent className="h-6 w-6 text-white" />
               </div>
               <div className="flex-1">
-                <p className="text-sm font-medium text-gray-500">{widget.title}</p>
+                <p className="text-sm font-medium text-gray-500 dark:text-gray-400">{widget.title}</p>
                 <div className="flex items-baseline">
-                  <p className="text-2xl font-bold text-gray-900">{displayValue}</p>
+                  <p className="text-2xl font-bold text-gray-900 dark:text-white">{displayValue}</p>
                   {widget.config.target && (
-                    <span className="ml-2 text-xs text-gray-400">
+                    <span className="ml-2 text-xs text-gray-400 dark:text-gray-500">
                       / {widget.config.target}{widget.config.displayFormat === 'percentage' ? '%' : ''}
                     </span>
                   )}
                 </div>
                 {/* Simulation d'une tendance si pas de vraie donnée */}
-                <div className="text-xs text-green-500 mt-1">↑ +2.3% vs précédent</div>
+                <div className="text-xs text-green-500 dark:text-green-400 mt-1">↑ +2.3% vs précédent</div>
               </div>
             </div>
           </div>
@@ -332,8 +334,8 @@ const WidgetDisplay: React.FC<WidgetDisplayProps> = ({ widget, refreshTrigger })
         return (
           <div className="h-full">
             <div className="flex justify-between items-center mb-2">
-              <h4 className="text-sm font-medium text-gray-900">{widget.title}</h4>
-              <span className="text-xs text-gray-500">
+              <h4 className="text-sm font-medium text-gray-900 dark:text-white">{widget.title}</h4>
+              <span className="text-xs text-gray-500 dark:text-gray-400">
                 {widget.config.orientation === 'horizontal' ? 'Horizontal' : 'Vertical'} - Top {widget.config.maxItems || 10}
               </span>
             </div>
@@ -366,8 +368,8 @@ const WidgetDisplay: React.FC<WidgetDisplayProps> = ({ widget, refreshTrigger })
         return (
           <div className="h-full">
             <div className="flex justify-between items-center mb-2">
-              <h4 className="text-sm font-medium text-gray-900">{widget.title}</h4>
-              <span className="text-xs text-gray-500">{widget.config.periode || '6 mois'}</span>
+              <h4 className="text-sm font-medium text-gray-900 dark:text-white">{widget.title}</h4>
+              <span className="text-xs text-gray-500 dark:text-gray-400">{widget.config.periode || '6 mois'}</span>
             </div>
             <ResponsiveContainer width="100%" height="80%">
               <LineChart data={lineData}>
@@ -399,7 +401,7 @@ const WidgetDisplay: React.FC<WidgetDisplayProps> = ({ widget, refreshTrigger })
         const legendPos = widget.config.legendPosition || 'right';
         return (
           <div className="h-full">
-            <h4 className="text-sm font-medium text-gray-900 mb-2">{widget.title}</h4>
+            <h4 className="text-sm font-medium text-gray-900 dark:text-white mb-2">{widget.title}</h4>
             <div className="flex h-full">
               <ResponsiveContainer width={legendPos !== 'none' ? "70%" : "100%"} height="90%">
                 <PieChart>
@@ -428,7 +430,7 @@ const WidgetDisplay: React.FC<WidgetDisplayProps> = ({ widget, refreshTrigger })
                         className="w-3 h-3 rounded-sm mr-2" 
                         style={{ backgroundColor: entry.color }}
                       ></div>
-                      <span className="truncate">{entry.name}</span>
+                      <span className="truncate text-gray-700 dark:text-gray-300">{entry.name}</span>
                     </div>
                   ))}
                 </div>
@@ -449,32 +451,32 @@ const WidgetDisplay: React.FC<WidgetDisplayProps> = ({ widget, refreshTrigger })
         return (
           <div className="h-full">
             <div className="flex justify-between items-center mb-2">
-              <h4 className="text-sm font-medium text-gray-900">{widget.title}</h4>
-              <span className="text-xs text-gray-500">{rowCount} lignes</span>
+              <h4 className="text-sm font-medium text-gray-900 dark:text-white">{widget.title}</h4>
+              <span className="text-xs text-gray-500 dark:text-gray-400">{rowCount} lignes</span>
             </div>
             <div className="overflow-auto h-5/6">
-              <table className="min-w-full divide-y divide-gray-200">
-                <thead className="bg-gray-50">
+              <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+                <thead className="bg-gray-50 dark:bg-gray-800">
                   <tr>
-                    <th className="px-2 py-1 text-left text-xs font-medium text-gray-500 uppercase">Nom</th>
-                    <th className="px-2 py-1 text-left text-xs font-medium text-gray-500 uppercase">Qté</th>
-                    <th className="px-2 py-1 text-left text-xs font-medium text-gray-500 uppercase">Statut</th>
+                    <th className="px-2 py-1 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Nom</th>
+                    <th className="px-2 py-1 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Qté</th>
+                    <th className="px-2 py-1 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Statut</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-gray-200">
+                <tbody className="divide-y divide-gray-200 dark:divide-gray-700 bg-white dark:bg-gray-900">
                   {tableData.slice(0, Math.min(rowCount, 10)).map((item: any, index: number) => (
                     <tr key={index}>
-                      <td className="px-2 py-1 text-xs text-gray-900 truncate">
+                      <td className="px-2 py-1 text-xs text-gray-900 dark:text-gray-100 truncate">
                         {item.nom || item.reference || item.numero_commande || `Item ${index + 1}`}
                       </td>
-                      <td className="px-2 py-1 text-xs text-gray-900">
+                      <td className="px-2 py-1 text-xs text-gray-900 dark:text-gray-100">
                         {item.valeur || item.stock_actuel || item.quantite || 'N/A'}
                       </td>
                       <td className="px-2 py-1 text-xs">
                         <span className={`inline-flex px-2 py-1 text-xs font-semibold rounded-full ${
-                          (item.statut || item.status) === 'En stock' || (item.statut || item.status) === 'en_cours' ? 'bg-green-100 text-green-800' :
-                          (item.statut || item.status) === 'Stock bas' || (item.statut || item.status) === 'en_attente' ? 'bg-yellow-100 text-yellow-800' :
-                          'bg-red-100 text-red-800'
+                          (item.statut || item.status) === 'En stock' || (item.statut || item.status) === 'en_cours' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-300' :
+                          (item.statut || item.status) === 'Stock bas' || (item.statut || item.status) === 'en_attente' ? 'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-300' :
+                          'bg-red-100 text-red-800 dark:bg-red-900 dark:text-red-300'
                         }`}>
                           {item.statut || item.status || 'N/A'}
                         </span>
@@ -505,7 +507,7 @@ const WidgetDisplay: React.FC<WidgetDisplayProps> = ({ widget, refreshTrigger })
         
         return (
           <div className="h-full flex flex-col justify-center items-center">
-            <h4 className="text-sm font-medium text-gray-900 mb-4">{widget.title}</h4>
+            <h4 className="text-sm font-medium text-gray-900 dark:text-white mb-4">{widget.title}</h4>
             <div className="relative">
               <svg width="120" height="80" viewBox="0 0 120 80">
                 {/* Background arc */}
@@ -531,7 +533,7 @@ const WidgetDisplay: React.FC<WidgetDisplayProps> = ({ widget, refreshTrigger })
                 <span className={`text-xl font-bold ${getGaugeColor()}`}>
                   {currentValue}
                 </span>
-                <span className="text-xs text-gray-500">
+                <span className="text-xs text-gray-500 dark:text-gray-400">
                   {minVal} - {maxVal}
                 </span>
               </div>
@@ -539,15 +541,15 @@ const WidgetDisplay: React.FC<WidgetDisplayProps> = ({ widget, refreshTrigger })
             <div className="flex space-x-4 mt-2 text-xs">
               <div className="flex items-center">
                 <div className="w-2 h-2 bg-green-500 rounded-full mr-1"></div>
-                <span>&lt;{warningThreshold}</span>
+                <span className="text-gray-700 dark:text-gray-300">&lt;{warningThreshold}</span>
               </div>
               <div className="flex items-center">
                 <div className="w-2 h-2 bg-yellow-500 rounded-full mr-1"></div>
-                <span>{warningThreshold}-{criticalThreshold}</span>
+                <span className="text-gray-700 dark:text-gray-300">{warningThreshold}-{criticalThreshold}</span>
               </div>
               <div className="flex items-center">
                 <div className="w-2 h-2 bg-red-500 rounded-full mr-1"></div>
-                <span>&gt;{criticalThreshold}</span>
+                <span className="text-gray-700 dark:text-gray-300">&gt;{criticalThreshold}</span>
               </div>
             </div>
           </div>
@@ -555,12 +557,12 @@ const WidgetDisplay: React.FC<WidgetDisplayProps> = ({ widget, refreshTrigger })
 
       default:
         return (
-          <div className="h-full flex items-center justify-center text-center bg-gradient-to-br from-gray-50 to-blue-50 rounded-lg">
+          <div className="h-full flex items-center justify-center text-center bg-gradient-to-br from-gray-50 to-blue-50 dark:from-gray-800 dark:to-blue-900 rounded-lg">
             <div>
-              <ChartBarIcon className="h-8 w-8 text-blue-500 mx-auto mb-2" />
-              <h4 className="text-sm font-medium text-gray-900">{widget.title}</h4>
-              <p className="text-xs text-blue-500 mt-1">Type: {widget.type}</p>
-              <p className="text-xs text-gray-500 mt-1">Configuration disponible</p>
+              <ChartBarIcon className="h-8 w-8 text-blue-500 dark:text-blue-400 mx-auto mb-2" />
+              <h4 className="text-sm font-medium text-gray-900 dark:text-white">{widget.title}</h4>
+              <p className="text-xs text-blue-500 dark:text-blue-400 mt-1">Type: {widget.type}</p>
+              <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">Configuration disponible</p>
             </div>
           </div>
         );

@@ -121,6 +121,14 @@ class Token(BaseModel):
     token_type: str
     user: User
 
+class UsersResponse(BaseModel):
+    users: List[User]
+    total: int
+    limit: int
+    skip: int
+    has_next: bool
+    has_previous: bool
+
 # Fournisseur Models
 class Contact(BaseModel):
     nom: str
@@ -230,6 +238,14 @@ class CommandeCreate(BaseModel):
     date_mise_disposition: Optional[datetime] = None
     date_embarquement_cible: Optional[datetime] = None
     notes: Optional[str] = None
+
+class CommandesResponse(BaseModel):
+    commandes: List[Commande]
+    total: int
+    limit: int
+    skip: int
+    has_next: bool
+    has_previous: bool
 
 # Alerte Models
 class Alerte(BaseModel):
@@ -843,14 +859,14 @@ async def get_current_user_info(current_user: User = Depends(get_current_user)):
     return current_user
 
 # Users Management Routes
-@api_router.get("/users", response_model=List[User])
+@api_router.get("/users", response_model=UsersResponse)
 async def get_users(
     search: Optional[str] = None,
     sort_by: Optional[str] = "nom",
     sort_order: Optional[str] = "asc",
     role: Optional[UserRole] = None,
     active: Optional[bool] = None,
-    limit: Optional[int] = 1000,
+    limit: Optional[int] = 10,
     skip: Optional[int] = 0,
     current_user: User = Depends(require_roles([UserRole.ADMIN]))
 ):
@@ -873,8 +889,25 @@ async def get_users(
     sort_direction = 1 if sort_order == "asc" else -1
     sort_criteria = [(sort_by, sort_direction)]
     
+    # Get total count
+    total = await db.users.count_documents(query)
+    
+    # Get users
     users = await db.users.find(query).sort(sort_criteria).skip(skip).limit(limit).to_list(limit)
-    return [User(**u) for u in users]
+    users_list = [User(**u) for u in users]
+    
+    # Calculate pagination flags
+    has_next = skip + limit < total
+    has_previous = skip > 0
+    
+    return UsersResponse(
+        users=users_list,
+        total=total,
+        limit=limit,
+        skip=skip,
+        has_next=has_next,
+        has_previous=has_previous
+    )
 
 @api_router.post("/users", response_model=User)
 async def create_user(
@@ -998,7 +1031,7 @@ async def create_fournisseur(
     await db.fournisseurs.insert_one(fournisseur.dict())
     return fournisseur
 
-@api_router.get("/fournisseurs", response_model=List[Fournisseur])
+@api_router.get("/fournisseurs")
 async def get_fournisseurs(
     search: Optional[str] = None,
     sort_by: Optional[str] = "nom",
@@ -1034,8 +1067,20 @@ async def get_fournisseurs(
     sort_direction = 1 if sort_order == "asc" else -1
     sort_criteria = [(sort_by, sort_direction)]
     
+    # Get total count for pagination
+    total_count = await db.fournisseurs.count_documents(query)
+    
+    # Get paginated results
     fournisseurs = await db.fournisseurs.find(query).sort(sort_criteria).skip(skip).limit(limit).to_list(limit)
-    return [Fournisseur(**f) for f in fournisseurs]
+    
+    return {
+        "fournisseurs": [Fournisseur(**f) for f in fournisseurs],
+        "total": total_count,
+        "limit": limit,
+        "skip": skip,
+        "has_next": (skip + limit) < total_count,
+        "has_previous": skip > 0
+    }
 
 @api_router.get("/fournisseurs/{fournisseur_id}", response_model=Fournisseur)
 async def get_fournisseur(
@@ -1076,7 +1121,7 @@ async def create_article(
     await db.articles.insert_one(article.dict())
     return article
 
-@api_router.get("/articles", response_model=List[Article])
+@api_router.get("/articles")
 async def get_articles(
     search: Optional[str] = None,
     sort_by: Optional[str] = "nom",
@@ -1115,8 +1160,20 @@ async def get_articles(
     sort_direction = 1 if sort_order == "asc" else -1
     sort_criteria = [(sort_by, sort_direction)]
     
+    # Get total count for pagination
+    total_count = await db.articles.count_documents(query)
+    
+    # Get paginated results
     articles = await db.articles.find(query).sort(sort_criteria).skip(skip).limit(limit).to_list(limit)
-    return [Article(**a) for a in articles]
+    
+    return {
+        "articles": [Article(**a) for a in articles],
+        "total": total_count,
+        "limit": limit,
+        "skip": skip,
+        "has_next": (skip + limit) < total_count,
+        "has_previous": skip > 0
+    }
 
 @api_router.get("/articles/stock-bas")
 async def get_articles_stock_bas(
@@ -1150,7 +1207,7 @@ async def create_commande(
     await db.commandes.insert_one(commande.dict())
     return commande
 
-@api_router.get("/commandes", response_model=List[Commande])
+@api_router.get("/commandes", response_model=CommandesResponse)
 async def get_commandes(
     search: Optional[str] = None,
     sort_by: Optional[str] = "created_at",
@@ -1159,7 +1216,7 @@ async def get_commandes(
     fournisseur_id: Optional[str] = None,
     date_from: Optional[str] = None,
     date_to: Optional[str] = None,
-    limit: Optional[int] = 1000,
+    limit: Optional[int] = 10,
     skip: Optional[int] = 0,
     current_user: User = Depends(get_current_user)
 ):
@@ -1192,8 +1249,24 @@ async def get_commandes(
     sort_direction = 1 if sort_order == "asc" else -1
     sort_criteria = [(sort_by, sort_direction)]
     
+    # Get total count
+    total = await db.commandes.count_documents(query)
+    
+    # Get paginated results
     commandes = await db.commandes.find(query).sort(sort_criteria).skip(skip).limit(limit).to_list(limit)
-    return [Commande(**c) for c in commandes]
+    
+    # Calculate pagination info
+    has_next = (skip + limit) < total
+    has_previous = skip > 0
+    
+    return CommandesResponse(
+        commandes=[Commande(**c) for c in commandes],
+        total=total,
+        limit=limit,
+        skip=skip,
+        has_next=has_next,
+        has_previous=has_previous
+    )
 
 # Alertes Routes
 @api_router.get("/alertes", response_model=List[Alerte])

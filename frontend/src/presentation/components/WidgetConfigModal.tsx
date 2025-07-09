@@ -59,12 +59,12 @@ const WidgetConfigModal: React.FC<WidgetConfigModalProps> = ({
         return (
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700">Métrique KPI</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Métrique KPI</label>
               <select
                 name="kpiType"
                 value={config.kpiType || ''}
                 onChange={handleInputChange}
-                className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                className="mt-1 block w-full border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
               >
                 <option value="">Sélectionner...</option>
                 <option value="total_fournisseurs">Total Fournisseurs</option>
@@ -82,12 +82,12 @@ const WidgetConfigModal: React.FC<WidgetConfigModalProps> = ({
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700">Couleur</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Couleur</label>
               <select
                 name="color"
                 value={config.color || 'blue'}
                 onChange={handleInputChange}
-                className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                className="mt-1 block w-full border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
               >
                 <option value="blue">Bleu</option>
                 <option value="green">Vert</option>
@@ -98,12 +98,12 @@ const WidgetConfigModal: React.FC<WidgetConfigModalProps> = ({
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700">Format d'affichage</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Format d'affichage</label>
               <select
                 name="displayFormat"
                 value={config.displayFormat || 'percentage'}
                 onChange={handleInputChange}
-                className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                className="mt-1 block w-full border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
               >
                 <option value="percentage">Pourcentage (%)</option>
                 <option value="number">Nombre</option>
@@ -112,14 +112,14 @@ const WidgetConfigModal: React.FC<WidgetConfigModalProps> = ({
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700">Objectif/Seuil</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Objectif/Seuil</label>
               <input
                 type="number"
                 name="target"
                 value={config.target || ''}
                 onChange={handleInputChange}
                 placeholder="Ex: 95 pour 95%"
-                className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                className="mt-1 block w-full border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
               />
             </div>
           </div>
@@ -134,7 +134,7 @@ const WidgetConfigModal: React.FC<WidgetConfigModalProps> = ({
                 name="dataSource"
                 value={config.dataSource || ''}
                 onChange={handleInputChange}
-                className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                className="mt-1 block w-full border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
               >
                 <option value="">Sélectionner...</option>
                 <option value="commandes_par_mois">Commandes par Mois</option>
@@ -151,7 +151,7 @@ const WidgetConfigModal: React.FC<WidgetConfigModalProps> = ({
                 name="periode"
                 value={config.periode || '3_mois'}
                 onChange={handleInputChange}
-                className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                className="mt-1 block w-full border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
               >
                 <option value="7_jours">7 Jours</option>
                 <option value="1_mois">1 Mois</option>
@@ -167,7 +167,7 @@ const WidgetConfigModal: React.FC<WidgetConfigModalProps> = ({
                 name="lineStyle"
                 value={config.lineStyle || 'solid'}
                 onChange={handleInputChange}
-                className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                className="mt-1 block w-full border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
               >
                 <option value="solid">Ligne continue</option>
                 <option value="dashed">Ligne pointillée</option>
@@ -180,7 +180,7 @@ const WidgetConfigModal: React.FC<WidgetConfigModalProps> = ({
                 name="chartColor"
                 value={config.chartColor || 'blue'}
                 onChange={handleInputChange}
-                className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                className="mt-1 block w-full border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
               >
                 <option value="blue">Bleu</option>
                 <option value="green">Vert</option>
@@ -197,12 +197,12 @@ const WidgetConfigModal: React.FC<WidgetConfigModalProps> = ({
         return (
           <div className="space-y-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700">Source de données</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Source de données</label>
               <select
                 name="dataSource"
                 value={config.dataSource || ''}
                 onChange={handleInputChange}
-                className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                className="mt-1 block w-full border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
               >
                 <option value="">Sélectionner...</option>
                 <option value="commandes_par_fournisseur">Commandes par Fournisseur</option>
@@ -213,19 +213,19 @@ const WidgetConfigModal: React.FC<WidgetConfigModalProps> = ({
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700">Orientation</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Orientation</label>
               <select
                 name="orientation"
                 value={config.orientation || 'vertical'}
                 onChange={handleInputChange}
-                className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                className="mt-1 block w-full border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
               >
                 <option value="vertical">Barres verticales</option>
                 <option value="horizontal">Barres horizontales</option>
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700">Nombre maximum d'éléments</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Nombre maximum d'éléments</label>
               <input
                 type="number"
                 name="maxItems"
@@ -233,16 +233,16 @@ const WidgetConfigModal: React.FC<WidgetConfigModalProps> = ({
                 onChange={handleInputChange}
                 min="5"
                 max="50"
-                className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                className="mt-1 block w-full border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700">Schéma de couleurs</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Schéma de couleurs</label>
               <select
                 name="colorScheme"
                 value={config.colorScheme || 'blue'}
                 onChange={handleInputChange}
-                className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                className="mt-1 block w-full border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
               >
                 <option value="blue">Tons de bleu</option>
                 <option value="green">Tons de vert</option>
@@ -262,7 +262,7 @@ const WidgetConfigModal: React.FC<WidgetConfigModalProps> = ({
                 name="dataSource"
                 value={config.dataSource || ''}
                 onChange={handleInputChange}
-                className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                className="mt-1 block w-full border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
               >
                 <option value="">Sélectionner...</option>
                 <option value="repartition_commandes">Répartition des Commandes</option>
@@ -278,7 +278,7 @@ const WidgetConfigModal: React.FC<WidgetConfigModalProps> = ({
                 name="displayType"
                 value={config.displayType || 'pie'}
                 onChange={handleInputChange}
-                className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                className="mt-1 block w-full border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
               >
                 <option value="pie">Camembert classique</option>
                 <option value="doughnut">Anneau (Donut)</option>
@@ -290,7 +290,7 @@ const WidgetConfigModal: React.FC<WidgetConfigModalProps> = ({
                 name="showPercentage"
                 value={config.showPercentage || 'true'}
                 onChange={handleInputChange}
-                className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                className="mt-1 block w-full border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
               >
                 <option value="true">Oui</option>
                 <option value="false">Non</option>
@@ -302,7 +302,7 @@ const WidgetConfigModal: React.FC<WidgetConfigModalProps> = ({
                 name="legendPosition"
                 value={config.legendPosition || 'right'}
                 onChange={handleInputChange}
-                className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                className="mt-1 block w-full border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
               >
                 <option value="top">En haut</option>
                 <option value="bottom">En bas</option>
@@ -323,7 +323,7 @@ const WidgetConfigModal: React.FC<WidgetConfigModalProps> = ({
                 name="dataSource"
                 value={config.dataSource || ''}
                 onChange={handleInputChange}
-                className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                className="mt-1 block w-full border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
               >
                 <option value="">Sélectionner...</option>
                 <option value="alertes_recentes">Alertes Récentes</option>
@@ -342,7 +342,7 @@ const WidgetConfigModal: React.FC<WidgetConfigModalProps> = ({
                 onChange={handleInputChange}
                 min="5"
                 max="100"
-                className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                className="mt-1 block w-full border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
               />
             </div>
             <div>
@@ -351,7 +351,7 @@ const WidgetConfigModal: React.FC<WidgetConfigModalProps> = ({
                 name="columns"
                 value={config.columns || 'default'}
                 onChange={handleInputChange}
-                className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                className="mt-1 block w-full border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
               >
                 <option value="default">Colonnes par défaut</option>
                 <option value="minimal">Vue minimale</option>
@@ -365,7 +365,7 @@ const WidgetConfigModal: React.FC<WidgetConfigModalProps> = ({
                 name="defaultSort"
                 value={config.defaultSort || 'date_desc'}
                 onChange={handleInputChange}
-                className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                className="mt-1 block w-full border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
               >
                 <option value="date_desc">Date (plus récent)</option>
                 <option value="date_asc">Date (plus ancien)</option>
@@ -385,7 +385,7 @@ const WidgetConfigModal: React.FC<WidgetConfigModalProps> = ({
                 name="metric"
                 value={config.metric || ''}
                 onChange={handleInputChange}
-                className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                className="mt-1 block w-full border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
               >
                 <option value="">Sélectionner...</option>
                 <option value="performance_fournisseur">Performance Fournisseur</option>
@@ -396,27 +396,27 @@ const WidgetConfigModal: React.FC<WidgetConfigModalProps> = ({
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700">Valeur minimale</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Valeur minimale</label>
               <input
                 type="number"
                 name="minValue"
                 value={config.minValue || 0}
                 onChange={handleInputChange}
-                className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                className="mt-1 block w-full border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700">Valeur maximale</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Valeur maximale</label>
               <input
                 type="number"
                 name="maxValue"
                 value={config.maxValue || 100}
                 onChange={handleInputChange}
-                className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                className="mt-1 block w-full border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700">Seuils d'alerte</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Seuils d'alerte</label>
               <div className="grid grid-cols-2 gap-2">
                 <input
                   type="number"
@@ -424,7 +424,7 @@ const WidgetConfigModal: React.FC<WidgetConfigModalProps> = ({
                   value={config.warningThreshold || 70}
                   onChange={handleInputChange}
                   placeholder="Seuil Warning"
-                  className="block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                  className="block w-full border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                 />
                 <input
                   type="number"
@@ -432,17 +432,17 @@ const WidgetConfigModal: React.FC<WidgetConfigModalProps> = ({
                   value={config.criticalThreshold || 90}
                   onChange={handleInputChange}
                   placeholder="Seuil Critique"
-                  className="block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                  className="block w-full border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
                 />
               </div>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700">Couleurs des zones</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Couleurs des zones</label>
               <select
                 name="colorZones"
                 value={config.colorZones || 'traffic_light'}
                 onChange={handleInputChange}
-                className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                className="mt-1 block w-full border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
               >
                 <option value="traffic_light">Feu tricolore (Vert/Orange/Rouge)</option>
                 <option value="blue_gradient">Dégradé de bleu</option>
@@ -454,29 +454,29 @@ const WidgetConfigModal: React.FC<WidgetConfigModalProps> = ({
 
       default:
         return (
-          <div className="text-center py-8 text-gray-500">
+          <div className="text-center py-8 text-gray-500 dark:text-gray-400">
             <div className="mb-4">
-              <svg className="mx-auto h-12 w-12 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <svg className="mx-auto h-12 w-12 text-gray-400 dark:text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
               </svg>
             </div>
-            <p className="text-lg font-medium">Configuration avancée en cours de développement</p>
-            <p className="text-sm mt-2">Ce type de widget sera bientôt personnalisable avec de nombreuses options.</p>
+            <p className="text-lg font-medium text-gray-900 dark:text-white">Configuration avancée en cours de développement</p>
+            <p className="text-sm mt-2 text-gray-500 dark:text-gray-400">Ce type de widget sera bientôt personnalisable avec de nombreuses options.</p>
           </div>
         );
     }
   };
 
   return (
-    <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full z-50">
-      <div className="relative top-20 mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
+    <div className="fixed inset-0 bg-gray-600 bg-opacity-50 dark:bg-gray-900 dark:bg-opacity-75 overflow-y-auto h-full w-full z-50">
+      <div className="relative top-20 mx-auto p-5 border border-gray-200 dark:border-gray-600 w-96 shadow-lg rounded-md bg-white dark:bg-gray-800">
         <div className="flex items-center justify-between mb-4">
-          <h3 className="text-lg font-medium text-gray-900">
+          <h3 className="text-lg font-medium text-gray-900 dark:text-white">
             Configuration du Widget
           </h3>
           <button
             onClick={onCancel}
-            className="text-gray-400 hover:text-gray-600"
+            className="text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300"
           >
             <XMarkIcon className="h-6 w-6" />
           </button>
@@ -485,7 +485,7 @@ const WidgetConfigModal: React.FC<WidgetConfigModalProps> = ({
         <div className="space-y-4">
           {/* Titre du widget */}
           <div>
-            <label className="block text-sm font-medium text-gray-700">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
               Titre du widget
             </label>
             <input
@@ -493,7 +493,7 @@ const WidgetConfigModal: React.FC<WidgetConfigModalProps> = ({
               name="title"
               value={config.title}
               onChange={handleInputChange}
-              className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+              className="mt-1 block w-full border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
               placeholder="Titre du widget"
             />
           </div>
@@ -501,12 +501,12 @@ const WidgetConfigModal: React.FC<WidgetConfigModalProps> = ({
           {/* Taille du widget */}
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-gray-700">Largeur</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Largeur</label>
               <select
                 name="width"
                 value={position.w}
                 onChange={(e) => handlePositionChange('w', parseInt(e.target.value))}
-                className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                className="mt-1 block w-full border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
               >
                 <option value="3">Petite (3)</option>
                 <option value="4">Moyenne (4)</option>
@@ -516,12 +516,12 @@ const WidgetConfigModal: React.FC<WidgetConfigModalProps> = ({
               </select>
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700">Hauteur</label>
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">Hauteur</label>
               <select
                 name="height"
                 value={position.h}
                 onChange={(e) => handlePositionChange('h', parseInt(e.target.value))}
-                className="mt-1 block w-full border-gray-300 rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
+                className="mt-1 block w-full border-gray-300 dark:border-gray-600 dark:bg-gray-700 dark:text-white rounded-md shadow-sm focus:ring-blue-500 focus:border-blue-500 sm:text-sm"
               >
                 <option value="2">Petite (2)</option>
                 <option value="3">Moyenne (3)</option>
@@ -538,7 +538,7 @@ const WidgetConfigModal: React.FC<WidgetConfigModalProps> = ({
         <div className="mt-6 flex justify-end space-x-3">
           <button
             onClick={onCancel}
-            className="px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50"
+            className="px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm text-sm font-medium text-gray-700 dark:text-gray-200 bg-white dark:bg-gray-700 hover:bg-gray-50 dark:hover:bg-gray-600"
           >
             Annuler
           </button>

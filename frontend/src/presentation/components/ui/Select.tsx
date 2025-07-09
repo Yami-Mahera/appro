@@ -89,9 +89,9 @@ export const SelectTrigger: React.FC<SelectTriggerProps> = ({
       type="button"
       onClick={onClick}
       className={`
-        w-full px-3 py-2 text-left bg-white border border-gray-300 rounded-md shadow-sm 
+        w-full px-3 py-2 text-left bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm 
         focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500
-        flex justify-between items-center
+        flex justify-between items-center text-gray-900 dark:text-white
         ${className}
       `}
     >
@@ -105,7 +105,7 @@ export const SelectTrigger: React.FC<SelectTriggerProps> = ({
 
 export const SelectValue: React.FC<SelectValueProps> = ({ placeholder, className = '' }) => {
   return (
-    <span className={`text-gray-900 ${className}`}>
+    <span className={`text-gray-900 dark:text-white ${className}`}>
       {placeholder}
     </span>
   );
@@ -119,7 +119,7 @@ export const SelectContent: React.FC<SelectContentProps> = ({
 }) => {
   return (
     <div className={`
-      absolute z-50 w-full mt-1 bg-white border border-gray-300 rounded-md shadow-lg max-h-60 
+      absolute z-50 w-full mt-1 bg-white dark:bg-gray-800 border border-gray-300 dark:border-gray-600 rounded-md shadow-lg max-h-60 
       overflow-auto ${className}
     `}>
       {React.Children.map(children, (child) => {
@@ -146,8 +146,8 @@ export const SelectItem: React.FC<SelectItemProps> = ({
     <div
       onClick={() => onSelect?.(value)}
       className={`
-        px-3 py-2 cursor-pointer hover:bg-gray-100 text-sm
-        ${isSelected ? 'bg-blue-50 text-blue-600' : 'text-gray-900'}
+        px-3 py-2 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-700 text-sm
+        ${isSelected ? 'bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400' : 'text-gray-900 dark:text-white'}
         ${className}
       `}
     >

@@ -10,6 +10,7 @@ import {
 } from "@heroicons/react/24/outline";
 import ApiService from "../../services/api";
 import { debounce } from "lodash";
+import Pagination from "../components/Pagination";
 
 interface Contact {
   nom: string;
@@ -63,6 +64,12 @@ const FournisseursAdvanced: React.FC = () => {
     active: true as boolean | undefined,
   });
 
+  // Pagination state
+  const [currentPage, setCurrentPage] = useState(1);
+  const [itemsPerPage, setItemsPerPage] = useState(10);
+  const [totalItems, setTotalItems] = useState(0);
+  const [totalPages, setTotalPages] = useState(1);
+
   const [formData, setFormData] = useState({
     nom: "",
     code_fournisseur: "",
@@ -87,11 +94,13 @@ const FournisseursAdvanced: React.FC = () => {
 
     // Nettoyage pour éviter des appels en cascade
     return () => debouncedLoad.cancel();
-  }, [searchTerm, sortField, sortOrder, filters]);
+  }, [searchTerm, sortField, sortOrder, filters, currentPage, itemsPerPage]);
 
   const loadFournisseurs = async () => {
     try {
       setLoading(true);
+      const skip = (currentPage - 1) * itemsPerPage;
+      
       const params = {
         search: searchTerm || undefined,
         sort_by: sortField,
@@ -99,10 +108,32 @@ const FournisseursAdvanced: React.FC = () => {
         ville: filters.ville || undefined,
         pays: filters.pays || undefined,
         active: filters.active,
+        limit: itemsPerPage,
+        skip: skip,
       };
 
-      const data = await ApiService.getFournisseurs(params);
-      setFournisseurs(data);
+      const response = await ApiService.getFournisseurs(params);
+      
+      // Handle new paginated response format
+      let fournisseursData, total;
+      
+      if (response && response.fournisseurs) {
+        // New format with pagination info
+        fournisseursData = response.fournisseurs;
+        total = response.total;
+      } else if (Array.isArray(response)) {
+        // Fallback for old format (array directly)
+        fournisseursData = response;
+        total = response.length;
+      } else {
+        // Unexpected format
+        fournisseursData = [];
+        total = 0;
+      }
+      
+      setFournisseurs(fournisseursData);
+      setTotalItems(total);
+      setTotalPages(Math.ceil(total / itemsPerPage));
     } catch (err: any) {
       setError(
         err.response?.data?.detail ||
@@ -120,6 +151,28 @@ const FournisseursAdvanced: React.FC = () => {
       setSortField(field);
       setSortOrder("asc");
     }
+    setCurrentPage(1); // Reset to first page when sorting
+  };
+
+  // Pagination handlers
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+  };
+
+  const handleItemsPerPageChange = (newItemsPerPage: number) => {
+    setItemsPerPage(newItemsPerPage);
+    setCurrentPage(1); // Reset to first page when changing items per page
+  };
+
+  // Reset to first page when filters change
+  const handleFiltersChange = (newFilters: typeof filters) => {
+    setFilters(newFilters);
+    setCurrentPage(1);
+  };
+
+  const handleSearchChange = (newSearchTerm: string) => {
+    setSearchTerm(newSearchTerm);
+    setCurrentPage(1);
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -229,7 +282,7 @@ const FournisseursAdvanced: React.FC = () => {
     children: React.ReactNode;
   }) => (
     <th
-      className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100"
+      className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-600"
       onClick={() => handleSort(field)}
     >
       <div className="flex items-center space-x-1">
@@ -255,10 +308,10 @@ const FournisseursAdvanced: React.FC = () => {
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <h1 className="text-2xl font-bold text-gray-900">Fournisseurs</h1>
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-gray-100">Fournisseurs</h1>
         <button
           onClick={handleAdd}
-          className="bg-blue-600 text-white px-4 py-2 rounded-lg flex items-center space-x-2 hover:bg-blue-700"
+          className="bg-blue-600 text-white px-4 py-2 rounded-lg flex items-center space-x-2 hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-800"
         >
           <PlusIcon className="w-5 h-5" />
           <span>Ajouter un fournisseur</span>
@@ -266,13 +319,13 @@ const FournisseursAdvanced: React.FC = () => {
       </div>
 
       {error && (
-        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
+        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded dark:bg-red-900 dark:border-red-700 dark:text-red-300">
           {error}
         </div>
       )}
 
       {/* Search and Filters */}
-      <div className="bg-white p-4 rounded-lg shadow-sm space-y-4">
+      <div className="bg-white dark:bg-gray-800 p-4 rounded-lg shadow-sm space-y-4">
         <div className="flex flex-wrap gap-4 items-center">
           <div className="flex-1 min-w-64 relative">
             <MagnifyingGlassIcon className="w-5 h-5 absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400" />
@@ -281,12 +334,12 @@ const FournisseursAdvanced: React.FC = () => {
               placeholder="Rechercher par nom, code, ville, email..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full pl-10 pr-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+              className="w-full pl-10 pr-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400"
             />
           </div>
           <button
             onClick={() => setShowFilters(!showFilters)}
-            className="flex items-center space-x-2 px-3 py-2 border border-gray-300 rounded-md hover:bg-gray-50"
+            className="flex items-center space-x-2 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md hover:bg-gray-50 dark:hover:bg-gray-600 bg-white dark:bg-gray-700 text-gray-700 dark:text-gray-300"
           >
             <AdjustmentsHorizontalIcon className="w-5 h-5" />
             <span>Filtres</span>
@@ -294,9 +347,9 @@ const FournisseursAdvanced: React.FC = () => {
         </div>
 
         {showFilters && (
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-4 border-t">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4 pt-4 border-t border-gray-200 dark:border-gray-700">
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 Ville
               </label>
               <input
@@ -305,12 +358,12 @@ const FournisseursAdvanced: React.FC = () => {
                 onChange={(e) =>
                   setFilters({ ...filters, ville: e.target.value })
                 }
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400"
                 placeholder="Filtrer par ville"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 Pays
               </label>
               <input
@@ -319,12 +372,12 @@ const FournisseursAdvanced: React.FC = () => {
                 onChange={(e) =>
                   setFilters({ ...filters, pays: e.target.value })
                 }
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400"
                 placeholder="Filtrer par pays"
               />
             </div>
             <div>
-              <label className="block text-sm font-medium text-gray-700 mb-1">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
                 Statut
               </label>
               <select
@@ -342,7 +395,7 @@ const FournisseursAdvanced: React.FC = () => {
                         : e.target.value === "true",
                   })
                 }
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
               >
                 <option value="all">Tous</option>
                 <option value="true">Actifs</option>
@@ -354,52 +407,52 @@ const FournisseursAdvanced: React.FC = () => {
       </div>
 
       {/* Table */}
-      <div className="bg-white shadow-sm rounded-lg overflow-hidden">
+      <div className="bg-white dark:bg-gray-800 shadow-sm rounded-lg overflow-hidden">
         <div className="overflow-x-auto">
-          <table className="min-w-full divide-y divide-gray-200">
-            <thead className="bg-gray-50">
+          <table className="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+            <thead className="bg-gray-50 dark:bg-gray-700">
               <tr>
                 <SortableHeader field="nom">Nom</SortableHeader>
                 <SortableHeader field="code_fournisseur">Code</SortableHeader>
                 <SortableHeader field="ville">Ville</SortableHeader>
                 <SortableHeader field="pays">Pays</SortableHeader>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                   Contact
                 </th>
                 <SortableHeader field="created_at">Créé le</SortableHeader>
-                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase tracking-wider">
                   Actions
                 </th>
               </tr>
             </thead>
-            <tbody className="bg-white divide-y divide-gray-200">
+            <tbody className="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
               {fournisseurs.map((fournisseur) => (
-                <tr key={fournisseur.id} className="hover:bg-gray-50">
+                <tr key={fournisseur.id} className="hover:bg-gray-50 dark:hover:bg-gray-700">
                   <td className="px-6 py-4 whitespace-nowrap">
                     <div>
-                      <div className="text-sm font-medium text-gray-900">
+                      <div className="text-sm font-medium text-gray-900 dark:text-gray-100">
                         {fournisseur.nom}
                       </div>
-                      <div className="text-sm text-gray-500">
+                      <div className="text-sm text-gray-500 dark:text-gray-400">
                         {fournisseur.email}
                       </div>
                     </div>
                   </td>
                   <td className="px-6 py-4 whitespace-nowrap">
-                    <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 text-blue-800">
+                    <span className="px-2 inline-flex text-xs leading-5 font-semibold rounded-full bg-blue-100 dark:bg-blue-900 text-blue-800 dark:text-blue-200">
                       {fournisseur.code_fournisseur}
                     </span>
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
                     {fournisseur.ville}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
                     {fournisseur.pays}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-gray-100">
                     {fournisseur.telephone}
                   </td>
-                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+                  <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
                     {new Date(fournisseur.created_at).toLocaleDateString(
                       "fr-FR"
                     )}
@@ -408,14 +461,14 @@ const FournisseursAdvanced: React.FC = () => {
                     <div className="flex space-x-2">
                       <button
                         onClick={() => handleView(fournisseur)}
-                        className="text-green-600 hover:text-green-900"
+                        className="text-green-600 hover:text-green-900 dark:text-green-400 dark:hover:text-green-300"
                         title="Voir les détails"
                       >
                         <EyeIcon className="w-4 h-4" />
                       </button>
                       <button
                         onClick={() => handleEdit(fournisseur)}
-                        className="text-blue-600 hover:text-blue-900"
+                        className="text-blue-600 hover:text-blue-900 dark:text-blue-400 dark:hover:text-blue-300"
                         title="Modifier"
                       >
                         <PencilIcon className="w-4 h-4" />
@@ -430,16 +483,28 @@ const FournisseursAdvanced: React.FC = () => {
 
         {fournisseurs.length === 0 && (
           <div className="text-center py-8">
-            <p className="text-gray-500">Aucun fournisseur trouvé</p>
+            <p className="text-gray-500 dark:text-gray-400">Aucun fournisseur trouvé</p>
           </div>
         )}
       </div>
 
+      {/* Pagination */}
+      {totalItems > 0 && (
+        <Pagination
+          currentPage={currentPage}
+          totalPages={totalPages}
+          totalItems={totalItems}
+          itemsPerPage={itemsPerPage}
+          onPageChange={handlePageChange}
+          onItemsPerPageChange={handleItemsPerPageChange}
+        />
+      )}
+
       {/* Edit/Add Modal */}
       {showModal && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 w-full max-w-4xl max-h-[90vh] overflow-y-auto">
-            <h2 className="text-xl font-bold mb-4">
+          <div className="bg-white dark:bg-gray-800 rounded-lg p-6 w-full max-w-4xl max-h-[90vh] overflow-y-auto">
+            <h2 className="text-xl font-bold mb-4 text-gray-900 dark:text-gray-100">
               {editingFournisseur
                 ? "Modifier le fournisseur"
                 : "Ajouter un fournisseur"}
@@ -448,7 +513,7 @@ const FournisseursAdvanced: React.FC = () => {
               {/* Basic Info */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                     Nom *
                   </label>
                   <input
@@ -457,12 +522,12 @@ const FournisseursAdvanced: React.FC = () => {
                     onChange={(e) =>
                       setFormData({ ...formData, nom: e.target.value })
                     }
-                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                    className="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                     required
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                     Code fournisseur *
                   </label>
                   <input
@@ -474,7 +539,7 @@ const FournisseursAdvanced: React.FC = () => {
                         code_fournisseur: e.target.value,
                       })
                     }
-                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                    className="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                     required
                   />
                 </div>
@@ -482,7 +547,7 @@ const FournisseursAdvanced: React.FC = () => {
 
               {/* Address */}
               <div>
-                <label className="block text-sm font-medium text-gray-700">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                   Adresse *
                 </label>
                 <textarea
@@ -490,7 +555,7 @@ const FournisseursAdvanced: React.FC = () => {
                   onChange={(e) =>
                     setFormData({ ...formData, adresse: e.target.value })
                   }
-                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                  className="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                   rows={3}
                   required
                 />
@@ -498,7 +563,7 @@ const FournisseursAdvanced: React.FC = () => {
 
               <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                     Ville *
                   </label>
                   <input
@@ -507,12 +572,12 @@ const FournisseursAdvanced: React.FC = () => {
                     onChange={(e) =>
                       setFormData({ ...formData, ville: e.target.value })
                     }
-                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                    className="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                     required
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                     Code postal *
                   </label>
                   <input
@@ -521,12 +586,12 @@ const FournisseursAdvanced: React.FC = () => {
                     onChange={(e) =>
                       setFormData({ ...formData, code_postal: e.target.value })
                     }
-                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                    className="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                     required
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                     Pays *
                   </label>
                   <input
@@ -535,7 +600,7 @@ const FournisseursAdvanced: React.FC = () => {
                     onChange={(e) =>
                       setFormData({ ...formData, pays: e.target.value })
                     }
-                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                    className="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                     required
                   />
                 </div>
@@ -544,7 +609,7 @@ const FournisseursAdvanced: React.FC = () => {
               {/* Contact Info */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                     Téléphone
                   </label>
                   <input
@@ -553,11 +618,11 @@ const FournisseursAdvanced: React.FC = () => {
                     onChange={(e) =>
                       setFormData({ ...formData, telephone: e.target.value })
                     }
-                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                    className="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                     Email
                   </label>
                   <input
@@ -566,7 +631,7 @@ const FournisseursAdvanced: React.FC = () => {
                     onChange={(e) =>
                       setFormData({ ...formData, email: e.target.value })
                     }
-                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                    className="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                   />
                 </div>
               </div>
@@ -574,7 +639,7 @@ const FournisseursAdvanced: React.FC = () => {
               {/* Business Info */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                     Site web
                   </label>
                   <input
@@ -583,11 +648,11 @@ const FournisseursAdvanced: React.FC = () => {
                     onChange={(e) =>
                       setFormData({ ...formData, site_web: e.target.value })
                     }
-                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                    className="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                   />
                 </div>
                 <div>
-                  <label className="block text-sm font-medium text-gray-700">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                     Délai livraison moyen (jours)
                   </label>
                   <input
@@ -599,13 +664,13 @@ const FournisseursAdvanced: React.FC = () => {
                         delai_livraison_moyen: e.target.value,
                       })
                     }
-                    className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                    className="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                   Conditions de paiement
                 </label>
                 <textarea
@@ -616,7 +681,7 @@ const FournisseursAdvanced: React.FC = () => {
                       conditions_paiement: e.target.value,
                     })
                   }
-                  className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                  className="mt-1 block w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md shadow-sm focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100"
                   rows={2}
                 />
               </div>
@@ -624,13 +689,13 @@ const FournisseursAdvanced: React.FC = () => {
               {/* Contacts */}
               <div>
                 <div className="flex justify-between items-center mb-3">
-                  <label className="block text-sm font-medium text-gray-700">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300">
                     Contacts
                   </label>
                   <button
                     type="button"
                     onClick={addContact}
-                    className="text-blue-600 hover:text-blue-800 text-sm"
+                    className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 text-sm"
                   >
                     + Ajouter un contact
                   </button>
@@ -638,16 +703,16 @@ const FournisseursAdvanced: React.FC = () => {
                 {formData.contacts.map((contact, index) => (
                   <div
                     key={index}
-                    className="border border-gray-200 rounded-lg p-4 mb-3"
+                    className="border border-gray-200 dark:border-gray-600 rounded-lg p-4 mb-3 bg-gray-50 dark:bg-gray-700"
                   >
                     <div className="flex justify-between items-center mb-3">
-                      <span className="text-sm font-medium text-gray-700">
+                      <span className="text-sm font-medium text-gray-700 dark:text-gray-300">
                         Contact {index + 1}
                       </span>
                       <button
                         type="button"
                         onClick={() => removeContact(index)}
-                        className="text-red-600 hover:text-red-800 text-sm"
+                        className="text-red-600 hover:text-red-800 dark:text-red-400 dark:hover:text-red-300 text-sm"
                       >
                         Supprimer
                       </button>
@@ -660,7 +725,7 @@ const FournisseursAdvanced: React.FC = () => {
                         onChange={(e) =>
                           updateContact(index, "nom", e.target.value)
                         }
-                        className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                        className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400"
                       />
                       <input
                         type="text"
@@ -669,7 +734,7 @@ const FournisseursAdvanced: React.FC = () => {
                         onChange={(e) =>
                           updateContact(index, "prenom", e.target.value)
                         }
-                        className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                        className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400"
                       />
                       <input
                         type="tel"
@@ -678,7 +743,7 @@ const FournisseursAdvanced: React.FC = () => {
                         onChange={(e) =>
                           updateContact(index, "telephone", e.target.value)
                         }
-                        className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                        className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400"
                       />
                       <input
                         type="email"
@@ -687,7 +752,7 @@ const FournisseursAdvanced: React.FC = () => {
                         onChange={(e) =>
                           updateContact(index, "email", e.target.value)
                         }
-                        className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500"
+                        className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400"
                       />
                       <input
                         type="text"
@@ -696,7 +761,7 @@ const FournisseursAdvanced: React.FC = () => {
                         onChange={(e) =>
                           updateContact(index, "poste", e.target.value)
                         }
-                        className="px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 md:col-span-2"
+                        className="px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-blue-500 focus:border-blue-500 bg-white dark:bg-gray-700 text-gray-900 dark:text-gray-100 placeholder-gray-500 dark:placeholder-gray-400 md:col-span-2"
                       />
                     </div>
                   </div>
@@ -707,13 +772,13 @@ const FournisseursAdvanced: React.FC = () => {
                 <button
                   type="button"
                   onClick={() => setShowModal(false)}
-                  className="px-4 py-2 text-gray-700 bg-gray-200 rounded-md hover:bg-gray-300"
+                  className="px-4 py-2 text-gray-700 dark:text-gray-300 bg-gray-200 dark:bg-gray-600 rounded-md hover:bg-gray-300 dark:hover:bg-gray-500"
                 >
                   Annuler
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+                  className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 dark:bg-blue-700 dark:hover:bg-blue-800"
                 >
                   {editingFournisseur ? "Modifier" : "Ajouter"}
                 </button>
@@ -726,12 +791,12 @@ const FournisseursAdvanced: React.FC = () => {
       {/* Detail Modal */}
       {showDetailModal && viewingFournisseur && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-          <div className="bg-white rounded-lg p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+          <div className="bg-white dark:bg-gray-800 rounded-lg p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
             <div className="flex justify-between items-center mb-4">
-              <h2 className="text-xl font-bold">Détails du fournisseur</h2>
+              <h2 className="text-xl font-bold text-gray-900 dark:text-gray-100">Détails du fournisseur</h2>
               <button
                 onClick={() => setShowDetailModal(false)}
-                className="text-gray-400 hover:text-gray-600"
+                className="text-gray-400 hover:text-gray-600 dark:text-gray-500 dark:hover:text-gray-300"
               >
                 ✕
               </button>
@@ -740,26 +805,26 @@ const FournisseursAdvanced: React.FC = () => {
             <div className="space-y-4">
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <span className="text-sm font-medium text-gray-500">
+                  <span className="text-sm font-medium text-gray-500 dark:text-gray-400">
                     Nom:
                   </span>
-                  <p className="text-gray-900">{viewingFournisseur.nom}</p>
+                  <p className="text-gray-900 dark:text-gray-100">{viewingFournisseur.nom}</p>
                 </div>
                 <div>
-                  <span className="text-sm font-medium text-gray-500">
+                  <span className="text-sm font-medium text-gray-500 dark:text-gray-400">
                     Code:
                   </span>
-                  <p className="text-gray-900">
+                  <p className="text-gray-900 dark:text-gray-100">
                     {viewingFournisseur.code_fournisseur}
                   </p>
                 </div>
               </div>
 
               <div>
-                <span className="text-sm font-medium text-gray-500">
+                <span className="text-sm font-medium text-gray-500 dark:text-gray-400">
                   Adresse complète:
                 </span>
-                <p className="text-gray-900">
+                <p className="text-gray-900 dark:text-gray-100">
                   {viewingFournisseur.adresse}
                   <br />
                   {viewingFournisseur.code_postal} {viewingFournisseur.ville}
@@ -770,18 +835,18 @@ const FournisseursAdvanced: React.FC = () => {
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <span className="text-sm font-medium text-gray-500">
+                  <span className="text-sm font-medium text-gray-500 dark:text-gray-400">
                     Téléphone:
                   </span>
-                  <p className="text-gray-900">
+                  <p className="text-gray-900 dark:text-gray-100">
                     {viewingFournisseur.telephone || "Non renseigné"}
                   </p>
                 </div>
                 <div>
-                  <span className="text-sm font-medium text-gray-500">
+                  <span className="text-sm font-medium text-gray-500 dark:text-gray-400">
                     Email:
                   </span>
-                  <p className="text-gray-900">
+                  <p className="text-gray-900 dark:text-gray-100">
                     {viewingFournisseur.email || "Non renseigné"}
                   </p>
                 </div>
@@ -789,15 +854,15 @@ const FournisseursAdvanced: React.FC = () => {
 
               {viewingFournisseur.site_web && (
                 <div>
-                  <span className="text-sm font-medium text-gray-500">
+                  <span className="text-sm font-medium text-gray-500 dark:text-gray-400">
                     Site web:
                   </span>
-                  <p className="text-gray-900">
+                  <p className="text-gray-900 dark:text-gray-100">
                     <a
                       href={viewingFournisseur.site_web}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-blue-600 hover:underline"
+                      className="text-blue-600 hover:underline dark:text-blue-400"
                     >
                       {viewingFournisseur.site_web}
                     </a>
@@ -807,10 +872,10 @@ const FournisseursAdvanced: React.FC = () => {
 
               {viewingFournisseur.conditions_paiement && (
                 <div>
-                  <span className="text-sm font-medium text-gray-500">
+                  <span className="text-sm font-medium text-gray-500 dark:text-gray-400">
                     Conditions de paiement:
                   </span>
-                  <p className="text-gray-900">
+                  <p className="text-gray-900 dark:text-gray-100">
                     {viewingFournisseur.conditions_paiement}
                   </p>
                 </div>
@@ -818,10 +883,10 @@ const FournisseursAdvanced: React.FC = () => {
 
               {viewingFournisseur.delai_livraison_moyen && (
                 <div>
-                  <span className="text-sm font-medium text-gray-500">
+                  <span className="text-sm font-medium text-gray-500 dark:text-gray-400">
                     Délai de livraison moyen:
                   </span>
-                  <p className="text-gray-900">
+                  <p className="text-gray-900 dark:text-gray-100">
                     {viewingFournisseur.delai_livraison_moyen} jours
                   </p>
                 </div>
@@ -830,25 +895,25 @@ const FournisseursAdvanced: React.FC = () => {
               {viewingFournisseur.contacts &&
                 viewingFournisseur.contacts.length > 0 && (
                   <div>
-                    <span className="text-sm font-medium text-gray-500">
+                    <span className="text-sm font-medium text-gray-500 dark:text-gray-400">
                       Contacts:
                     </span>
                     <div className="mt-2 space-y-2">
                       {viewingFournisseur.contacts.map((contact, index) => (
-                        <div key={index} className="bg-gray-50 p-3 rounded">
-                          <p className="font-medium">
+                        <div key={index} className="bg-gray-50 dark:bg-gray-700 p-3 rounded">
+                          <p className="font-medium text-gray-900 dark:text-gray-100">
                             {contact.prenom} {contact.nom}
                           </p>
                           {contact.poste && (
-                            <p className="text-sm text-gray-600">
+                            <p className="text-sm text-gray-600 dark:text-gray-400">
                               {contact.poste}
                             </p>
                           )}
                           {contact.telephone && (
-                            <p className="text-sm">{contact.telephone}</p>
+                            <p className="text-sm text-gray-900 dark:text-gray-100">{contact.telephone}</p>
                           )}
                           {contact.email && (
-                            <p className="text-sm">{contact.email}</p>
+                            <p className="text-sm text-gray-900 dark:text-gray-100">{contact.email}</p>
                           )}
                         </div>
                       ))}
@@ -856,7 +921,7 @@ const FournisseursAdvanced: React.FC = () => {
                   </div>
                 )}
 
-              <div className="grid grid-cols-2 gap-4 text-sm text-gray-500">
+              <div className="grid grid-cols-2 gap-4 text-sm text-gray-500 dark:text-gray-400">
                 <div>
                   <span className="font-medium">Créé le:</span>
                   <p>
