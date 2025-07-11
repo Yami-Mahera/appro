@@ -3,7 +3,7 @@ import json
 from datetime import datetime, timedelta
 
 # Configuration
-BASE_URL = "https://4fd6b5a8-f5b9-4094-81f8-79e6e8445b9c.preview.emergentagent.com/api"
+BASE_URL = "https://b9825217-ce0e-4ec4-ab99-809c8d682176.preview.emergentagent.com/api"
 ADMIN_CREDENTIALS = {
     "email": "admin@test.com",
     "password": "admin123"
