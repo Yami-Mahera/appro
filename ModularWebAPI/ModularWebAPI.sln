@@ -3,6 +3,10 @@ Microsoft Visual Studio Solution File, Format Version 12.00
 # Visual Studio Version 17
 VisualStudioVersion = 17.0.31903.59
 MinimumVisualStudioVersion = 10.0.40219.1
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "src", "src", "{E5DD80C5-9FE9-4011-976F-858CE8DB723B}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ModularWebAPI", "src\ModularWebAPI\ModularWebAPI.csproj", "{40880E4D-DD56-4DBB-9E2A-D19CF5251DFA}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -10,5 +14,14 @@ Global
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{40880E4D-DD56-4DBB-9E2A-D19CF5251DFA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{40880E4D-DD56-4DBB-9E2A-D19CF5251DFA}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{40880E4D-DD56-4DBB-9E2A-D19CF5251DFA}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{40880E4D-DD56-4DBB-9E2A-D19CF5251DFA}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{40880E4D-DD56-4DBB-9E2A-D19CF5251DFA} = {E5DD80C5-9FE9-4011-976F-858CE8DB723B}
 	EndGlobalSection
 EndGlobal
