@@ -4,7 +4,7 @@ import time
 from datetime import datetime
 
 # Configuration
-BASE_URL = "https://b9825217-ce0e-4ec4-ab99-809c8d682176.preview.emergentagent.com/api"
+BASE_URL = "https://f34ec9e4-f8d2-4f2f-8755-8a29954709c8.preview.emergentagent.com/api"
 ADMIN_USER = {
     "email": "admin@test.com",
     "password": "admin123"
