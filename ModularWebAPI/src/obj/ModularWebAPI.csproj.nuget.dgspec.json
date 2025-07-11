@@ -1,17 +1,17 @@
 {
   "format": 1,
   "restore": {
-    "/app/ModularWebAPI/ModularWebAPI.csproj": {}
+    "/app/ModularWebAPI/src/ModularWebAPI.csproj": {}
   },
   "projects": {
-    "/app/ModularWebAPI/ModularWebAPI.csproj": {
+    "/app/ModularWebAPI/src/ModularWebAPI.csproj": {
       "version": "1.0.0",
       "restore": {
-        "projectUniqueName": "/app/ModularWebAPI/ModularWebAPI.csproj",
+        "projectUniqueName": "/app/ModularWebAPI/src/ModularWebAPI.csproj",
         "projectName": "ModularWebAPI",
-        "projectPath": "/app/ModularWebAPI/ModularWebAPI.csproj",
+        "projectPath": "/app/ModularWebAPI/src/ModularWebAPI.csproj",
         "packagesPath": "/root/.nuget/packages/",
-        "outputPath": "/app/ModularWebAPI/obj/",
+        "outputPath": "/app/ModularWebAPI/src/obj/",
         "projectStyle": "PackageReference",
         "configFilePaths": [
           "/root/.nuget/NuGet/NuGet.Config"
@@ -46,6 +46,10 @@
             "Microsoft.AspNetCore.OpenApi": {
               "target": "Package",
               "version": "[8.0.18, )"
+            },
+            "Microsoft.EntityFrameworkCore.SqlServer": {
+              "target": "Package",
+              "version": "[8.0.11, )"
             },
             "Swashbuckle.AspNetCore": {
               "target": "Package",
